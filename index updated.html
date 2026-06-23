@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AHD Group — Profitability Simulator</title>
+<style>
+:root{
+  --bg:#0E0E0E; --panel:#161513; --panel2:#1C1A16; --line:#2C2A24;
+  --gold:#C9A86A; --gold2:#E0C68C; --cream:#F3EFE6; --mute:#8C857A;
+  --green:#74B27F; --red:#CE7B6B; --blue:#7BA7C9;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--cream);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1060px;margin:0 auto;padding:30px 22px 80px}
+h1{font-family:Georgia,serif;font-weight:500;letter-spacing:.3px;font-size:30px;margin:0}
+.eyebrow{color:var(--gold);font-size:11.5px;letter-spacing:3px;text-transform:uppercase;margin:0 0 8px}
+.sub{color:var(--mute);font-size:13.5px;line-height:1.6;margin:6px 0 0;max-width:690px}
+.groupbar{display:flex;align-items:center;gap:16px;margin:22px 0 6px;padding:14px 18px;
+  background:linear-gradient(180deg,#1A1813,#141310);border:1px solid var(--line);border-radius:12px}
+.groupbar .k{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mute)}
+.groupbar .v{font-family:Georgia,serif;font-size:24px}
+.panel{margin-top:30px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;scroll-margin-top:135px}
+.phead{padding:18px 22px 14px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.phead .badge{font-size:10.5px;letter-spacing:2px;text-transform:uppercase;color:#0E0E0E;background:var(--gold);
+  padding:3px 9px;border-radius:4px;font-weight:700}
+.phead h2{font-family:Georgia,serif;font-weight:500;font-size:21px;margin:0}
+.phead .tag{color:var(--mute);font-size:12.5px;margin-left:auto}
+.pbody{padding:20px 22px 24px}
+.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:20px}
+@media(max-width:680px){.ctrls{grid-template-columns:1fr}}
+.ctrl label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mute);margin-bottom:9px;letter-spacing:.3px}
+.ctrl label b{color:var(--cream);font-family:Georgia,serif;font-size:15px;font-weight:500}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:3px;background:#33302A;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;
+  background:var(--gold);cursor:pointer;border:2px solid #0E0E0E;box-shadow:0 0 0 1px var(--gold)}
+input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid #0E0E0E}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:6px}
+@media(max-width:680px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+.tile .t{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--mute)}
+.tile .n{font-family:Georgia,serif;font-size:19px;margin-top:4px}
+.tile .s{font-size:11px;color:var(--mute);margin-top:2px}
+.pos{color:var(--green)} .neg{color:var(--red)}
+.chartwrap{margin-top:18px;display:grid;grid-template-columns:1.25fr 1fr;gap:20px}
+@media(max-width:680px){.chartwrap{grid-template-columns:1fr}}
+.chartwrap .cap{font-size:11.5px;color:var(--mute);margin:0 0 6px;letter-spacing:.3px}
+svg{display:block;width:100%;height:auto}
+.note{font-size:12px;color:var(--mute);line-height:1.6;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.brk .row{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:12.5px}
+.brk .lab{width:118px;color:var(--mute)}
+.brk .barbg{flex:1;height:14px;background:#26241F;border-radius:3px;overflow:hidden}
+.brk .barfill{height:100%;background:var(--gold)}
+.brk .val{width:80px;text-align:right;font-family:Georgia,serif}
+.foot{color:var(--mute);font-size:11.5px;line-height:1.7;margin-top:40px;border-top:1px solid var(--line);padding-top:18px}
+#gate{position:fixed;inset:0;background:#0B0B0B;display:flex;align-items:center;justify-content:center;z-index:50}
+#gate .box{text-align:center}
+#gate input{margin-top:16px;background:#161513;border:1px solid var(--line);color:var(--cream);
+  padding:11px 14px;border-radius:8px;font-size:15px;text-align:center;letter-spacing:2px;width:200px}
+#gate .hint{color:var(--mute);font-size:12px;margin-top:10px}
+.navlink{font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);color:var(--mute);text-decoration:none;background:var(--panel)}
+.navlink:hover{color:var(--cream);border-color:var(--gold)}
+.seg{display:flex;gap:6px}
+.segb{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--mute);padding:9px 6px;border-radius:7px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.segb.on{background:var(--gold);color:#0E0E0E;border-color:var(--gold);font-weight:700}
+.segb:hover{border-color:var(--gold)}
+</style>
+</head>
+<body>
+
+<div id="gate"><div class="box">
+  <div class="eyebrow">Amr Helmy Designs</div>
+  <div style="font-family:Georgia,serif;font-size:26px">Profitability Simulator</div>
+  <div><input id="gpw" type="password" placeholder="enter password" autofocus></div>
+  <div class="hint" id="ghint">&nbsp;</div>
+</div></div>
+
+<div class="wrap" id="app" style="display:none">
+  <div class="eyebrow">Amr Helmy Designs &middot; delivered-basis model, 2025 actuals</div>
+  <h1>Where the discount goes</h1>
+  <p class="sub">Move discount and watch it pull volume, then sales, then profit. Overhead is fixed each month, so volume spreads it thinner &mdash; the question every panel answers is whether the extra units win back what the discount gives away. AHD and Designy run on their own; the group panel lets AHD's sales drag the attached lines along.</p>
+
+  <div id="stickyhead" style="position:sticky;top:0;z-index:30;background:#0E0E0E;margin-top:14px;padding:8px 0 9px;border-bottom:1px solid var(--line)">
+    <div class="groupbar" style="margin:0 0 9px;padding:9px 16px">
+      <div><div class="k">Group profit / month</div><div class="v" id="gbProfit" style="font-size:20px">&mdash;</div></div>
+      <div style="margin-left:auto;text-align:right"><div class="k">Group sales / month</div><div class="v" id="gbSales" style="font-size:20px">&mdash;</div></div>
+    </div>
+    <div id="nav" style="display:flex;gap:8px;flex-wrap:wrap">
+      <a href="#sec-group" class="navlink" style="border-color:#F3EFE6;color:#F3EFE6">1 Company</a>
+      <a href="#sec-reco" class="navlink" style="border-color:#C9A86A;color:#C9A86A">2 Recommendations</a>
+      <a href="#sec-consultant" class="navlink">3 Consultant</a>
+      <a href="#sec-marketing" class="navlink" style="border-color:#74B27F;color:#74B27F">4 Marketing</a>
+      <a href="#sec-ahd" class="navlink">5 AHD</a>
+      <a href="#sec-rotto" class="navlink">6 AHD lines</a>
+      <a href="#sec-winrate" class="navlink">7 Discounts?</a>
+      <a href="#sec-designy" class="navlink">8 Designy</a>
+      <a href="#sec-insights" class="navlink">9 Summary</a>
+      <a href="#sec-playbook" class="navlink" style="border-color:#C9A86A;color:#0E0E0E;background:#C9A86A;font-weight:700">10 Playbook</a>
+    </div>
+  </div>
+
+  <!-- 1. WHOLE COMPANY (master, controls the pinned top bar) -->
+  <div class="panel" id="sec-group" style="border-color:#5a564a">
+    <div class="phead"><span class="badge" style="background:var(--cream)">1</span><h2>1 &middot; The whole company</h2>
+      <span class="tag">this drives the number pinned at the top</span></div>
+    <div class="pbody">
+      <p class="sub" style="margin:0 0 16px">The master view. Set AHD and Designy discount and your monthly ad spend; the attached lines (appliances, Korsagy, Helmy&rsquo;s, sofas, marble) ride on AHD, overhead is the fixed 4.12M, and the result is what stays pinned at the top.</p>
+      <div class="ctrls" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="ctrl"><label>AHD discount <b><span id="gAD">27</span>%</b></label>
+          <input id="gADr" type="range" min="0" max="50" value="27" step="1"></div>
+        <div class="ctrl"><label>Designy discount <b><span id="gDD">32</span>%</b></label>
+          <input id="gDDr" type="range" min="0" max="50" value="32" step="1"></div>
+        <div class="ctrl"><label>Ad spend <b><span id="gMK">0</span>/mo</b></label>
+          <input id="gMKr" type="range" min="0" max="1000000" value="0" step="25000"></div>
+      </div>
+      <div class="tiles" id="gTiles"></div>
+      <p class="cap" style="margin:18px 0 4px;font-size:11.5px;color:var(--mute)">Monthly contribution by line vs the fixed overhead it must cover</p>
+      <div class="brk" id="gBrk"></div>
+      <div class="note" id="gNote"></div>
+    </div>
+  </div>
+
+  <!-- 2. ULTIMATE RECOMMENDATIONS -->
+  <div class="panel" id="sec-reco" style="border-color:#6a5a2e;background:linear-gradient(180deg,#1e1a12,#161513)">
+    <div class="phead" style="border-color:#3a3424"><span class="badge">Bottom line</span><h2>2 &middot; My ultimate recommendations</h2>
+      <span class="tag">ranked by impact</span></div>
+    <div class="pbody">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex:0 0 28px;height:28px;border-radius:50%;background:var(--gold);color:#0E0E0E;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center">1</div>
+          <div><b style="font-family:Georgia,serif;font-size:15.5px;color:#F3EFE6">Overhead is the lever, not pricing.</b><br><span style="font-size:12.5px;color:var(--mute);line-height:1.6">4.12M/month, 56% of it salaries. The group only breaks even because AHD&rsquo;s profit covers Designy&rsquo;s loss. <b style="color:var(--green)">Every 10% trimmed &asymp; +0.4M/month</b>, straight to the bottom line &mdash; a bigger, more reliable gain than any pricing move.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex:0 0 28px;height:28px;border-radius:50%;background:var(--gold);color:#0E0E0E;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center">2</div>
+          <div><b style="font-family:Georgia,serif;font-size:15.5px;color:#F3EFE6">Stop over-discounting AHD projects.</b><br><span style="font-size:12.5px;color:var(--mute);line-height:1.6">Deals you won averaged 23.6% discount; deals you lost, 24.8%. Discount doesn&rsquo;t close projects &mdash; some of your biggest landed at 3&ndash;7%. <b style="color:var(--green)">Holding toward 15% &asymp; +0.5M/month</b> with no measured hit to win-rate.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex:0 0 28px;height:28px;border-radius:50%;background:var(--gold);color:#0E0E0E;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center">3</div>
+          <div><b style="font-family:Georgia,serif;font-size:15.5px;color:#F3EFE6">Fix Designy&rsquo;s unit economics &mdash; or cap it.</b><br><span style="font-size:12.5px;color:var(--mute);line-height:1.6">It loses ~0.9M/month: each module earns ~4k after material against ~10k of overhead. <b style="color:var(--cream)">Raise price-per-module or cut the 47% material cost</b> &mdash; discounting it only adds loss-making volume. Don&rsquo;t scale it until the per-module math works.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex:0 0 28px;height:28px;border-radius:50%;background:var(--gold);color:#0E0E0E;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center">4</div>
+          <div><b style="font-family:Georgia,serif;font-size:15.5px;color:#F3EFE6">Lean into Rotto and Bauhaus.</b><br><span style="font-size:12.5px;color:var(--mute);line-height:1.6">Rotto wardrobes throw off <b style="color:var(--cream)">~42.5k gross profit per module</b> and Bauhaus <b style="color:var(--cream)">~30.8k</b> &mdash; both well above a Maximalism kitchen&rsquo;s ~20k. Weight sales and factory capacity toward your higher-margin lines, and convert more of those Bauhaus quotes that sit un-closed.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex:0 0 28px;height:28px;border-radius:50%;background:#6F685C;color:#0E0E0E;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center">5</div>
+          <div><b style="font-family:Georgia,serif;font-size:15.5px;color:#F3EFE6">Don&rsquo;t load factory overhead onto resale.</b><br><span style="font-size:12.5px;color:var(--mute);line-height:1.6">Appliances and marble run at 80% material &mdash; near pass-through. Charge them handling only; they each add a small positive margin and shouldn&rsquo;t be made to look like losers.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex:0 0 28px;height:28px;border-radius:50%;background:#74B27F;color:#0E0E0E;font-family:Georgia,serif;font-weight:700;display:flex;align-items:center;justify-content:center">6</div>
+          <div><b style="font-family:Georgia,serif;font-size:15.5px;color:#F3EFE6">Fix the lead follow-up before spending more on ads.</b><br><span style="font-size:12.5px;color:var(--mute);line-height:1.6">Your Meta leads cost ~1,100 EGP each, but <b style="color:var(--cream)">45% never answer and 28% sit unprocessed</b> &mdash; only 1 of 289 reached a contract. The ad spend is fine; the conversion is the leak. Faster call-backs and disciplined follow-up turn the same spend from break-even to <b style="color:var(--green)">~+600k/month</b>. This is the cheapest growth lever you have.</span></div>
+        </div>
+      </div>
+      <div class="note">Use the consultant below to put numbers behind these &mdash; pull the levers you control and watch the group result, and the priority order, update.</div>
+    </div>
+  </div>
+
+  <!-- CONSULTANT -->
+  <div class="panel" id="sec-consultant">
+    <div class="phead"><span class="badge" style="background:#7BA7C9">Consultant</span><h2>3 &middot; Pull the levers, get the verdict</h2>
+      <span class="tag">you set it &middot; it advises</span></div>
+    <div class="pbody">
+      <p class="sub" style="margin:0 0 18px">Set the variables you actually control. The model recomputes group profit on your delivered-basis numbers and ranks what would move it most from where you&rsquo;ve put the sliders.</p>
+      <div class="ctrls" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="ctrl"><label>AHD discount <b><span id="co_ad">27</span>%</b></label><input id="co_adr" type="range" min="0" max="45" value="27"></div>
+        <div class="ctrl"><label>Designy discount <b><span id="co_dd">32</span>%</b></label><input id="co_ddr" type="range" min="0" max="45" value="32"></div>
+        <div class="ctrl"><label>Overhead cut <b><span id="co_oh">0</span>%</b></label><input id="co_ohr" type="range" min="0" max="30" value="0"></div>
+        <div class="ctrl"><label>AHD material cost <b><span id="co_ac">35</span>%</b></label><input id="co_acr" type="range" min="28" max="42" value="35"></div>
+        <div class="ctrl"><label>Designy material cost <b><span id="co_dc">47</span>%</b></label><input id="co_dcr" type="range" min="38" max="54" value="47"></div>
+        <div class="ctrl"><label>Designy scale <b><span id="co_ds">100</span>%</b></label><input id="co_dsr" type="range" min="0" max="160" value="100"></div>
+      </div>
+      <div class="tiles" id="conTiles"></div>
+      <p class="cap" style="font-size:11.5px;color:var(--mute);margin:18px 0 6px">Consultant&rsquo;s recommendations from here &mdash; biggest profit impact first</p>
+      <div class="brk" id="conRecs"></div>
+      <div class="note" id="conNote"></div>
+    </div>
+  </div>
+
+  <!-- MARKETING -->
+  <div class="panel" id="sec-marketing">
+    <div class="phead"><span class="badge" style="background:#74B27F">Marketing</span><h2>4 &middot; The gas pedal &mdash; on your real Meta data</h2>
+      <span class="tag">289 leads &middot; May&ndash;Jun 2026</span></div>
+    <div class="pbody">
+      <p class="sub" style="margin:0 0 16px">Now grounded in your actual Meta funnel: <b>1,100 EGP per lead</b> (blended over two weeks), demand is kitchen-led (42%) with wardrobe meaningful (21%), and at a ~330k average deal the economics are strongly positive once leads convert. The catch is the leak &mdash; <b>45% of leads never answer and 28% sit unprocessed</b>. Cost-per-lead and the funnel are from your data; lead&rarr;contract conversion is the dial to watch.</p>
+      <div class="tiles" style="margin-bottom:18px">
+        <div class="tile"><div class="t">Cost / lead</div><div class="n">1,100</div><div class="s">EGP, blended real</div></div>
+        <div class="tile"><div class="t">Leads / 5 wks</div><div class="n">289</div><div class="s">kitchen 42% &middot; ward 21%</div></div>
+        <div class="tile"><div class="t">Leads reached</div><div class="n neg">~30%</div><div class="s">45% no-answer, 28% idle</div></div>
+        <div class="tile"><div class="t">Reached contract</div><div class="n neg">1</div><div class="s">funnel still young</div></div>
+      </div>
+      <div class="ctrls" style="grid-template-columns:1fr 1fr 1fr">
+        <div class="ctrl"><label>Marketing spend <b><span id="mkt_s">300k</span>/mo</b></label><input id="mkt_sr" type="range" min="0" max="1500000" step="25000" value="300000"></div>
+        <div class="ctrl"><label>Lead &rarr; contract <b><span id="mkt_c">1.5</span>%</b></label><input id="mkt_cr" type="range" min="0.5" max="6" step="0.5" value="1.5"></div>
+        <div class="ctrl"><label>Avg deal value <b><span id="mkt_v">330k</span></b></label><input id="mkt_vr" type="range" min="100000" max="800000" step="25000" value="330000"></div>
+      </div>
+      <div class="ctrl" style="margin-bottom:6px"><label>Lead is for</label><div id="mktSeg" class="seg" style="flex-wrap:wrap"></div></div>
+      <div class="tiles" id="mktTiles" style="margin-top:14px"></div>
+      <p class="cap" style="font-size:11.5px;color:var(--mute);margin:18px 0 6px">Your real funnel, May&ndash;Jun 2026 &mdash; where the leads go</p>
+      <div class="brk" id="mktFunnel"></div>
+      <div class="note" id="mktNote"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="sec-ahd">
+    <div class="phead"><span class="badge">AHD</span><h2>5 &middot; Maximalism &amp; Rotto</h2>
+      <span class="tag">premium kitchens &amp; wardrobes &middot; built at Badr</span></div>
+    <div class="pbody">
+      <div class="ctrls">
+        <div class="ctrl"><label>Discount <b><span id="aD">27</span>%</b></label>
+          <input id="aDr" type="range" min="0" max="50" value="27" step="1"></div>
+        <div class="ctrl"><label>Volume response to discount <b><span id="aE">0.0</span>&times;</b></label>
+          <input id="aEr" type="range" min="0" max="6" value="0" step="0.1">
+          <div style="font-size:11px;color:var(--mute);margin-top:6px">Fitted from 2025+2026 delivered data: <b style="color:#9AA7B5">0.0</b> &mdash; flat (correlation ~0.00; 2026 even negative). Discounting AHD does nothing for volume.</div></div>
+      </div>
+      <div class="tiles" id="aTiles"></div>
+      <div class="chartwrap">
+        <div><p class="cap">Profit vs discount (units respond)</p><div id="aChart"></div></div>
+        <div><p class="cap">Per-module economics at this setting</p><div id="aUnit"></div></div>
+      </div>
+      <div class="note" id="aNote"></div>
+    </div>
+  </div>
+
+  <!-- AHD SUB-LINES: MAXIMALISM / BAUHAUS / ROTTO -->
+  <div class="panel" id="sec-rotto">
+    <div class="phead"><span class="badge">AHD lines</span><h2>6 &middot; Inside AHD: Maximalism, Bauhaus &amp; Rotto</h2>
+      <span class="tag">delivered 2025 &middot; set each discount</span></div>
+    <div class="pbody">
+      <p class="sub" style="margin:0 0 18px">AHD is really three lines with very different economics. Set the discount on each and compare what it keeps per module of factory output. Volume is held flat &mdash; AHD volume doesn&rsquo;t follow discount &mdash; so the slider moves margin, not units.</p>
+      <div id="ahdLines"></div>
+      <div class="note" id="ahdLinesNote"></div>
+    </div>
+  </div>
+
+  <!-- WIN-RATE EVIDENCE -->
+  <div class="panel" id="sec-winrate">
+    <div class="phead"><span class="badge" style="background:#7BA7C9">Evidence</span><h2>7 &middot; Do discounts win AHD deals?</h2>
+      <span class="tag">quote &rarr; order, 2025&ndash;26</span></div>
+    <div class="pbody">
+      <p class="sub" style="margin:0 0 18px">Tested at the deal level: of every high-ticket AHD quote, did a bigger discount make it more likely to convert into an order? It didn&rsquo;t.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+        <div class="tile" style="padding:16px"><div class="t">High-ticket deals you WON</div><div class="n pos" style="font-size:26px">23.6%</div><div class="s">average discount given</div></div>
+        <div class="tile" style="padding:16px"><div class="t">High-ticket deals you LOST</div><div class="n neg" style="font-size:26px">24.8%</div><div class="s">average discount &mdash; <b>more</b> than the wins</div></div>
+      </div>
+      <p style="font-size:13px;color:var(--mute);line-height:1.6;margin:0 0 16px">Win-rate stays ~33% whether the quote carried 0% or 40% off, and the deals you <i>lost</i> were discounted harder than the deals you won. Discount tracks the size and type of project &mdash; it isn&rsquo;t the lever that closes it.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div style="background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+          <div style="font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--green);margin-bottom:8px">Won at near-zero</div>
+          <div style="font-size:12.5px;color:var(--mute);line-height:1.8">Ahmed Mourad &mdash; ordered 3.48M at <b style="color:var(--cream)">3%</b><br>Ail Shorbagy &mdash; quoted 1.3M at <b style="color:var(--cream)">4%</b><br>Arwa Gouda &mdash; quoted at <b style="color:var(--cream)">0%</b></div></div>
+        <div style="background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+          <div style="font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Won at deep discount</div>
+          <div style="font-size:12.5px;color:var(--mute);line-height:1.8">Ahmed Heshmat &mdash; 5.71M at 50%<br>Mohamed Adel &mdash; 6.26M at 42%<br>Gaber ElHoushy &mdash; 3.59M at 50%</div></div>
+        <div style="background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:12px 14px">
+          <div style="font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--red);margin-bottom:8px">Lost despite deep discount</div>
+          <div style="font-size:12.5px;color:var(--mute);line-height:1.8">Hatem Samir &mdash; 13.2M at 29%<br>Ahmed ElGishy &mdash; 5.85M at <b style="color:var(--cream)">41%</b><br>Hossam Ghali &mdash; 5.07M at 36%</div></div>
+      </div>
+      <div style="margin-top:20px;background:linear-gradient(180deg,#16201c,#141513);border:1px solid #2f4a3a;border-radius:11px;padding:18px 20px">
+        <div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--green);margin-bottom:6px">Recommendation</div>
+        <div style="font-family:Georgia,serif;font-size:18px;color:#F3EFE6;margin-bottom:12px">Cap AHD project discounts at 15%, and make anything deeper an exception that must be earned.</div>
+        <div style="font-size:12.5px;color:var(--mute);line-height:1.7">
+          <b style="color:var(--cream)">1. Set a hard 15% ceiling on AHD quotes.</b> Above it requires manager sign-off and a written reason. The data shows no win-rate gain beyond ~15% &mdash; lost deals were discounted <i>more</i> than won ones.<br>
+          <b style="color:var(--cream)">2. Re-train the pitch: sell design, not price.</b> Reps should open on quality, lead time and finish &mdash; discount is a closing concession of last resort, not an opener.<br>
+          <b style="color:var(--cream)">3. Tier by buyer signal, not deal size.</b> A buyer who has chosen AHD pays near list; reserve real depth only for a genuine price-shopper who is about to walk.<br>
+          <b style="color:var(--cream)">4. Make discipline visible.</b> Review each rep&rsquo;s average discount and win-rate monthly; reward margin held, not revenue booked at any cost.
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid #2f4a3a;font-size:12.5px;color:#F3EFE6"><b>Expected impact:</b> moving the book from ~27% toward 15% adds <b style="color:var(--green)">~0.5M/month</b> with no measured loss in close rate.</div>
+      </div>
+      <div class="note">Honest caveat: this matches quotes to orders at the <b>customer</b> level (the files don&rsquo;t tie a single quote to its order), so it can&rsquo;t prove discount never rescues a specific price-sensitive buyer. But across 172 high-ticket deals the pattern is consistent &mdash; the discount isn&rsquo;t what closes them, so projects that would land anyway are leaving margin on the table.</div>
+    </div>
+  </div>
+
+  <div class="panel" id="sec-designy">
+    <div class="phead"><span class="badge">Designy</span><h2>8 &middot; Designy Twelve &middot; entry-level</h2>
+      <span class="tag">Diana / Leonardo / De Niro &middot; built at Badr</span></div>
+    <div class="pbody">
+      <div class="ctrls">
+        <div class="ctrl"><label>Discount <b><span id="dD">32</span>%</b></label>
+          <input id="dDr" type="range" min="0" max="50" value="32" step="1"></div>
+        <div class="ctrl"><label>Volume response to discount <b><span id="dE">4.9</span>&times;</b></label>
+          <input id="dEr" type="range" min="0" max="6" value="4.9" step="0.1">
+          <div style="font-size:11px;color:var(--mute);margin-top:6px">Fitted from 2025+2026 delivered data: <b style="color:#74B27F">4.9</b> &mdash; strong (correlation +0.54; 2026 +0.74). Designy volume really does follow discount.</div></div>
+      </div>
+      <div class="tiles" id="dTiles"></div>
+      <div class="chartwrap">
+        <div><p class="cap">Profit vs discount (units respond)</p><div id="dChart"></div></div>
+        <div><p class="cap">Per-module economics at this setting</p><div id="dUnit"></div></div>
+      </div>
+      <div class="note" id="dNote"></div>
+    </div>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="panel" id="sec-insights">
+    <div class="phead"><span class="badge" style="background:#9AA7B5">Summary</span><h2>9 &middot; What the numbers say</h2>
+      <span class="tag">the four things that decide profit</span></div>
+    <div class="pbody">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 9px 9px 0;padding:14px 16px">
+          <div style="font-family:Georgia,serif;font-size:16px;margin-bottom:5px">AHD: you&rsquo;re over-discounting</div>
+          <div style="font-size:12.5px;color:var(--mute);line-height:1.6">At the deal level, discount doesn&rsquo;t win AHD projects: the high-ticket deals you <b>won</b> averaged 23.6% discount, the ones you <b>lost</b> 24.8% &mdash; lost deals were discounted <i>more</i>, and some big projects closed at 3&ndash;7%. <b style="color:var(--cream)">Holding firmer toward 15% adds ~0.5M/month</b> with no hit to win-rate. Test it deal by deal.</div></div>
+        <div style="background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--red);border-radius:0 9px 9px 0;padding:14px 16px">
+          <div style="font-family:Georgia,serif;font-size:16px;margin-bottom:5px">Designy: structural loss</div>
+          <div style="font-size:12.5px;color:var(--mute);line-height:1.6">Each Designy module earns <b style="color:var(--red)">~4k</b> after material against <b>~10k</b> of overhead. Its volume <i>does</i> follow discount (+0.54), but more volume can&rsquo;t close a per-module gap that size. The fix is price-per-module up or the <b>47% material cost</b> down &mdash; not discounting.</div></div>
+        <div style="background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:14px 16px">
+          <div style="font-family:Georgia,serif;font-size:16px;margin-bottom:5px">Overhead is the lever</div>
+          <div style="font-size:12.5px;color:var(--mute);line-height:1.6">4.12M/month, of which <b style="color:var(--cream)">salaries are 52%</b>. The group only reaches breakeven because AHD&rsquo;s profit covers Designy&rsquo;s loss. Pricing is a small dial next to this &mdash; every 100k/mo trimmed from overhead drops almost straight to profit.</div></div>
+        <div style="background:var(--panel2);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:0 9px 9px 0;padding:14px 16px">
+          <div style="font-family:Georgia,serif;font-size:16px;margin-bottom:5px">Don&rsquo;t over-charge resale</div>
+          <div style="font-size:12.5px;color:var(--mute);line-height:1.6">Appliances and marble run at <b>80% material</b> &mdash; near pass-through. They never touch the factory, so charging them factory overhead makes them look like losers when they actually add a small positive margin. Charge them handling only.</div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1.15fr;gap:22px;margin-top:22px">
+        <div>
+          <p class="cap" style="font-size:11.5px;color:var(--mute);margin:0 0 8px">Where the 4.12M overhead goes</p>
+          <div id="ohBreak"></div>
+        </div>
+        <div>
+          <p class="cap" style="font-size:11.5px;color:var(--mute);margin:0 0 8px">Net margin by line (after material + its fair overhead)</p>
+          <div id="lineMarg"></div>
+        </div>
+      </div>
+      <div class="note" id="insNote"></div>
+    </div>
+  </div>
+
+  <!-- SALES PLAYBOOK -->
+  <div class="panel" id="sec-playbook">
+    <div class="phead"><span class="badge" style="background:var(--gold)">Playbook</span><h2>10 &middot; Tell the rep what discount to give</h2>
+      <span class="tag">tap &amp; read &middot; rep-facing</span></div>
+    <div class="pbody">
+      <p class="sub" style="margin:0 0 18px">The rep taps the brand and the kind of buyer; the tool sets the discount from your data. They only enter the quote size &mdash; no dial to fiddle with.</p>
+      <div class="ctrls" style="grid-template-columns:1fr 1.4fr">
+        <div class="ctrl"><label>Brand</label><div id="pbBrand" class="seg"></div></div>
+        <div class="ctrl"><label>Buyer type</label><div id="pbBuyer" class="seg"></div></div>
+      </div>
+      <div class="ctrl" style="margin-bottom:18px"><label>Quote value at full price <b><span id="pbQV">250k</span></b></label>
+        <input id="pbQ" type="range" min="30000" max="2000000" step="10000" value="250000"></div>
+      <div class="tiles" id="pbTiles"></div>
+      <div class="note" id="pbNote"></div>
+    </div>
+  </div>
+
+  <div class="foot" id="foot"></div>
+</div>
+
+<script>
+var AHD={list:50900, baseD:0.273, baseV:139, cogs:0.351, ohFix:2350000, mpo:8.97};
+var DES={list:10322, baseD:0.324, baseV:155, cogs:0.468, ohFix:1490000, mpo:7.05};
+var ATT=[ {n:'Appliances',r:0.1284,cogs:0.80},
+          {n:'Korsagy',r:0.0292,cogs:0.45},
+          {n:'Helmy dining',r:0.0253,cogs:0.44},
+          {n:'YNG sofa',r:0.0097,cogs:0.33},
+          {n:'Esspresso',r:0.0049,cogs:0.30},
+          {n:'Marble/Corian',r:0.0175,cogs:0.78} ];
+var GROUP_OH=4124604;
+
+function $(id){return document.getElementById(id);}
+function m(x){ var s=x<0?'-':''; x=Math.abs(x);
+  if(x>=1e6) return s+(x/1e6).toFixed(2)+'M';
+  if(x>=1e3) return s+Math.round(x/1e3)+'k';
+  return s+Math.round(x); }
+function k(x){ return Math.round(x/1e3)+'k'; }
+function pn(x){ return x>=0?'pos':'neg'; }
+
+function comp(b,d,E){
+  var vol=b.baseV*(1+E*(d-b.baseD));
+  if(vol<b.baseV*0.2) vol=b.baseV*0.2;
+  if(vol>b.baseV*2.6) vol=b.baseV*2.6;
+  var net=vol*b.list*(1-d);
+  var contrib=net*(1-b.cogs);
+  var profit=contrib-b.ohFix;
+  var orders=vol/b.mpo;
+  return {vol:vol, orders:orders, net:net, contrib:contrib, oh:b.ohFix, profit:profit, cogs:b.cogs,
+          ohMod:b.ohFix/vol, ohOrd:b.ohFix/orders, gpMod:contrib/vol};
+}
+function attached(netAHD){
+  var rev=0, con=0, rows=[];
+  for(var i=0;i<ATT.length;i++){ var a=ATT[i]; var rv=a.r*netAHD; var cn=rv*(1-a.cogs);
+    rev+=rv; con+=cn; rows.push({n:a.n, rev:rv, con:cn}); }
+  return {rev:rev, con:con, rows:rows};
+}
+
+function curve(b,d,E){
+  var W=360,H=210,L=44,R=12,T=14,B=30, x1=0.50, n=60;
+  var pts=[],min=1e15,max=-1e15;
+  for(var i=0;i<=n;i++){ var dd=x1*i/n; var p=comp(b,dd,E).profit; pts.push([dd,p]);
+    if(p<min)min=p; if(p>max)max=p; }
+  if(max<0)max=0; if(min>0)min=0; var pad=(max-min)*0.12||1; min-=pad;max+=pad;
+  function X(v){return L+v/x1*(W-L-R);}
+  function Y(v){return T+(1-(v-min)/(max-min))*(H-T-B);}
+  var path='';
+  for(i=0;i<pts.length;i++){ path+=(i?'L':'M')+X(pts[i][0]).toFixed(1)+' '+Y(pts[i][1]).toFixed(1); }
+  var zeroY=Y(0), cx=X(d), cy=Y(comp(b,d,E).profit), grid='';
+  for(var g=0;g<=5;g++){ var gv=g*0.1, gx=X(gv);
+    grid+='<line x1="'+gx+'" y1="'+T+'" x2="'+gx+'" y2="'+(H-B)+'" stroke="#221F1B"/>'
+        +'<text x="'+gx+'" y="'+(H-10)+'" fill="#6B655B" font-size="10" text-anchor="middle">'+Math.round(gv*100)+'%</text>'; }
+  return '<svg viewBox="0 0 '+W+' '+H+'">'+grid
+    +'<line x1="'+L+'" y1="'+zeroY+'" x2="'+(W-R)+'" y2="'+zeroY+'" stroke="#4A463E" stroke-dasharray="3 3"/>'
+    +'<text x="'+(L-6)+'" y="'+(zeroY+3)+'" fill="#6B655B" font-size="10" text-anchor="end">0</text>'
+    +'<path d="'+path+'" fill="none" stroke="#C9A86A" stroke-width="2"/>'
+    +'<line x1="'+cx+'" y1="'+T+'" x2="'+cx+'" y2="'+(H-B)+'" stroke="#E0C68C" stroke-opacity="0.5"/>'
+    +'<circle cx="'+cx+'" cy="'+cy+'" r="4.5" fill="#F3EFE6"/></svg>';
+}
+
+function unitView(b,d,E){
+  var r=comp(b,d,E), price=b.list*(1-d), mat=price*b.cogs, oh=r.ohMod, prof=price-mat-oh, W=300;
+  function seg(y,lab,val,col,acc){ var full=W-150, w=Math.max(2,Math.min(full,Math.abs(val)/price*full));
+    return '<text x="0" y="'+(y+11)+'" fill="#8C857A" font-size="11">'+lab+'</text>'
+      +'<rect x="118" y="'+y+'" width="'+w+'" height="14" rx="2" fill="'+col+'"/>'
+      +'<text x="'+W+'" y="'+(y+11)+'" fill="'+acc+'" font-size="11.5" text-anchor="end" font-family="Georgia,serif">'+k(val)+'</text>'; }
+  return '<svg viewBox="0 0 '+W+' 150">'
+    + seg(6,'Sale price',price,'#3A372F','#F3EFE6')
+    + seg(34,'&minus; Material',mat,'#5A4A3A','#CBB089')
+    + seg(62,'&minus; Overhead',oh,'#4A463E','#9AA7B5')
+    + '<line x1="0" y1="92" x2="'+W+'" y2="92" stroke="#2C2A24"/>'
+    + seg(100,'= Net / module',prof,(prof>=0?'#2F4A37':'#4A2F2C'),(prof>=0?'#74B27F':'#CE7B6B'))
+    + '<text x="0" y="138" fill="#6B655B" font-size="10.5">'+(prof>=0?'earns ':'loses ')+k(Math.abs(prof))+' on every module made</text>'
+    + '</svg>';
+}
+
+function tiles(el,r){
+  function t(tt,n,s,cls){ return '<div class="tile"><div class="t">'+tt+'</div><div class="n '+(cls||'')+'">'+n+'</div><div class="s">'+(s||'')+'</div></div>'; }
+  el.innerHTML=
+     t('Volume', Math.round(r.vol)+' mod', Math.round(r.orders)+' orders/mo')
+    +t('Net sales', m(r.net), '/month')
+    +t('Material', m(r.net*r.cogs), Math.round(r.cogs*100)+'% of sales')
+    +t('Contribution', m(r.contrib), 'after material')
+    +t('Overhead', m(r.oh), 'fixed / month')
+    +t('OH / module', k(r.ohMod), 'the production unit')
+    +t('Net margin', (r.profit/r.net*100).toFixed(0)+'%', 'sales \u2192 profit', pn(r.profit))
+    +t('Profit', m(r.profit), '/month', pn(r.profit));
+  el.style.gridTemplateColumns='repeat(4,1fr)';
+}
+
+function bestD(b,E){ var best=0,bp=-1e15; for(var i=0;i<=50;i++){ var dd=i/100, p=comp(b,dd,E).profit; if(p>bp){bp=p;best=dd;} } return best; }
+
+function renderAHD(){
+  var d=+$('aDr').value/100, E=+$('aEr').value;
+  $('aD').textContent=Math.round(d*100); $('aE').textContent=E.toFixed(1);
+  var r=comp(AHD,d,E); tiles($('aTiles'),r);
+  $('aChart').innerHTML=curve(AHD,d,E); $('aUnit').innerHTML=unitView(AHD,d,E);
+  var best=bestD(AHD,E);
+  $('aNote').innerHTML='At '+Math.round(d*100)+'% discount AHD turns <b class="'+pn(r.profit)+'">'+m(r.profit)+'/mo</b>. '
+    +'Confirmed at the deal level: high-ticket deals you won averaged 23.6% discount, the ones you lost 24.8% &mdash; discount doesn\u2019t decide AHD wins, so the profit curve just falls as you discount. '
+    +'Each module earns '+k(r.gpMod)+' after material and carries '+k(r.ohMod)+' of overhead.';
+}
+function renderDES(){
+  var d=+$('dDr').value/100, E=+$('dEr').value;
+  $('dD').textContent=Math.round(d*100); $('dE').textContent=E.toFixed(1);
+  var r=comp(DES,d,E); tiles($('dTiles'),r);
+  $('dChart').innerHTML=curve(DES,d,E); $('dUnit').innerHTML=unitView(DES,d,E);
+  $('dNote').innerHTML='At '+Math.round(d*100)+'% discount Designy turns <b class="'+pn(r.profit)+'">'+m(r.profit)+'/mo</b>. '
+    +'<b>Designy loses money at every discount setting</b> &mdash; from &minus;1.32M at 0% to &minus;0.70M at 50%; its best case is still a 0.70M loss. '
+    +'Discount does lift its volume (correlation +0.54), which is why the loss shrinks as you discount, but it never crosses zero: Designy keeps only '+k(r.gpMod)+' per module against '+k(r.ohMod)+' of overhead. Only a higher price per module or a lower 47% material cost fixes it &mdash; not discounting.';
+}
+
+function renderGroup(){
+  var dA=+$('gADr').value/100, dD=+$('gDDr').value/100, spend=+$('gMKr').value;
+  $('gAD').textContent=Math.round(dA*100); $('gDD').textContent=Math.round(dD*100); $('gMK').textContent=k(spend);
+  var a=comp(AHD,dA,+$('aEr').value), de=comp(DES,dD,+$('dEr').value), at=attached(a.net);
+  // ad spend -> leads (1,100 each) -> contracts (1.5%) -> kitchen sales (330k, 68.3% margin, ~9 modules each)
+  var leads=spend/1100, contracts=leads*0.015, mSales=contracts*330000, mCon=mSales*0.683, mUnits=contracts*9;
+  var gSales=a.net+de.net+at.rev+mSales;
+  var gCon=a.contrib+de.contrib+at.con+mCon;
+  var gProfit=gCon-GROUP_OH-spend;
+  var units=Math.round(a.vol+de.vol+mUnits);
+  $('gTiles').innerHTML=
+     '<div class="tile"><div class="t">Group sales</div><div class="n">'+m(gSales)+'</div><div class="s">/month</div></div>'
+    +'<div class="tile"><div class="t">Units sold</div><div class="n">'+units+'</div><div class="s">modules / mo</div></div>'
+    +'<div class="tile"><div class="t">Overhead + ads</div><div class="n">'+m(GROUP_OH+spend)+'</div><div class="s">4.12M fixed + spend</div></div>'
+    +'<div class="tile"><div class="t">Group profit</div><div class="n '+pn(gProfit)+'">'+m(gProfit)+'</div><div class="s">/month</div></div>';
+  $('gTiles').style.gridTemplateColumns='repeat(4,1fr)';
+  var rows=[{n:'AHD',v:a.contrib},{n:'Designy',v:de.contrib}], i;
+  if(mCon>0) rows.push({n:'Ad-driven',v:mCon});
+  for(i=0;i<at.rows.length;i++) rows.push({n:at.rows[i].n,v:at.rows[i].con});
+  var maxv=a.contrib, h='';
+  for(i=0;i<rows.length;i++){ var w=Math.max(2,rows[i].v/maxv*100);
+    h+='<div class="row"><div class="lab">'+rows[i].n+'</div><div class="barbg"><div class="barfill" style="width:'+w+'%;background:'+(rows[i].n==='AHD'?'#C9A86A':rows[i].n==='Designy'?'#9AA7B5':rows[i].n==='Ad-driven'?'#74B27F':'#6E665A')+'"></div></div><div class="val">'+m(rows[i].v)+'</div></div>'; }
+  h+='<div class="row" style="margin-top:12px;border-top:1px solid #2C2A24;padding-top:12px"><div class="lab" style="color:#CE7B6B">Overhead + ads</div><div class="barbg"><div class="barfill" style="width:'+((GROUP_OH+spend)/maxv*100)+'%;background:#5A3F3A"></div></div><div class="val neg">'+m(-(GROUP_OH+spend))+'</div></div>';
+  h+='<div class="row"><div class="lab" style="color:#F3EFE6;width:118px;font-family:Georgia,serif">= Net</div><div class="barbg" style="background:none"></div><div class="val '+pn(gProfit)+'">'+m(gProfit)+'</div></div>';
+  $('gBrk').innerHTML=h;
+  $('gNote').innerHTML='Pinned at the top. At '+k(spend)+'/mo ad spend the company sells <b>'+units+' modules</b> for <b>'+m(gSales)+'</b> and nets <b class="'+pn(gProfit)+'">'+m(gProfit)+'/mo</b>. '
+    +(spend>0?'Ad spend adds '+contracts.toFixed(1)+' kitchen contracts (+'+m(mSales)+' sales) at the 1.5% conversion off 1,100-EGP leads. ':'Push the ad-spend lever and watch volume and profit climb &mdash; it&rsquo;s the real growth pedal. ')
+    +'Discounting AHD doesn&rsquo;t add volume; Designy loses at any discount.';
+  $('gbProfit').innerHTML='<span class="'+pn(gProfit)+'">'+m(gProfit)+'</span>';
+  $('gbSales').textContent=m(gSales);
+}
+
+function wire(id,fn){ $(id).addEventListener('input',fn); }
+wire('aDr',function(){renderAHD();}); wire('aEr',function(){renderAHD();renderGroup();});
+wire('dDr',function(){renderDES();}); wire('dEr',function(){renderDES();renderGroup();});
+wire('gADr',function(){ $('gAD').textContent=$('gADr').value; renderGroup(); });
+wire('gDDr',function(){ $('gDD').textContent=$('gDDr').value; renderGroup(); });
+wire('gMKr',function(){ renderGroup(); });
+
+$('foot').innerHTML='Model basis: 2025 delivered orders, Badr per-order costing. AHD net 5.14M/mo at 35.1% material; Designy 1.08M/mo at 46.8%. '
+ +'Overhead 4.12M/mo (salaries already include social insurance &mdash; not double-counted). Overhead is held fixed: volume spreads it, it does not grow with units in the short run. '
+ +'Volume\u2013discount response is fitted from 2025 (delivered) and 2026 (orders) monthly data (AHD 0.0; Designy 4.9) and cross-checked at the deal level: across 172 high-ticket AHD quotes, won deals averaged 23.6% discount vs 24.8% for lost deals, so discount does not predict an AHD close. Quote\u2192order matching is at customer level. Stays editable via the &times; slider; treat as direction, not forecast. '
+ +'Attached-line ratios (appliances ~13%, Korsagy ~3%, etc.) are 2025 shares of AHD sales. A decision aid, not your management accounts.';
+
+function renderInsights(){
+  var OHB=[['Salaries (incl. insurance)',2.32,'#C9A86A'],['Transport / freight',0.44,'#6E665A'],['Marketing',0.33,'#6E665A'],['Payroll tax',0.32,'#6E665A'],['Install + custodies',0.27,'#6E665A'],['Rent + utilities',0.22,'#6E665A'],['Everything else',0.22,'#6E665A']];
+  var h='',i,w;
+  for(i=0;i<OHB.length;i++){ w=OHB[i][1]/2.32*100;
+    h+='<div class="row"><div class="lab" style="width:152px">'+OHB[i][0]+'</div><div class="barbg"><div class="barfill" style="width:'+w+'%;background:'+OHB[i][2]+'"></div></div><div class="val" style="width:62px">'+OHB[i][1].toFixed(2)+'M</div></div>'; }
+  var ob=$('ohBreak'); ob.className='brk'; ob.innerHTML=h;
+  var L=[['AHD',3.34,'65%','#C9A86A'],['Designy',0.575,'53%','#9AA7B5'],['Appliances',0.13,'20%','#6E665A'],['Korsagy',0.08,'55%','#6E665A'],['Helmy dining',0.07,'56%','#6E665A'],['YNG sofa',0.034,'67%','#6E665A'],['Esspresso',0.018,'70%','#6E665A'],['Marble/Corian',0.02,'22%','#6E665A']];
+  var h2='';
+  for(i=0;i<L.length;i++){ w=Math.max(2,L[i][1]/3.34*100);
+    h2+='<div class="row"><div class="lab" style="width:104px">'+L[i][0]+'</div><div class="barbg"><div class="barfill" style="width:'+w+'%;background:'+L[i][3]+'"></div></div><div class="val" style="width:104px">'+L[i][1].toFixed(2)+'M &middot; '+L[i][2]+'</div></div>'; }
+  var lm=$('lineMarg'); lm.className='brk'; lm.innerHTML=h2;
+  $('insNote').innerHTML='Every line earns a positive contribution &mdash; none "loses money" on its own. The figures on the right are revenue minus material; that ~4.27M pool is what pays the shared 4.12M overhead, leaving the group just above breakeven. The lines aren\u2019t the problem &mdash; the overhead they all feed is.';
+}
+
+var PB={brand:'AHD', buyer:'normal', q:250000};
+var PBREC={ AHD:{quality:0, normal:12, price:20}, Designy:{quality:10, normal:22, price:33} };
+var PBCOGS={AHD:0.351, Designy:0.468};
+function pbSeg(id,opts,cur,key){ var h='';
+  for(var i=0;i<opts.length;i++){ h+='<button data-k="'+key+'" data-v="'+opts[i][0]+'" class="segb'+(opts[i][0]===cur?' on':'')+'">'+opts[i][1]+'</button>'; }
+  $(id).innerHTML=h; }
+function renderPB(){
+  pbSeg('pbBrand',[['AHD','AHD'],['Designy','Designy']],PB.brand,'brand');
+  pbSeg('pbBuyer',[['quality','Quality'],['normal','Normal'],['price','Price shopper']],PB.buyer,'buyer');
+  var disc=PBREC[PB.brand][PB.buyer]/100, pay=PB.q*(1-disc), keep=pay*(1-PBCOGS[PB.brand]);
+  $('pbQV').textContent=k(PB.q);
+  $('pbTiles').innerHTML=
+     '<div class="tile"><div class="t">Discount to give</div><div class="n" style="color:var(--gold)">'+Math.round(disc*100)+'%</div><div class="s">recommended</div></div>'
+    +'<div class="tile"><div class="t">Customer pays</div><div class="n">'+m(pay)+'</div></div>'
+    +'<div class="tile"><div class="t">Margin kept</div><div class="n pos">'+m(keep)+'</div><div class="s">after material</div></div>'
+    +'<div class="tile"><div class="t">Material</div><div class="n">'+Math.round(PBCOGS[PB.brand]*100)+'%</div><div class="s">of what they pay</div></div>';
+  $('pbTiles').style.gridTemplateColumns='repeat(4,1fr)';
+  $('pbNote').innerHTML = PB.brand==='AHD'
+    ? 'At the deal level, AHD win-rate is flat across discount &mdash; deals you lost were discounted as heavily (24.8%) as deals you won (23.6%). So hold near list; the discount rarely buys the deal. Only concede if the buyer will genuinely walk.'
+    : 'Designy buyers <b>do</b> respond to discount (it genuinely lifts the close rate), so a real cut is worth it for a price-shopper. Just remember each Designy module still runs at a loss against overhead &mdash; chase the volume only when it fills factory time you\u2019re paying for anyway.';
+}
+function pbWire(id){ $(id).addEventListener('click',function(e){ var b=e.target;
+  if(b.getAttribute&&b.getAttribute('data-k')){ PB[b.getAttribute('data-k')]=b.getAttribute('data-v'); renderPB(); } }); }
+pbWire('pbBrand'); pbWire('pbBuyer');
+$('pbQ').addEventListener('input',function(){ PB.q=+$('pbQ').value; renderPB(); });
+
+/* ---------- CONSULTANT ---------- */
+function conGrp(dA,dD,ohCut,cA,cD,sD){
+  var ahdNet=7.07e6*(1-dA), ahdCon=ahdNet*(1-cA);
+  var dvol=155*(1+4.9*(dD-0.324))*sD; if(dvol<31)dvol=31;
+  var dNet=dvol*10322*(1-dD), dCon=dNet*(1-cD);
+  var attCon=ahdNet*0.0700;
+  var sales=ahdNet+dNet+ahdNet*0.215;
+  var oh=4.124604e6*(1-ohCut);
+  return {prof:ahdCon+dCon+attCon-oh, sales:sales};
+}
+function consult(){
+  var dA=+$('co_adr').value/100, dD=+$('co_ddr').value/100, ohCut=+$('co_ohr').value/100,
+      cA=+$('co_acr').value/100, cD=+$('co_dcr').value/100, sD=+$('co_dsr').value/100;
+  $('co_ad').textContent=Math.round(dA*100); $('co_dd').textContent=Math.round(dD*100);
+  $('co_oh').textContent=Math.round(ohCut*100); $('co_ac').textContent=Math.round(cA*100);
+  $('co_dc').textContent=Math.round(cD*100); $('co_ds').textContent=Math.round(sD*100);
+  var cur=conGrp(dA,dD,ohCut,cA,cD,sD);
+  $('conTiles').innerHTML=
+     '<div class="tile"><div class="t">Group sales</div><div class="n">'+m(cur.sales)+'</div><div class="s">/month</div></div>'
+    +'<div class="tile"><div class="t">Group profit</div><div class="n '+pn(cur.prof)+'">'+m(cur.prof)+'</div><div class="s">/month</div></div>'
+    +'<div class="tile"><div class="t">Margin</div><div class="n '+pn(cur.prof)+'">'+(cur.prof/cur.sales*100).toFixed(0)+'%</div></div>'
+    +'<div class="tile"><div class="t">Annualised</div><div class="n '+pn(cur.prof)+'">'+m(cur.prof*12)+'</div><div class="s">/year</div></div>';
+  $('conTiles').style.gridTemplateColumns='repeat(4,1fr)';
+  // candidate moves -> impact vs current
+  var recs=[];
+  if(ohCut<0.15) recs.push(['Cut overhead to \u221215% &mdash; salaries are 56% of it; this is the surest gain', conGrp(dA,dD,0.15,cA,cD,sD).prof-cur.prof]);
+  if(dA>0.15) recs.push(['Hold AHD discount at 15% &mdash; won deals averaged 23.6%, lost 24.8%, so no win-rate cost', conGrp(0.15,dD,ohCut,cA,cD,sD).prof-cur.prof]);
+  if(cD>0.42) recs.push(['Cut Designy material to 42% &mdash; the only real fix for its unit economics', conGrp(dA,dD,ohCut,cA,0.42,sD).prof-cur.prof]);
+  if(cA>0.32) recs.push(['Trim AHD material to 32% &mdash; sourcing / waste on kitchens', conGrp(dA,dD,ohCut,0.32,cD,sD).prof-cur.prof]);
+  if(sD>1.0) recs.push(['Pull Designy scale back to 100% &mdash; extra volume loses money at this material cost', conGrp(dA,dD,ohCut,cA,cD,1.0).prof-cur.prof]);
+  if(dD<0.324 && sD>=1.0) recs.push(['Designy discount does win volume (+4.9 response) &mdash; but each module still loses, so only if it fills idle capacity', conGrp(dA,0.36,ohCut,cA,cD,sD).prof-cur.prof]);
+  recs.sort(function(a,b){return b[1]-a[1];});
+  var h='', shown=0;
+  for(var i=0;i<recs.length;i++){ if(recs[i][1]<=2000) continue; shown++;
+    var w=Math.min(100,recs[i][1]/700000*100);
+    h+='<div class="row"><div class="lab" style="width:auto;flex:1;color:var(--cream);font-size:12.5px;padding-right:10px">'+recs[i][0]+'</div><div class="val '+pn(recs[i][1])+'" style="width:96px">+'+m(recs[i][1])+'/mo</div></div>'; }
+  if(!shown) h='<div style="font-size:12.5px;color:var(--green);padding:6px 0">You\u2019re at or beyond the recommended settings on every lever &mdash; this is about as good as the model gets from here. Group profit '+m(cur.prof)+'/mo.</div>';
+  $('conRecs').innerHTML=h;
+  var best = recs.length && recs[0][1]>2000 ? recs[0][0].replace(/&mdash;.*/,'').trim() : 'holding the current settings';
+  $('conNote').innerHTML='From where you\u2019ve set the sliders, the single biggest move is: <b style="color:var(--cream)">'+best+'</b>. Impacts are vs. your current settings, holding everything else fixed; AHD volume is held flat with discount (the deal-level finding), Designy volume responds.';
+}
+['co_adr','co_ddr','co_ohr','co_acr','co_dcr','co_dsr'].forEach(function(id){ $(id).addEventListener('input',consult); });
+
+/* ---------- AHD SUB-LINES (Maximalism / Bauhaus / Rotto) ---------- */
+var AHDL=[
+ {n:'Maximalism kitchen', mod:93, listmod:41100, cogs:0.317, d:27, col:'#C9A86A'},
+ {n:'Bauhaus kitchen',    mod:7,  listmod:60700, cogs:0.310, d:27, col:'#7BA7C9'},
+ {n:'Rotto wardrobe',     mod:34, listmod:90600, cogs:0.366, d:27, col:'#74B27F'}
+];
+function buildAHDL(){
+  var h='',i;
+  for(i=0;i<AHDL.length;i++){ var L=AHDL[i];
+    h+='<div style="border:1px solid var(--line);border-left:3px solid '+L.col+';border-radius:0 10px 10px 0;padding:14px 16px;margin-bottom:12px;background:var(--panel2)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px"><b style="font-family:Georgia,serif;font-size:16px">'+L.n+'</b><span style="font-size:11.5px;color:var(--mute)">'+L.mod+' modules/mo &middot; '+Math.round(L.cogs*100)+'% material</span></div>'
+      +'<label style="display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-bottom:7px">Discount <b id="al_d'+i+'" style="color:var(--cream);font-family:Georgia,serif">'+L.d+'%</b></label>'
+      +'<input type="range" min="0" max="50" value="'+L.d+'" data-li="'+i+'" style="margin-bottom:12px">'
+      +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">'
+        +'<div class="tile"><div class="t">Price / module</div><div class="n" id="al_price'+i+'" style="color:var(--cream)"></div><div class="s">what they pay</div></div>'
+        +'<div class="tile"><div class="t">Net sales</div><div class="n" id="al_net'+i+'"></div><div class="s">/mo</div></div>'
+        +'<div class="tile"><div class="t">GP / module</div><div class="n" id="al_gp'+i+'" style="color:'+L.col+'"></div><div class="s">after material</div></div>'
+        +'<div class="tile"><div class="t">Contribution</div><div class="n pos" id="al_con'+i+'"></div><div class="s">/mo</div></div>'
+      +'</div></div>';
+  }
+  $('ahdLines').innerHTML=h;
+  for(i=0;i<AHDL.length;i++) updAHDL(i);
+  ahdlNote();
+}
+function updAHDL(i){ var L=AHDL[i], d=L.d/100;
+  var price=L.listmod*(1-d), net=L.mod*price, gp=price*(1-L.cogs), con=net*(1-L.cogs);
+  $('al_d'+i).textContent=L.d+'%'; $('al_price'+i).textContent=k(price); $('al_net'+i).textContent=m(net); $('al_gp'+i).textContent=k(gp); $('al_con'+i).textContent=m(con);
+}
+function gpmodOf(L){ return L.listmod*(1-L.d/100)*(1-L.cogs); }
+function ahdlNote(){
+  $('ahdLinesNote').innerHTML='Per module of factory output, <b>Bauhaus ('+k(gpmodOf(AHDL[1]))+')</b> sits between Maximalism ('+k(gpmodOf(AHDL[0]))+') and Rotto ('+k(gpmodOf(AHDL[2]))+'). '
+    +'Bauhaus is a strong mid-tier line &mdash; pricier per module than Maximalism at the same ~31% material &mdash; but it converts few of its many quotes (3,350 quote lines vs ~500 ordered). The lever for Bauhaus is <b>closing more of it</b>, not discounting it.';
+}
+$('ahdLines').addEventListener('input',function(e){ var li=e.target.getAttribute('data-li'); if(li!==null){ AHDL[+li].d=+e.target.value; updAHDL(+li); ahdlNote(); } });
+
+/* ---------- MARKETING (real Meta funnel) ---------- */
+var CPL=1100; // EGP blended cost per lead (real: wk1 1204, wk2 1039 -> 1100)
+var MKT=[ {n:'Kitchen (AHD)',m:0.683},{n:'Wardrobe (Rotto)',m:0.634},{n:'Designy',m:0.532} ];
+var mktSel=0;
+function renderMkt(){
+  var spend=+$('mkt_sr').value, conv=+$('mkt_cr').value/100, deal=+$('mkt_vr').value;
+  $('mkt_s').textContent=k(spend); $('mkt_c').textContent=(conv*100).toFixed(1); $('mkt_v').textContent=k(deal);
+  var hs='';
+  for(var i=0;i<MKT.length;i++) hs+='<button data-mk="'+i+'" class="segb'+(i===mktSel?' on':'')+'" style="flex:0 0 auto">'+MKT[i].n+'</button>';
+  $('mktSeg').innerHTML=hs;
+  var L=MKT[mktSel];
+  var leads=spend/CPL, contracts=leads*conv, revenue=contracts*deal, contrib=revenue*L.m, net=contrib-spend, roas=spend>0?revenue/spend:0;
+  var baseSales=7.33e6, baseProf=0.151e6;
+  $('mktTiles').innerHTML=
+     '<div class="tile"><div class="t">Leads / mo</div><div class="n">'+Math.round(leads)+'</div><div class="s">at 1,100 each</div></div>'
+    +'<div class="tile"><div class="t">Contracts / mo</div><div class="n">'+contracts.toFixed(1)+'</div><div class="s">at '+(conv*100).toFixed(1)+'% conversion</div></div>'
+    +'<div class="tile"><div class="t">New sales</div><div class="n">'+m(revenue)+'</div><div class="s">/mo added</div></div>'
+    +'<div class="tile"><div class="t">ROAS</div><div class="n '+(roas>=1?'pos':'neg')+'">'+roas.toFixed(1)+'&times;</div><div class="s">sales per pound</div></div>'
+    +'<div class="tile"><div class="t">Profit impact</div><div class="n '+pn(net)+'">'+(net>=0?'+':'')+m(net)+'</div><div class="s">contribution &minus; spend</div></div>'
+    +'<div class="tile"><div class="t">New group sales</div><div class="n">'+m(baseSales+revenue)+'</div><div class="s">was 7.33M</div></div>'
+    +'<div class="tile"><div class="t">New group profit</div><div class="n '+pn(baseProf+net)+'">'+m(baseProf+net)+'</div><div class="s">was 0.15M</div></div>'
+    +'<div class="tile"><div class="t">Cost / contract</div><div class="n">'+(contracts>0?m(spend/contracts):'&mdash;')+'</div><div class="s">vs '+k(deal)+' deal</div></div>'
+    +'<div class="tile"><div class="t">Net / contract</div><div class="n '+pn(deal*L.m-spend/Math.max(contracts,1e-9))+'">'+m(deal*L.m-(contracts>0?spend/contracts:0))+'</div><div class="s">contribution &minus; CAC</div></div>';
+  $('mktTiles').style.gridTemplateColumns='repeat(4,1fr)';
+  // real funnel bars (May-Jun 2026): 288 leads -> 158 answered -> 14 groups -> 2 measurement -> 1 contract
+  var fun=[['Leads',289,'#74B27F'],['Answered call (~30%)',88,'#9AA7B5'],['Active pipeline',52,'#9AA7B5'],['WhatsApp group',14,'#C9A86A'],['Paid measurement',2,'#CE9B6B'],['Contract',1,'#CE7B6B']];
+  var h='';
+  for(i=0;i<fun.length;i++){ var w=Math.max(1.5,fun[i][1]/289*100);
+    h+='<div class="row"><div class="lab" style="width:140px">'+fun[i][0]+'</div><div class="barbg"><div class="barfill" style="width:'+w+'%;background:'+fun[i][2]+'"></div></div><div class="val" style="width:50px">'+fun[i][1]+'</div></div>'; }
+  $('mktFunnel').innerHTML=h;
+  $('mktNote').innerHTML='At 1,100 per lead against a '+k(deal)+' deal, even <b>1% conversion returns ~'+(0.01*deal/1100).toFixed(0)+'&times;</b> &mdash; marketing is not your problem, the funnel is. '
+    +'Right now <b>45% of leads never answer and 28% sit unprocessed</b>; only 14 of 289 reached a WhatsApp group and 1 a contract. Closing that gap (faster call-backs, qualification, follow-up) is worth far more than ad budget: '
+    +'every extra point of conversion on '+Math.round(leads)+' leads/mo adds <b class="pos">'+m(leads*0.01*deal*L.m)+'</b> of contribution. Point spend at kitchens and wardrobes (demand is 42% / 21%); they carry the highest margins.';
+}
+$('mktSeg').addEventListener('click',function(e){ var mk=e.target.getAttribute('data-mk'); if(mk!==null){ mktSel=+mk; renderMkt(); } });
+['mkt_sr','mkt_cr','mkt_vr'].forEach(function(id){ $(id).addEventListener('input',renderMkt); });
+
+function unlock(){ $('gate').style.display='none'; $('app').style.display='block';
+  renderAHD(); renderDES(); $('gAD').textContent=$('gADr').value; $('gDD').textContent=$('gDDr').value; renderGroup(); renderInsights(); renderPB(); consult(); buildAHDL(); renderMkt(); }
+$('gpw').addEventListener('keydown',function(e){
+  if(e.key==='Enter'){ if($('gpw').value==='ahd2026'){ unlock(); } else { $('ghint').textContent='Incorrect password'; } }
+});
+</script>
+</body>
+</html>
