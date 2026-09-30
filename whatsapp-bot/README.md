@@ -17,14 +17,32 @@ What it does:
 
 ## 1. Setup
 
-You need Node.js 20 or newer and an Anthropic API key
+You need Node.js 20 or newer, git, and an Anthropic API key
 (https://platform.claude.com -> API keys).
 
+**Mac, first time only**: install Node.js with Homebrew, or download the installer
+from https://nodejs.org (the "LTS" button) and run it.
+
 ```bash
-cd whatsapp-bot
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install node
+node -v
+```
+
+Then get the code and start the bot (one command per line, no trailing comments):
+
+```bash
+git clone -b claude/whatsapp-groups-access-0jddmi https://github.com/ahdinstallation-sketch/ahdprofit.git
+cd ahdprofit/whatsapp-bot
 npm install
 cp .env.example .env
-# open .env and paste your ANTHROPIC_API_KEY, put your own number in OWNER_NUMBERS
+open -e .env
+```
+
+In the `.env` file that opens, paste your key after `ANTHROPIC_API_KEY=` and put your
+own number (digits only, with country code) after `OWNER_NUMBERS=`. Save, close, then:
+
+```bash
 npm start
 ```
 
