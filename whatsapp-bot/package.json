@@ -1,0 +1,25 @@
+{
+  "name": "ahd-claude-whatsapp",
+  "version": "1.0.0",
+  "description": "Give Claude a WhatsApp number: a Claude-powered WhatsApp bot with group access (Baileys + Anthropic SDK)",
+  "type": "module",
+  "private": true,
+  "main": "src/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "node --test test/*.test.js",
+    "logout": "rm -rf auth && echo 'Auth cleared. Run npm start to scan a new QR code.'"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.129.0",
+    "@hapi/boom": "^10.0.1",
+    "@whiskeysockets/baileys": "7.0.0-rc14",
+    "dotenv": "^16.4.5",
+    "pino": "^10.3.1",
+    "qrcode-terminal": "^0.12.0"
+  }
+}
