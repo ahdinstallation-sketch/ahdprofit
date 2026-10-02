@@ -352,7 +352,7 @@ const ORGANS=[
   why:(v)=>`${fmtN(v.todos)} links waiting to be confirmed, ${fmtN(v.price_decisions)} material prices undecided, ${fmtN(v.approvals)} price approvals waiting.`,
   formula:'score = 100 − 70 × (to-dos ÷ 3000) − 20 × (prices ÷ 50) − 10 × (approvals ÷ 20), each term capped\nreaction time = 0.4 + 4 × (1 − score) seconds; the gaze drops from the horizon to the ground as the score falls'},
 ];
-const VISUALS=['heart rate','stride length','cadence','gait','posture','arm swing','breathing','build','belly','complexion','gaze','hand tremor','open-mouth breathing','sweat','eyelids','foot clearance','stumbles','limp','reaction time'];
+const VISUALS=['status glow','heart rate','stride length','cadence','gait','posture','arm swing','breathing','build','belly','complexion','gaze','hand tremor','open-mouth breathing','sweat','eyelids','foot clearance','stumbles','limp','reaction time'];
 
 /* ---------- engine ---------- */
 const DEFAULTS=Object.fromEntries(INPUTS.map(i=>[i.id,i.value]));
@@ -559,6 +559,16 @@ function draw(now){
   ctx.fillStyle=css('--ground2');for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.life-=dt*1.8;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=40*dt;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life*0.5;ctx.beginPath();ctx.arc(p.x,Math.min(p.y,0),1.5+2*(1-p.life),0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
 
   ctx.restore();
+  // status vignette: hue from red (critical) through amber to green (thriving), pulsing with the heartbeat
+  {
+    const hue=4+116*Math.pow(m.health,1.4);
+    const sat=82-22*m.health;
+    const a=(0.30+0.34*pulse)*(1.1-0.35*m.health);
+    const R=Math.max(W,H);
+    const vg=ctx.createRadialGradient(W*0.5,H*0.5,R*0.16,W*0.5,H*0.5,R*0.74);
+    vg.addColorStop(0,hsl(hue,sat,45,0));vg.addColorStop(0.55,hsl(hue,sat,45,a*0.4));vg.addColorStop(1,hsl(hue,sat,38,a));
+    ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+  }
   // traces
   bufT+=dt;if(bufT>0.03){bufT=0;ecgBuf.copyWithin(0,1);ecgBuf[ecgBuf.length-1]=ecgSample(beatPhase);respBuf.copyWithin(0,1);respBuf[respBuf.length-1]=breath/m.breathDepth}
   drawTrace(ecgCtx,ecg,ecgBuf,0.5,css('--critical'));drawTrace(respCtx,resp,respBuf,0.45,css('--accent'));
@@ -785,7 +795,7 @@ function describeMoves(a,b){
   for(const i of INPUTS)if(!near(a.v[i.id],b.v[i.id])){moved.add(i.id);lines.push({l:i.label,from:fmtInput(i.id,a.v[i.id]),to:fmtInput(i.id,b.v[i.id]),up:b.v[i.id]>a.v[i.id]})}
   for(const x of DERIVED)if(!near(a.d[x.id],b.d[x.id])){moved.add(x.id);lines.push({l:x.label,from:x.fmt(a.d[x.id]),to:x.fmt(b.d[x.id]),up:b.d[x.id]>a.d[x.id]})}
   for(const x of ORGANS)if(Math.round(a.o[x.id])!==Math.round(b.o[x.id])){moved.add(x.id);x.visual.split(/, | \(/).forEach(v=>moved.add('vis:'+v.replace(/\)$/,'').trim()));lines.push({l:x.name+' ('+x.dept+')',from:Math.round(a.o[x.id]),to:Math.round(b.o[x.id]),up:b.o[x.id]>a.o[x.id]})}
-  if(Math.round(a.health)!==Math.round(b.health)){['complexion','posture','gait'].forEach(v=>moved.add('vis:'+v));lines.push({l:'Overall health',from:Math.round(a.health),to:Math.round(b.health),up:b.health>a.health})}
+  if(Math.round(a.health)!==Math.round(b.health)){['status glow','complexion','posture','gait'].forEach(v=>moved.add('vis:'+v));lines.push({l:'Overall health',from:Math.round(a.health),to:Math.round(b.health),up:b.health>a.health})}
   if(moved.has('heart')){moved.add('vis:gait');moved.add('vis:arm swing')}
   if(moved.size)moved.add('src');
   return {moved,lines};

@@ -57,6 +57,9 @@ The person is drawn procedurally on a canvas every frame at human scale
 - Reaction time: a changed number is approached with a time constant set by
   the Brain score, so a company with many open decisions visibly takes longer
   to respond.
+- Status glow: a vignette around the scene whose hue runs from red (critical)
+  through amber to green (thriving) with overall health, and whose strength
+  pulses with each heartbeat.
 - Monitor: live ECG and breathing traces at the current heart and breath rate.
 - Layout: the walker stays pinned at the top while the sliders beside it
   scroll, so a change and its effect are visible together.
