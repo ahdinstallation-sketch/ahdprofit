@@ -6,13 +6,14 @@
 <title>Company Creature</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: a field study. The animal walks across the full width at the top, the gait readouts sit beside it,
-   the live controls are right under it, then the department-to-organ map, the organ chart, the numbers bench and the data-flow strip. */
+/* Layout: a gait lab. The person walks across the full width at the top with the monitor beside them,
+   the live controls sit under it, then the department-to-system map, the system cards, the numbers bench and the data-flow strip. */
 :root{
   --bg:#edf2f0; --surface:#ffffff; --surface-2:#e2eae7; --ink:#14262b; --ink-2:#4b6066; --ink-3:#7d9096; --line:#cdd9d5;
   --accent:#1e6b86; --accent-ink:#ffffff; --accent-soft:#d9e9ef;
   --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
-  --sky1:#dfeaf2; --sky2:#f3f0e6; --hill1:#b9c9bd; --hill2:#9fb3a6; --ground:#cfc3a3; --ground2:#b8ab89; --shadow:rgba(20,38,43,.18);
+  --sky1:#dfeaf2; --sky2:#f3f0e6; --hill1:#b9c9bd; --hill2:#9fb3a6; --ground:#cfc3a3; --ground2:#b8ab89; --path:#d9cfb4; --shadow:rgba(20,38,43,.18);
+  --shirt:#3b6b8c; --shirt2:#2c5169; --trouser:#3a3f4b; --trouser2:#2a2e37; --shoe:#1f1a17; --hair:#2b1d14;
   --display:"Bricolage Grotesque","Avenir Next","Segoe UI",sans-serif;
   --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
@@ -20,11 +21,13 @@
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   --bg:#0e191c; --surface:#152427; --surface-2:#1b2f34; --ink:#e3edef; --ink-2:#a7bbc0; --ink-3:#7b9096; --line:#27414a;
   --accent:#64b8d3; --accent-ink:#0e191c; --accent-soft:#1a3d4a;
-  --sky1:#0f1f2a; --sky2:#1d2b30; --hill1:#1f3238; --hill2:#2a4047; --ground:#3a3a2f; --ground2:#2d2d24; --shadow:rgba(0,0,0,.5); color-scheme:dark } }
+  --sky1:#0f1f2a; --sky2:#1d2b30; --hill1:#1f3238; --hill2:#2a4047; --ground:#3a3a2f; --ground2:#2d2d24; --path:#45443a; --shadow:rgba(0,0,0,.5);
+  --shirt:#5a93b8; --shirt2:#3f6f8f; --trouser:#4b5160; --trouser2:#363b47; --shoe:#15110f; --hair:#1c130d; color-scheme:dark } }
 :root[data-theme="dark"]{
   --bg:#0e191c; --surface:#152427; --surface-2:#1b2f34; --ink:#e3edef; --ink-2:#a7bbc0; --ink-3:#7b9096; --line:#27414a;
   --accent:#64b8d3; --accent-ink:#0e191c; --accent-soft:#1a3d4a;
-  --sky1:#0f1f2a; --sky2:#1d2b30; --hill1:#1f3238; --hill2:#2a4047; --ground:#3a3a2f; --ground2:#2d2d24; --shadow:rgba(0,0,0,.5); color-scheme:dark }
+  --sky1:#0f1f2a; --sky2:#1d2b30; --hill1:#1f3238; --hill2:#2a4047; --ground:#3a3a2f; --ground2:#2d2d24; --path:#45443a; --shadow:rgba(0,0,0,.5);
+  --shirt:#5a93b8; --shirt2:#3f6f8f; --trouser:#4b5160; --trouser2:#363b47; --shoe:#15110f; --hair:#1c130d; color-scheme:dark }
 
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
@@ -53,17 +56,20 @@ header.top{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justif
 .chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:13px}
 
-.field-stage{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:stretch}
+.field-stage{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:stretch}
 @media (max-width:900px){.field-stage{grid-template-columns:1fr}}
-.canvasbox{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--sky1);min-height:300px}
+.canvasbox{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--sky1);min-height:320px}
 canvas#field{display:block;width:100%;height:100%}
-.canvasbox .legend{position:absolute;left:12px;top:10px;font-size:12px;color:var(--ink-2);background:color-mix(in srgb,var(--surface) 80%,transparent);border-radius:8px;padding:4px 8px}
-.readouts{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:8px;align-content:start}
-.ro{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:baseline;border-top:1px solid var(--line);padding-top:6px}
-.ro:first-child{border-top:0;padding-top:0}
+.canvasbox .legend{position:absolute;left:12px;top:10px;font-size:12px;color:var(--ink-2);background:color-mix(in srgb,var(--surface) 80%,transparent);border-radius:8px;padding:4px 8px;max-width:calc(100% - 24px)}
+.monitor{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:6px;align-content:start}
+.monitor .traces{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.trace{background:var(--surface-2);border-radius:10px;padding:6px 8px 2px}
+.trace .k{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.trace canvas{display:block;width:100%;height:38px}
+.ro{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:baseline;border-top:1px solid var(--line);padding-top:5px}
 .ro .k{font-size:13px;color:var(--ink-2)}
 .ro .k small{display:block;color:var(--ink-3);font-size:11.5px}
-.ro .v{font-family:var(--display);font-weight:700;font-size:20px;text-align:right}
+.ro .v{font-family:var(--display);font-weight:700;font-size:19px;text-align:right}
 .ro .v small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--ink-3);margin-left:3px}
 
 .quick{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 18px}
@@ -143,8 +149,8 @@ footer p{margin:6px 0}
 <header class="top">
   <div>
     <div class="eyebrow">Company Creature</div>
-    <h1>AHD Group, as a living animal</h1>
-    <div class="subject">Each department is the body system that does the same job in an animal: sales is the mouth and temperature, purchasing the lungs, the factory the stomach and muscles, finance the heart, planning the sense of balance, delivery the legs, data the nerves, management the brain. The department's numbers set that system's score, and the score is visible in how the animal moves. Figures from AHD Costing, 1 Oct 2026.</div>
+    <h1>AHD Group, as a person walking</h1>
+    <div class="subject">Each department is the body system that does the same job in a person: sales is the mouth and temperature, purchasing the lungs, the factory the stomach and muscles, finance the heart, planning the sense of balance, delivery the legs, data the nerves, management the brain. The department's numbers set that system's score, and the score is in the way they walk. Figures from AHD Costing, 1 Oct 2026.</div>
   </div>
   <div class="healthbadge" aria-live="polite">
     <div class="score num" id="health-score">—</div>
@@ -164,20 +170,24 @@ footer p{margin:6px 0}
 
 <div class="field-stage">
   <div class="canvasbox">
-    <canvas id="field" role="img" aria-label="A four-legged animal walking across a field. Its pace, gait, posture, breathing, stumbles and limp follow the company's numbers."></canvas>
+    <canvas id="field" role="img" aria-label="A person walking across a field. Their pace, stride, posture, breathing, stumbles and limp follow the company's numbers."></canvas>
     <div class="legend" id="legend">walking</div>
   </div>
-  <div class="readouts" id="readouts">
+  <div class="monitor" id="monitor">
+    <div class="traces">
+      <div class="trace"><div class="k">Heart <span class="num" id="tr-hr"></span></div><canvas id="ecg"></canvas></div>
+      <div class="trace"><div class="k">Breath <span class="num" id="tr-br"></span></div><canvas id="resp"></canvas></div>
+    </div>
     <div class="ro"><div class="k">Gait<small>from the speed the numbers allow</small></div><div class="v" id="ro-gait">—</div></div>
-    <div class="ro"><div class="k">Heart rate<small>finance: margin</small></div><div class="v num" id="ro-hr">—<small>bpm</small></div></div>
-    <div class="ro"><div class="k">Cadence<small>sales fever + factory backlog</small></div><div class="v num" id="ro-cad">—<small>strides/min</small></div></div>
-    <div class="ro"><div class="k">Stride<small>finance: share of a full stride</small></div><div class="v num" id="ro-stride">—</div></div>
-    <div class="ro"><div class="k">Breathing<small>purchasing: material intake</small></div><div class="v num" id="ro-breath">—<small>/min</small></div></div>
+    <div class="ro"><div class="k">Speed<small>stride × cadence</small></div><div class="v num" id="ro-speed">—<small>km/h</small></div></div>
+    <div class="ro"><div class="k">Cadence<small>sales fever + factory backlog</small></div><div class="v num" id="ro-cad">—<small>steps/min</small></div></div>
+    <div class="ro"><div class="k">Stride<small>finance: margin</small></div><div class="v num" id="ro-stride">—<small>m</small></div></div>
+    <div class="ro"><div class="k">Posture<small>finance + overall health</small></div><div class="v" id="ro-posture" style="font-size:15px">—</div></div>
+    <div class="ro"><div class="k">Gaze<small>management: decisions waiting</small></div><div class="v" id="ro-gaze" style="font-size:15px">—</div></div>
     <div class="ro"><div class="k">Stumbles<small>planning: orders with no plan</small></div><div class="v num" id="ro-stumble">—</div></div>
-    <div class="ro"><div class="k">Limp<small>delivery &amp; invoicing: late orders</small></div><div class="v" id="ro-limp" style="font-size:15px">—</div></div>
-    <div class="ro"><div class="k">Reaction time<small>management: decisions waiting</small></div><div class="v num" id="ro-react">—<small>s</small></div></div>
-    <div class="ro"><div class="k">Head, tail<small>finance, overall health</small></div><div class="v" id="ro-head" style="font-size:15px">—</div></div>
-    <div class="ro"><div class="k">Ground covered<small>since the page opened</small></div><div class="v num" id="ro-dist">—<small>lengths</small></div></div>
+    <div class="ro"><div class="k">Limp<small>left leg: delivery · right leg: invoicing</small></div><div class="v" id="ro-limp" style="font-size:15px">—</div></div>
+    <div class="ro"><div class="k">Reaction time<small>management</small></div><div class="v num" id="ro-react">—<small>s</small></div></div>
+    <div class="ro"><div class="k">Distance walked<small>since the page opened</small></div><div class="v num" id="ro-dist">—<small>m</small></div></div>
   </div>
 </div>
 
@@ -185,7 +195,7 @@ footer p{margin:6px 0}
 
 <div class="map">
   <div class="eyebrow" style="margin-bottom:6px">Departments and their body systems</div>
-  <div class="tablewrap"><table><thead><tr><th>Department</th><th>Body system</th><th>Why this system</th><th>Score</th><th>Seen in the animal as</th></tr></thead><tbody id="map-body"></tbody></table></div>
+  <div class="tablewrap"><table><thead><tr><th>Department</th><th>Body system</th><th>Why this system</th><th>Score</th><th>Seen in the walk as</th></tr></thead><tbody id="map-body"></tbody></table></div>
 </div>
 
 <section class="block">
@@ -199,7 +209,7 @@ footer p{margin:6px 0}
 </section>
 
 <section class="block">
-  <div class="hd"><h2>How the data moves</h2><span class="small muted">Sources feed numbers, numbers feed derived figures, those feed body systems, systems move the animal.</span></div>
+  <div class="hd"><h2>How the data moves</h2><span class="small muted">Sources feed numbers, numbers feed derived figures, those feed body systems, systems move the person.</span></div>
   <div class="flow" id="flow"></div>
   <div class="moves" id="moves"><div class="eyebrow">What moved</div><div class="small muted" id="moves-empty">Nothing yet. Change a number or pick a scenario.</div><ul id="moves-list"></ul></div>
 </section>
@@ -210,7 +220,7 @@ footer p{margin:6px 0}
 </section>
 
 <footer>
-  <p><strong>How it is built.</strong> The same shape as the costing database: sources are imported with a date, each number keeps its evidence, rules turn numbers into scores, and a recalculation runs through the whole chain after any change. The animal is drawn procedurally every frame: a gait cycle with duty factor and phase offsets per leg, two-bone leg kinematics, breathing, heartbeat, stumbles, head and tail dynamics, all parameterised by the system scores. How fast the animal takes on a change is itself a score: the brain's.</p>
+  <p><strong>How it is built.</strong> The same shape as the costing database: sources are imported with a date, each number keeps its evidence, rules turn numbers into scores, and a recalculation runs through the whole chain after any change. The person is drawn procedurally every frame at human scale (175 cm): a gait cycle with double support, heel strike and toe-off, two-bone leg and arm kinematics, counter-swinging arms, pelvis bob, torso lean, breathing on the ribcage, a pulse at the neck, stumbles, tremor and a limp, all parameterised by the system scores. How fast the walker takes on a change is itself a score: the brain's.</p>
   <p>Seed values are reconstructed from the AHD Costing home page of 1 Oct 2026 and reproduce its material-method margins within half a percentage point. System thresholds, weights and the motion mapping are first settings to tune with management.</p>
 </footer>
 </div>
@@ -224,6 +234,7 @@ const fmtM=x=>(x/1e6).toLocaleString('en-US',{maximumFractionDigits:2})+' M EGP'
 const fmtPct=(x,d=1)=>(x*100).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';
 const fmtN=x=>Math.round(x).toLocaleString('en-US');
 const fmt1=x=>x.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+const D2R=Math.PI/180;
 
 /* ---------- 1. Numbers (the facts), grouped by department, each with its source ---------- */
 const INPUTS=[
@@ -279,63 +290,63 @@ const DERIVED=[
 
 /* ---------- 3. Body systems: a department's numbers → a 0–100 score ---------- */
 const ORGANS=[
- {id:'heart',name:'Heart & blood',dept:'Finance',part:'margin',weight:20,deps:['margin'],visual:'heart rate, stride length, head carriage',
-  biomimicry:'The heart pushes oxygen round the body; margin pushes cash round the company. A weak margin is a weak pulse: short steps, low head.',
+ {id:'heart',name:'Heart & blood',dept:'Finance',part:'margin',weight:20,deps:['margin'],visual:'heart rate, stride length, posture',
+  biomimicry:'The heart pushes oxygen round the body; margin pushes cash round the company. A weak margin is a weak pulse: short steps, rounded shoulders, head down.',
   score:d=>100*clamp((d.margin+0.5)/0.65),
   why:(v,d)=>`Margin ${fmtPct(d.margin)} on ${fmtM(d.revenue)} revenue. Profit ${fmtM(d.profit)}.`,
-  formula:'score = (margin + 50%) ÷ 65%, so −50% → 0 and +15% → 100\nheart rate = 60 + 0.6 × (100 − score) bpm\nstride = 45% + 115% × score of the leg length; head carriage rises with the score'},
- {id:'fat',name:'Fat',dept:'Administration',part:'overhead weight',weight:15,deps:['oh_share'],visual:'girth, foot lift',
+  formula:'score = (margin + 50%) ÷ 65%, so −50% → 0 and +15% → 100\nheart rate = 62 + 0.55 × (100 − score) bpm\nstride = 0.6 m + 0.9 m × score; the torso straightens and the arms swing wider as the score rises'},
+ {id:'fat',name:'Fat',dept:'Administration',part:'overhead weight',weight:15,deps:['oh_share'],visual:'build, foot clearance',
   biomimicry:'Fat is stored cost the body carries everywhere. Overhead is the cost the company carries on every sale.',
   score:d=>100*clamp((1-d.oh_share)/0.70),
   why:(v,d)=>`Overhead of ${fmtM(d.overhead)} is ${fmtPct(d.oh_share,0)} of what customers paid, ${d.oh_rate.toFixed(2)}× the material.`,
-  formula:'score = (100% − overhead ÷ paid) ÷ 70%, so 30% → 100 and 100% → 0\nthe body thickens as the score falls; a heavier body bobs less and lifts its feet less'},
- {id:'fever',name:'Mouth & temperature',dept:'Sales',part:'discounting',weight:10,deps:['discount','break_even'],visual:'cadence, panting, sweat',
-  biomimicry:'The mouth takes in food; sales takes in orders. Selling below break-even is a fever: the animal gets agitated and pants.',
+  formula:'score = (100% − overhead ÷ paid) ÷ 70%, so 30% → 100 and 100% → 0\nthe build thickens as the score falls; a heavier walker bobs less and clears the ground less'},
+ {id:'fever',name:'Mouth & temperature',dept:'Sales',part:'discounting',weight:10,deps:['discount','break_even'],visual:'cadence, open-mouth breathing, sweat, flushed face',
+  biomimicry:'The mouth takes in food; sales takes in orders. Selling below break-even is a fever: the walker gets agitated, flushed, breathes through the mouth and sweats.',
   score:(d,v)=>100*(1-clamp((v.discount/100-d.break_even)/0.40)),
   why:(v,d)=>`Discount ${fmtPct(v.discount/100)} against a break-even of ${fmtPct(d.break_even)}. Every point above it is fever.`,
-  formula:'excess = discount − break-even discount (not below 0)\nscore = 100 − excess ÷ 40%\nfever quickens the cadence; below 50 the animal pants and sweats'},
+  formula:'excess = discount − break-even discount (not below 0)\nscore = 100 − excess ÷ 40%\nfever quickens the cadence; below 50 the mouth opens, the face flushes and sweat runs'},
  {id:'eyes',name:'Eyes',dept:'Costing',part:'seeing costs',weight:5,deps:['cost_coverage','profitable_share'],visual:'eyelids',
-  biomimicry:'Eyes tell the animal what is in front of it; costing tells the company what a sale really costs before it is made.',
+  biomimicry:'Eyes tell a person what is in front of them; costing tells the company what a sale really costs before it is made.',
   score:(d,v)=>50*clamp(v.cost_coverage/100)+50*d.profitable_share,
   why:(v,d)=>`${fmtPct(v.cost_coverage/100,0)} of the sales value has a known cost, and ${fmtN(v.items_priced-v.items_losing)} of ${fmtN(v.items_priced)} priced items make money at list.`,
   formula:'score = 50 × share of sales with a cost + 50 × items profitable at list ÷ priced items\nthe eyelid closes over what is not seen'},
- {id:'lungs',name:'Lungs',dept:'Purchasing',part:'material intake',weight:10,deps:['inflation_items','fx_gap'],visual:'breathing rate and depth',
+ {id:'lungs',name:'Lungs',dept:'Purchasing',part:'material intake',weight:10,deps:['inflation_items','fx_gap'],visual:'breathing rate and depth, shoulder rise',
   biomimicry:'Lungs draw in the air the body runs on; purchasing draws in the material the factory runs on. Rising prices are thin air: faster, shallower breaths.',
   score:(d,v)=>100-60*clamp(v.inflation_items/500)-40*clamp(d.fx_gap/0.30),
   why:(v,d)=>`${fmtN(v.inflation_items)} purchased items rose 10% or more in a year; the market dollar is ${fmtPct(d.fx_gap)} above the cost-card rate.`,
-  formula:'score = 100 − 60 × (items up ≥10% ÷ 500) − 40 × (FX gap ÷ 30%), each term capped\nbreaths per minute = 14 + 50 × (1 − score)'},
+  formula:'score = 100 − 60 × (items up ≥10% ÷ 500) − 40 × (FX gap ÷ 30%), each term capped\nbreaths per minute = 12 + 24 × (1 − score)'},
  {id:'balance',name:'Balance',dept:'Planning',part:'coordination',weight:10,deps:['unplanned_share'],visual:'stumbles, uneven rhythm',
-  biomimicry:'The inner ear and cerebellum place each foot before the body arrives; planning places each order in the factory before it is due. Without it the animal trips.',
+  biomimicry:'The inner ear and cerebellum place each foot before the body arrives; planning places each order in the factory before it is due. Without it the walker trips.',
   score:d=>100*(1-d.unplanned_share),
   why:(v,d)=>`${fmtN(v.no_plan)} of ${fmtN(v.open_orders)} open orders have no factory plan (${fmtPct(d.unplanned_share,0)}).`,
-  formula:'score = 100 − unplanned orders ÷ open orders\nchance of a stumble per stride = 35% × unplanned share'},
+  formula:'score = 100 − unplanned orders ÷ open orders\nchance of a stumble per stride = 30% × unplanned share'},
  {id:'stomach',name:'Stomach',dept:'Factory',part:'digesting orders',weight:10,deps:['late_share'],visual:'belly, cadence',
   biomimicry:'The stomach turns food into the body; the factory turns orders into furniture. Orders that sit undelivered are undigested food: a swollen belly.',
   score:d=>100*(1-d.late_share),
   why:(v,d)=>`${fmtN(d.late)} of ${fmtN(v.open_orders)} open orders are past due (${fmtPct(d.late_share,0)}).`,
-  formula:'score = 100 − late orders ÷ open orders\nthe belly sags with the late share and adds to the cadence'},
- {id:'muscles',name:'Muscles',dept:'Factory',part:'flow through the shops',weight:5,deps:['stuck_share'],visual:'foot lift, leg bulk',
+  formula:'score = 100 − late orders ÷ open orders\nthe belly protrudes with the late share and adds to the cadence'},
+ {id:'muscles',name:'Muscles',dept:'Factory',part:'flow through the shops',weight:5,deps:['stuck_share'],visual:'foot clearance, knee lift, limb bulk',
   biomimicry:'Muscle is what actually moves the body; the shop floor is what actually moves the work. Plans stuck before release are muscle that will not fire.',
   score:d=>100*(1-d.stuck_share),
   why:(v,d)=>`${fmtN(v.should_start)} of ${fmtN(v.plans)} open plans are past their start date and not released (${fmtPct(d.stuck_share,0)}).`,
-  formula:'score = 100 − stuck plans ÷ open plans\nweak muscles lift the feet less, so the paws scuff; the legs thin'},
- {id:'legs',name:'Legs',dept:'Delivery & invoicing',part:'getting it to the customer',weight:5,deps:['late30_share','over30_share'],visual:'limp (front: delivery, hind: invoicing)',
-  biomimicry:'Legs carry the body to where it is going; delivery and invoicing carry the order to the customer and the money back. Late in front, the forelegs limp; delivered but not invoiced, the hind legs drag.',
+  formula:'score = 100 − stuck plans ÷ open plans\nweak muscles lift the feet less, so the walker shuffles'},
+ {id:'legs',name:'Legs',dept:'Delivery & invoicing',part:'getting it to the customer',weight:5,deps:['late30_share','over30_share'],visual:'limp (left leg: delivery, right leg: invoicing)',
+  biomimicry:'Legs carry a person to where they are going; delivery and invoicing carry the order to the customer and the money back. Late deliveries weaken the left leg; delivered but not invoiced weakens the right.',
   score:(d)=>50*(1-clamp(d.late30_share*3))+50*(1-clamp(d.over30_share*2)),
   why:(v,d)=>`${fmtN(v.late_30)} orders late up to 30 days (${fmtPct(d.late30_share,0)}), ${fmtN(v.late_over30)} late over 30 days (${fmtPct(d.over30_share,0)}), probably delivered but not invoiced.`,
-  formula:'foreleg strength = 1 − 3 × (late ≤30 days ÷ open orders)\nhind leg strength = 1 − 2 × (late >30 days ÷ open orders)\nscore = average × 100; a leg under 50 shortens its step and the body dips; under 25 it drags'},
- {id:'nerves',name:'Nerves',dept:'Data & IT',part:'signals the brain can trust',weight:5,deps:['audit_high','matches_pending'],visual:'tremor',
-  biomimicry:'Nerves carry signals from body to brain; the data carries numbers from factory to management. Bad data is a noisy nerve: the body trembles.',
+  formula:'left leg strength = 1 − 3 × (late ≤30 days ÷ open orders)\nright leg strength = 1 − 2 × (late >30 days ÷ open orders)\nscore = average × 100; a leg under 50 shortens its step and the hip drops on it; under 25 the foot drags'},
+ {id:'nerves',name:'Nerves',dept:'Data & IT',part:'signals the brain can trust',weight:5,deps:['audit_high','matches_pending'],visual:'hand tremor',
+  biomimicry:'Nerves carry signals from body to brain; the data carries numbers from factory to management. Bad data is a noisy nerve: the hands shake.',
   score:(d,v)=>100-65*clamp(v.audit_high/1000)-35*clamp(v.matches_pending/4000),
   why:(v)=>`${fmtN(v.audit_high)} high audit findings and ${fmtN(v.matches_pending)} GP to factory matches unconfirmed.`,
-  formula:'score = 100 − 65 × (findings ÷ 1000) − 35 × (matches ÷ 4000), each term capped\nbelow 60 the body trembles'},
- {id:'brain',name:'Brain',dept:'Management',part:'decisions',weight:5,deps:['todos','price_decisions','approvals'],visual:'reaction time, ears',
-  biomimicry:'The brain decides and the body follows; management decides and the company follows. Decisions left waiting are a slow brain: the animal takes longer to react to anything that changes.',
+  formula:'score = 100 − 65 × (findings ÷ 1000) − 35 × (matches ÷ 4000), each term capped\nbelow 60 the hands tremble; below 30 the whole body'},
+ {id:'brain',name:'Brain',dept:'Management',part:'decisions',weight:5,deps:['todos','price_decisions','approvals'],visual:'reaction time, gaze',
+  biomimicry:'The brain decides and the body follows; management decides and the company follows. Decisions left waiting are a slow brain: the walker stares at the ground and takes longer to react to anything that changes.',
   score:(d,v)=>100-70*clamp(v.todos/3000)-20*clamp(v.price_decisions/50)-10*clamp(v.approvals/20),
   why:(v)=>`${fmtN(v.todos)} links waiting to be confirmed, ${fmtN(v.price_decisions)} material prices undecided, ${fmtN(v.approvals)} price approvals waiting.`,
-  formula:'score = 100 − 70 × (to-dos ÷ 3000) − 20 × (prices ÷ 50) − 10 × (approvals ÷ 20), each term capped\nreaction time = 0.4 + 4 × (1 − score) seconds; the ears droop as the score falls'},
+  formula:'score = 100 − 70 × (to-dos ÷ 3000) − 20 × (prices ÷ 50) − 10 × (approvals ÷ 20), each term capped\nreaction time = 0.4 + 4 × (1 − score) seconds; the gaze drops from the horizon to the ground as the score falls'},
 ];
-const VISUALS=['heart rate','stride length','cadence','gait','head carriage','breathing','girth','belly','coat','tail','tremor','panting','eyelids','foot lift','stumbles','limp','reaction time','ears'];
+const VISUALS=['heart rate','stride length','cadence','gait','posture','arm swing','breathing','build','belly','complexion','gaze','hand tremor','open-mouth breathing','sweat','eyelids','foot clearance','stumbles','limp','reaction time'];
 
 /* ---------- engine ---------- */
 const DEFAULTS=Object.fromEntries(INPUTS.map(i=>[i.id,i.value]));
@@ -346,7 +357,7 @@ function compute(v){
   const o={};for(const x of ORGANS)o[x.id]=clamp(x.score(d,v),0,100);
   const wsum=ORGANS.reduce((s,x)=>s+x.weight,0);
   const health=ORGANS.reduce((s,x)=>s+x.weight*o[x.id],0)/wsum;
-  const legs={front:1-clamp(d.late30_share*3),hind:1-clamp(d.over30_share*2)};
+  const legs={L:1-clamp(d.late30_share*3),R:1-clamp(d.over30_share*2)};
   return {v:{...v},d,o,health,legs};
 }
 function status(s){return s>=75?{k:'good',t:'Healthy',i:'✓'}:s>=50?{k:'warn',t:'Strained',i:'!'}:s>=25?{k:'serious',t:'Sick',i:'!!'}:{k:'critical',t:'Critical',i:'✕'}}
@@ -357,79 +368,92 @@ function allDeps(ids,acc=new Set()){for(const id of ids){if(DERIVED_BY[id]){acc.
 const $=id=>document.getElementById(id);
 function fmtInput(id,val){const i=INPUT_BY[id];if(i.type==='toggle')return val?'yes':'no';if(i.fmt)return i.fmt(val);return (i.unit==='%'?fmt1(val)+'%':val.toLocaleString('en-US',{maximumFractionDigits:2}))+(i.unit&&i.unit!=='%'&&i.unit!=='EGP'?' '+i.unit:'')}
 
-/* ---------- motion parameters from the scores ---------- */
-const LEG_LEN=124, BODY_LEN=260;
+/* ---------- motion parameters from the scores (human scale, cm) ---------- */
 function motionFrom(r){
   const o=r.o,h=r.health/100;
   const vigor=o.heart/100, fever=1-o.fever/100, late=r.d.late_share, lungs=o.lungs/100, nerves=o.nerves/100, fat=1-o.fat/100, muscles=o.muscles/100, brain=o.brain/100;
   const stress=clamp(0.6*fever+0.4*late);
-  const cadenceSpm=60+50*vigor+40*stress;
-  const strideFrac=0.45+1.15*vigor;
-  const stride=strideFrac*LEG_LEN;
-  const speed=stride*cadenceSpm/60;
-  const bl=speed/BODY_LEN;
-  const gait=bl<0.8?'walk':bl<1.5?'trot':'canter';
-  const duty={walk:0.64,trot:0.5,canter:0.38}[gait];
-  const offsets={walk:{LH:0,LF:0.25,RH:0.5,RF:0.75},trot:{LH:0,RF:0,RH:0.5,LF:0.5},canter:{LH:0,RH:0.12,LF:0.5,RF:0.62}}[gait];
-  const bob={walk:3+3*vigor,trot:6,canter:9}[gait]*(1-0.5*fat);
-  const lift=(18+20*vigor)*(0.5+0.5*muscles)*(1-0.4*fat);
-  return {vigor,stress,fever,fat,nerves,lungs,muscles,health:h,late,
-    cadenceHz:cadenceSpm/60,cadenceSpm,stride,strideFrac,speed,bl,gait,duty,offsets,bob,lift,
-    heartBpm:60+0.6*(100-o.heart),
-    breathHz:(14+50*(1-lungs))/60,breathDepth:0.4+0.6*lungs,panting:o.fever<50,
-    headCarriage:0.2+0.8*vigor,tailUp:h,earDroop:1-brain*0.6-h*0.4,
-    tremor:nerves<0.6?2.4*(1-nerves):0,rhythmJitter:(1-o.balance/100)*0.12,
-    stumbleChance:0.35*r.d.unplanned_share,
+  const stepsPerMin=70+35*vigor+25*stress;
+  const strideM=0.6+0.9*vigor;                 // metres per full gait cycle (two steps)
+  const speed=strideM*100*stepsPerMin/2/60;    // cm/s
+  const kmh=speed*0.036;
+  const gait=kmh<2.6?'shuffle':kmh<4.2?'walk':kmh<6.5?'brisk walk':'jog';
+  const duty=gait==='jog'?0.42:0.62;
+  return {vigor,stress,fever,fat,nerves,lungs,muscles,health:h,late,brain,
+    cadenceHz:stepsPerMin/120,stepsPerMin,strideCm:strideM*100,strideM,speed,kmh,gait,duty,
+    bob:(1.8+1.6*vigor)*(1-0.5*fat),
+    lift:(9+13*vigor)*(0.45+0.55*muscles)*(1-0.4*fat),
+    heartBpm:62+0.55*(100-o.heart),
+    breathHz:(12+24*(1-lungs))/60,breathDepth:0.45+0.55*lungs,panting:o.fever<50,
+    lean:4+16*(1-0.6*vigor-0.4*h),            // degrees of forward torso lean
+    slump:(1-0.6*vigor-0.4*h),                // 0 upright shoulders → 1 rounded
+    gaze:brain,                               // 1 horizon → 0 ground
+    armSwing:8+24*vigor,
+    tremor:nerves<0.6?(0.6-nerves)/0.6:0,
+    rhythmJitter:(1-o.balance/100)*0.10,
+    stumbleChance:0.30*r.d.unplanned_share,
     eyeLid:0.85*(1-o.eyes/100),
-    sheen:clamp((h-0.4)/0.6),
+    flush:clamp((fever-0.3)/0.7),
     reaction:0.4+4*(1-brain),
     legs:{...r.legs}};
 }
 
-/* ---------- the animal (canvas) ---------- */
+/* ---------- the person (canvas) ---------- */
 const cv=$('field'),ctx=cv.getContext('2d');
+const ecg=$('ecg'),ecgCtx=ecg.getContext('2d'),resp=$('resp'),respCtx=resp.getContext('2d');
 let W=0,H=0,DPR=1,motion=null,targetMotion=null;
 let tSim=0,cycle=0,dist=0,lastT=performance.now(),lastCycleInt=0,stumble=0,stumbles=0;
-const legPhasePrev={LH:0,LF:0,RH:0,RF:0};
+const legPhasePrev={L:0,R:0};
 const particles=[];const sweat=[];
 let blinkT=0,blinkNext=3;
+const ecgBuf=new Float32Array(160).fill(0),respBuf=new Float32Array(160).fill(0);let bufT=0;
 
 function resize(){
   const box=cv.parentElement.getBoundingClientRect();
-  W=Math.max(320,box.width);H=Math.max(300,Math.min(460,W*0.46));
+  W=Math.max(320,box.width);H=Math.max(320,Math.min(480,W*0.5));
   DPR=Math.min(2,window.devicePixelRatio||1);
   cv.width=W*DPR;cv.height=H*DPR;cv.style.height=H+'px';cv.parentElement.style.height=H+'px';
+  for(const c of [ecg,resp]){const r=c.getBoundingClientRect();c.width=Math.max(60,r.width)*DPR;c.height=38*DPR}
 }
 window.addEventListener('resize',resize);
 function css(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
 function hsl(h,s,l,a=1){return `hsla(${h} ${s}% ${l}% / ${a})`}
 
 function ik(P,F,a,b,dir){
-  let dx=F.x-P.x,dy=F.y-P.y;let d=Math.hypot(dx,dy);const max=a+b-0.5,min=Math.abs(a-b)+0.5;
+  let dx=F.x-P.x,dy=F.y-P.y;let d=Math.hypot(dx,dy);const max=a+b-0.3,min=Math.abs(a-b)+0.3;
   if(d>max){dx*=max/d;dy*=max/d;d=max}if(d<min)d=min;
   const base=Math.atan2(dy,dx);
   const A=Math.acos(clamp((a*a+d*d-b*b)/(2*a*d),-1,1));
   const k1={x:P.x+a*Math.cos(base-A),y:P.y+a*Math.sin(base-A)};
   const k2={x:P.x+a*Math.cos(base+A),y:P.y+a*Math.sin(base+A)};
   const knee=dir*(k1.x-P.x)>dir*(k2.x-P.x)?k1:k2;
-  return {knee,foot:{x:P.x+dx,y:P.y+dy}};
+  return {knee,end:{x:P.x+dx,y:P.y+dy}};
 }
-function legState(id,m,anchorX,cyc){
-  const strength=id[1]==='F'?m.legs.front:m.legs.hind;
+const ANKLE_H=8,THIGH=44,SHIN=43,UPPER_ARM=30,FOREARM=26;
+function legState(id,m,cyc){
+  const strength=m.legs[id];
   const sev=strength<0.5?clamp((0.5-strength)/0.5):0;
-  const beta=m.duty*(1-0.45*sev);
-  const phi=((cyc+m.offsets[id])%1+1)%1;
-  const S=beta*m.stride;
-  let x,y,bump=0;
-  if(phi<beta){const u=phi/beta;x=S*(0.5-u);y=0;bump=Math.sin(Math.PI*u)}
-  else{const u=(phi-beta)/(1-beta);x=S*(-0.5+u);y=-m.lift*(1-0.75*sev)*Math.sin(Math.PI*u);if(sev>0.5)y=Math.min(y,-2)}
-  return {x:anchorX+x,y,phi,beta,sev,strength,bump};
+  const beta=m.duty*(1-0.4*sev);
+  const phi=((cyc+(id==='L'?0:0.5))%1+1)%1;
+  const S=beta*m.strideCm;
+  let x,y,theta,bump=0,drag=false;
+  if(phi<beta){
+    const u=phi/beta;x=S*(0.5-u);bump=Math.sin(Math.PI*u);
+    theta=u<0.15?-14*(1-u/0.15):u>0.62?38*((u-0.62)/0.38)*(1-0.5*sev):0;   // heel strike → flat → toe-off
+    y=-ANKLE_H-18*Math.sin(Math.max(0,theta)*D2R);
+  }else{
+    const u=(phi-beta)/(1-beta);x=S*(-0.5+u);
+    const lift=m.lift*(1-0.8*sev);
+    y=-ANKLE_H-lift*Math.sin(Math.PI*u);
+    theta=lerp(30,-14,u)*(1-0.5*sev);
+    if(sev>0.5){drag=true;theta=22;y=-ANKLE_H-1.5}
+  }
+  return {x,y,theta,phi,beta,sev,strength,bump,drag};
 }
 
 function draw(now){
   const dt=Math.min(0.05,(now-lastT)/1000);lastT=now;
   if(!motion)return requestAnimationFrame(draw);
-  // the brain sets how fast a change in the numbers reaches the body
   const k=1-Math.exp(-dt/Math.max(0.15,motion.reaction));
   for(const key of Object.keys(targetMotion)){
     const tv=targetMotion[key];
@@ -442,142 +466,192 @@ function draw(now){
   const jitter=1+m.rhythmJitter*Math.sin(tSim*7.3)*Math.sin(tSim*2.1);
   cycle+=dt*m.cadenceHz*jitter;
   dist+=dt*m.speed;
-  // stumble: decided once per stride, by the planning score
-  const ci=Math.floor(cycle);
-  if(ci!==lastCycleInt){lastCycleInt=ci;if(stumble<=0&&Math.random()<m.stumbleChance){stumble=0.55;stumbles++}}
-  let stumbleDip=0,stumblePitch=0;
-  if(stumble>0){const u=1-stumble/0.55;stumbleDip=16*Math.sin(Math.PI*u);stumblePitch=0.12*Math.sin(Math.PI*u);stumble-=dt}
+  const ci=Math.floor(cycle*2);
+  if(ci!==lastCycleInt){lastCycleInt=ci;if(stumble<=0&&Math.random()<m.stumbleChance/2){stumble=0.6;stumbles++}}
+  let st=0;if(stumble>0){st=Math.sin(Math.PI*(1-stumble/0.6));stumble-=dt}
 
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.clearRect(0,0,W,H);
-  const groundY=H*0.8;
+  const groundY=H*0.84;
   const sky=ctx.createLinearGradient(0,0,0,groundY);sky.addColorStop(0,css('--sky1'));sky.addColorStop(1,css('--sky2'));
   ctx.fillStyle=sky;ctx.fillRect(0,0,W,groundY);
-  drawHills(groundY-40,0.12,css('--hill1'),55,230);
-  drawHills(groundY-14,0.3,css('--hill2'),28,140);
+  drawHills(groundY-44,0.1,css('--hill1'),60,240);
+  drawHills(groundY-16,0.26,css('--hill2'),30,150);
   ctx.fillStyle=css('--ground');ctx.fillRect(0,groundY,W,H-groundY);
+  ctx.fillStyle=css('--path');ctx.fillRect(0,groundY-3,W,10);
   ctx.fillStyle=css('--ground2');
-  const sp=74,off=-(dist%sp);
-  for(let x=off-sp;x<W+sp;x+=sp){const i=Math.round((x-off)/sp);const h=4+((i*37)%7);ctx.fillRect(x,groundY+6+((i*13)%9),10+((i*5)%9),2);ctx.beginPath();ctx.moveTo(x+30,groundY+1);ctx.lineTo(x+33,groundY-h);ctx.lineTo(x+36,groundY+1);ctx.fill()}
-  ctx.fillStyle=css('--ink');ctx.globalAlpha=.08;ctx.fillRect(0,groundY,W,1.5);ctx.globalAlpha=1;
+  const sp=80,off=-(dist*0.55%sp);
+  for(let x=off-sp;x<W+sp;x+=sp){const i=Math.round((x-off)/sp);ctx.fillRect(x,groundY+14+((i*13)%11),12+((i*5)%9),2);ctx.beginPath();ctx.moveTo(x+40,groundY+9);ctx.lineTo(x+43,groundY+1-((i*7)%5));ctx.lineTo(x+46,groundY+9);ctx.fill()}
+  ctx.fillStyle=css('--ink');ctx.globalAlpha=.1;ctx.fillRect(0,groundY+7,W,1.5);ctx.globalAlpha=1;
 
-  const s=Math.min(W/720,groundY/280);
-  const cx=W*0.5-20*s;
-  ctx.save();ctx.translate(cx,groundY);ctx.scale(s,s);
-  if(m.tremor>0.05)ctx.translate((Math.random()-0.5)*2*m.tremor,(Math.random()-0.5)*2*m.tremor);
+  // scale: 1 unit = 1 cm; the person is 175 cm
+  const s=Math.min((groundY-26)/200,W/420);
+  const cx=W*0.5;
+  ctx.save();ctx.translate(cx,groundY+6);ctx.scale(s,s);
+  const bodyTremor=m.tremor>0.5?(m.tremor-0.5)*2:0;
+  if(bodyTremor>0)ctx.translate((Math.random()-0.5)*1.2*bodyTremor,(Math.random()-0.5)*1.2*bodyTremor);
 
-  const yBob=-m.bob*Math.cos(4*Math.PI*cycle);
+  // kinematics
   const breath=Math.sin(2*Math.PI*m.breathHz*tSim)*m.breathDepth;
   const beatPhase=(tSim*m.heartBpm/60)%1;
-  const pulse=Math.exp(-beatPhase*9)*0.6+Math.exp(-((beatPhase-0.3+1)%1)*14)*0.4;
-  const legsOut={};
-  const hipX=-85,shX=85;
-  let dipH=0,dipF=stumbleDip;
-  for(const id of ['LH','RH']){const L=legState(id,m,hipX+4,cycle);legsOut[id]=L;dipH+=12*L.sev*L.bump}
-  for(const id of ['LF','RF']){const L=legState(id,m,shX+4,cycle);legsOut[id]=L;dipF+=12*L.sev*L.bump}
-  const hip={x:hipX,y:-118+yBob+dipH},sh={x:shX,y:-128+yBob*0.85+dipF};
-  const girth=0.85+0.55*m.fat;const sag=34*m.late;
-  const breathG=1+0.03*breath;
+  const pulse=Math.exp(-beatPhase*10)*0.7+Math.exp(-(((beatPhase-0.32)%1+1)%1)*16)*0.3;
+  const legs={L:legState('L',m,cycle),R:legState('R',m,cycle)};
+  const dip=5*(legs.L.sev*legs.L.bump+legs.R.sev*legs.R.bump)+6*st;
+  const hipY=-(THIGH+SHIN-1)+m.bob*Math.cos(4*Math.PI*cycle)+dip;
+  const hip={x:0,y:hipY};
+  const lean=(m.lean+22*st)*D2R;
+  const girth=1+0.5*m.fat;
+  const belly=3+15*m.late+7*m.fat;
+  const spineLen=50;
+  const sh={x:hip.x+spineLen*Math.sin(lean)+6*m.slump,y:hip.y-spineLen*Math.cos(lean)+5*m.slump-0.8*breath};
+  const headTilt=lean+(8+28*(1-m.gaze)+18*st)*D2R;
+  const neckBase={x:sh.x+3,y:sh.y-3};
+  const headC={x:neckBase.x+15*Math.sin(headTilt),y:neckBase.y-15*Math.cos(headTilt)};
+  // arms: near (right) arm swings with the left leg
+  const swing=(m.armSwing*D2R)*Math.cos(2*Math.PI*cycle);
+  const armR=swing+1.2*st, armL=-swing+1.2*st;
+  const bend=(28+12*Math.max(0,Math.cos(2*Math.PI*cycle)))*D2R;
+  const shoulderJ={x:sh.x-2,y:sh.y+4};
+  const handTremor=m.tremor*0.9;
+  function arm(angle,bendSign){
+    const E={x:shoulderJ.x+UPPER_ARM*Math.sin(angle),y:shoulderJ.y+UPPER_ARM*Math.cos(angle)};
+    const a2=angle+bend*bendSign;
+    const Wr={x:E.x+FOREARM*Math.sin(a2)+(Math.random()-0.5)*handTremor,y:E.y+FOREARM*Math.cos(a2)+(Math.random()-0.5)*handTremor};
+    return {E,Wr,a2};
+  }
+  const AR=arm(armR,1),AL=arm(armL,1);
 
-  const hue=27,sat=18+50*m.health,lit=30+13*m.health;
-  const coat=hsl(hue,sat,lit),coatDark=hsl(hue,sat,lit-9),coatLight=hsl(hue,sat,lit+8),coatFar=hsl(hue,sat*0.9,lit-14);
-  const skinPink=hsl(5,55,62);
+  // colours
+  const skinH=22,skinS=42+18*m.health,skinL=62+6*m.health-6*(1-m.health);
+  const skin=hsl(skinH-8*m.flush,skinS+25*m.flush,skinL-4*m.flush),skinDark=hsl(skinH,skinS,skinL-14);
+  const shirt=css('--shirt'),shirt2=css('--shirt2'),trouser=css('--trouser'),trouser2=css('--trouser2'),shoe=css('--shoe'),hair=css('--hair');
 
-  ctx.fillStyle=css('--shadow');ctx.beginPath();ctx.ellipse(0,0,150,9,0,0,Math.PI*2);ctx.fill();
-  drawLeg(legsOut.LH,{x:hip.x+10,y:hip.y+8},+1,coatFar,m);
-  drawLeg(legsOut.LF,{x:sh.x+8,y:sh.y+6},-1,coatFar,m);
+  // shadow
+  ctx.fillStyle=css('--shadow');ctx.beginPath();ctx.ellipse(4,-2,34+6*Math.abs(Math.sin(2*Math.PI*cycle)),4,0,0,Math.PI*2);ctx.fill();
 
-  // tail
-  const wag=m.health>0.6?Math.sin(tSim*2*Math.PI*2.2)*0.35*(m.health-0.6)/0.4:Math.sin(tSim*1.3)*0.05;
-  const tailBase={x:hip.x-36,y:hip.y-6};
-  const psi=(-55+95*m.tailUp)*Math.PI/180+wag;
-  const tip={x:tailBase.x-72*Math.cos(psi),y:tailBase.y-72*Math.sin(psi)};
-  const tcp={x:tailBase.x-38*Math.cos(psi-0.35),y:tailBase.y-38*Math.sin(psi-0.35)};
-  ctx.strokeStyle=coatDark;ctx.lineCap='round';ctx.lineWidth=11;ctx.beginPath();ctx.moveTo(tailBase.x,tailBase.y);ctx.quadraticCurveTo(tcp.x,tcp.y,tip.x,tip.y);ctx.stroke();
-  ctx.lineWidth=6;ctx.strokeStyle=coat;ctx.beginPath();ctx.moveTo(lerp(tailBase.x,tcp.x,.5),lerp(tailBase.y,tcp.y,.5));ctx.quadraticCurveTo(tcp.x,tcp.y,tip.x,tip.y);ctx.stroke();
+  // far limbs
+  drawArm(AL,shirt2,skinDark);
+  drawLeg(legs.L,hip,trouser2,shoe,false);
+  // torso
+  drawTorso();
+  // head
+  drawHead();
+  // near limbs
+  drawLeg(legs.R,hip,trouser,shoe,true);
+  drawArm(AR,shirt,skin);
 
-  // body (pitches forward in a stumble)
-  ctx.save();ctx.translate(sh.x,sh.y);ctx.rotate(stumblePitch);ctx.translate(-sh.x,-sh.y);
-  const T={x:hip.x-38,y:hip.y-10};
-  const N={x:sh.x+24,y:sh.y-20*girth};
-  const chestPulse=1+0.02*pulse;
-  const C={x:sh.x+30,y:sh.y+40*girth*breathG*chestPulse};
-  const B={x:hip.x+12,y:hip.y+34*girth+sag*0.8};
-  ctx.beginPath();
-  ctx.moveTo(T.x,T.y);
-  ctx.bezierCurveTo(hip.x-6,hip.y-32*girth,sh.x-42,sh.y-34*girth*breathG,sh.x,sh.y-24*girth*breathG);
-  ctx.quadraticCurveTo(sh.x+16,sh.y-24*girth,N.x,N.y);
-  ctx.bezierCurveTo(sh.x+40,sh.y+2,sh.x+40*chestPulse,sh.y+26*girth,C.x,C.y);
-  ctx.bezierCurveTo(sh.x-10,sh.y+54*girth*breathG+sag*0.4,hip.x+50,hip.y+50*girth+sag*1.3,B.x,B.y);
-  ctx.bezierCurveTo(hip.x-24,hip.y+26*girth,hip.x-46,hip.y+8,T.x,T.y);
-  ctx.closePath();
-  const bg=ctx.createLinearGradient(0,sh.y-40,0,hip.y+60);bg.addColorStop(0,coatLight);bg.addColorStop(.55,coat);bg.addColorStop(1,coatDark);
-  ctx.fillStyle=bg;ctx.fill();
-  ctx.save();ctx.clip();
-  if(m.sheen>0){ctx.strokeStyle=`hsla(40 60% 90% / ${0.45*m.sheen})`;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(hip.x-10,hip.y-26*girth);ctx.bezierCurveTo(hip.x+40,sh.y-36*girth,sh.x-30,sh.y-34*girth,sh.x-2,sh.y-22*girth);ctx.stroke()}
-  if(m.fat<0.15&&m.health<0.5){ctx.strokeStyle=hsl(hue,sat,lit-14,0.35);ctx.lineWidth=2;for(let i=0;i<4;i++){ctx.beginPath();ctx.moveTo(sh.x-30-i*14,sh.y-10);ctx.quadraticCurveTo(sh.x-34-i*14,sh.y+20,sh.x-26-i*14,sh.y+40);ctx.stroke()}}
-  // heartbeat glow on the chest
-  ctx.fillStyle=hsl(355,70,55,0.18*pulse);ctx.beginPath();ctx.ellipse(sh.x-4,sh.y+18,22,20,0,0,Math.PI*2);ctx.fill();
-  ctx.restore();
-
-  // neck and head
-  const hc=m.headCarriage;
-  const headBob=yBob*0.5+2*Math.sin(2*Math.PI*cycle*2+1)+stumbleDip*0.8;
-  const Hd={x:N.x+54,y:N.y-18-62*hc+headBob};
-  ctx.strokeStyle=coat;ctx.lineCap='round';ctx.lineWidth=34;ctx.beginPath();ctx.moveTo(N.x-6,N.y+6);ctx.lineTo(Hd.x-8,Hd.y+8);ctx.stroke();
-  ctx.lineWidth=28;ctx.strokeStyle=coatLight;ctx.globalAlpha=.5;ctx.beginPath();ctx.moveTo(N.x-4,N.y-4);ctx.lineTo(Hd.x-10,Hd.y-2);ctx.stroke();ctx.globalAlpha=1;
-  const droop=clamp(m.earDroop);
-  drawEar(Hd.x-14,Hd.y-20,droop,coatDark,-1);
-  ctx.fillStyle=coat;ctx.beginPath();ctx.arc(Hd.x,Hd.y,27,0,Math.PI*2);ctx.fill();
-  const jaw=m.panting?0.18+0.1*Math.sin(tSim*2*Math.PI*2.6):0.02;
-  ctx.fillStyle=coat;ctx.beginPath();ctx.ellipse(Hd.x+28,Hd.y+6,26,15,0.05,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=coatLight;ctx.globalAlpha=.6;ctx.beginPath();ctx.ellipse(Hd.x+30,Hd.y+1,22,8,0.05,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
-  ctx.save();ctx.translate(Hd.x+6,Hd.y+12);ctx.rotate(jaw);
-  ctx.fillStyle=coatDark;ctx.beginPath();ctx.ellipse(22,6,22,7,0,0,Math.PI*2);ctx.fill();
-  if(m.panting){ctx.fillStyle=skinPink;ctx.beginPath();ctx.ellipse(30,12+6*jaw,7,13,0.2,0,Math.PI*2);ctx.fill()}
-  ctx.restore();
-  ctx.fillStyle='#1c1412';ctx.beginPath();ctx.ellipse(Hd.x+52,Hd.y+2,5.5,4.5,0,0,Math.PI*2);ctx.fill();
-  const eyeX=Hd.x+10,eyeY=Hd.y-6;
-  blinkT+=dt;let blinkCover=0;if(blinkT>blinkNext){const b=(blinkT-blinkNext)/0.16;blinkCover=b<1?Math.sin(Math.PI*b):0;if(b>=1){blinkT=0;blinkNext=2.5+Math.random()*4}}
-  const lid=Math.max(m.eyeLid,blinkCover);
-  ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(eyeX,eyeY,6.5,5.5,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle='#1c1412';ctx.beginPath();ctx.arc(eyeX+1.5,eyeY+0.5,3.3,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle=coat;ctx.beginPath();ctx.rect(eyeX-8,eyeY-7,16,14*lid);ctx.fill();
-  ctx.strokeStyle=coatDark;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(eyeX-7,eyeY-7+14*lid);ctx.lineTo(eyeX+7,eyeY-7+14*lid);ctx.stroke();
-  drawEar(Hd.x+2,Hd.y-24,droop,coat,1);
-  ctx.restore(); // stumble pitch
-
-  drawLeg(legsOut.RH,{x:hip.x+2,y:hip.y+10},+1,coat,m,true);
-  drawLeg(legsOut.RF,{x:sh.x,y:sh.y+8},-1,coat,m,true);
-
-  if(m.fever>0.5&&Math.random()<dt*3*m.fever){sweat.push({x:Hd.x-10+Math.random()*20,y:Hd.y-20,vy:20,life:1})}
-  ctx.fillStyle=css('--accent');for(let i=sweat.length-1;i>=0;i--){const d=sweat[i];d.life-=dt*1.4;d.y+=d.vy*dt;d.vy+=60*dt;if(d.life<=0){sweat.splice(i,1);continue}ctx.globalAlpha=d.life*0.8;ctx.beginPath();ctx.ellipse(d.x,d.y,2.2,3.4,0,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
-
-  for(const id in legsOut){const L=legsOut[id];if(legPhasePrev[id]>0.9&&L.phi<0.1&&m.speed>120){for(let i=0;i<3;i++)particles.push({x:L.x,y:-2,vx:-m.speed*0.25-Math.random()*40,vy:-30-Math.random()*40,life:1})}legPhasePrev[id]=L.phi}
-  if(stumble>0.5){for(let i=0;i<4;i++)particles.push({x:legsOut.RF.x,y:-2,vx:-m.speed*0.3-Math.random()*60,vy:-40-Math.random()*50,life:1})}
-  ctx.fillStyle=css('--ground2');for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.life-=dt*1.8;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=90*dt;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life*0.5;ctx.beginPath();ctx.arc(p.x,Math.min(p.y,0),3+3*(1-p.life),0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+  // sweat
+  if(m.fever>0.5&&Math.random()<dt*2.5*m.fever){sweat.push({x:headC.x+2+Math.random()*8,y:headC.y-8,vy:6,life:1})}
+  ctx.fillStyle=css('--accent');for(let i=sweat.length-1;i>=0;i--){const d=sweat[i];d.life-=dt*1.2;d.y+=d.vy*dt;d.vy+=25*dt;if(d.life<=0){sweat.splice(i,1);continue}ctx.globalAlpha=d.life*0.8;ctx.beginPath();ctx.ellipse(d.x,d.y,0.9,1.5,0,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+  // dust at heel strike
+  for(const id in legs){const L=legs[id];if(legPhasePrev[id]>0.9&&L.phi<0.1&&m.speed>90){for(let i=0;i<3;i++)particles.push({x:L.x+4,y:-1,vx:-m.speed*0.2-Math.random()*20,vy:-12-Math.random()*18,life:1})}legPhasePrev[id]=L.phi}
+  if(stumble>0.55)for(let i=0;i<5;i++)particles.push({x:legs.R.x,y:-1,vx:-m.speed*0.3-Math.random()*30,vy:-18-Math.random()*20,life:1});
+  ctx.fillStyle=css('--ground2');for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.life-=dt*1.8;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=40*dt;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life*0.5;ctx.beginPath();ctx.arc(p.x,Math.min(p.y,0),1.5+2*(1-p.life),0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
 
   ctx.restore();
+  // traces
+  bufT+=dt;if(bufT>0.03){bufT=0;ecgBuf.copyWithin(0,1);ecgBuf[ecgBuf.length-1]=ecgSample(beatPhase);respBuf.copyWithin(0,1);respBuf[respBuf.length-1]=breath/m.breathDepth}
+  drawTrace(ecgCtx,ecg,ecgBuf,0.5,css('--critical'));drawTrace(respCtx,resp,respBuf,0.45,css('--accent'));
   updateReadouts(m);
   requestAnimationFrame(draw);
 
+  /* ----- drawing helpers (closures over this frame) ----- */
   function drawHills(baseY,par,color,amp,wl){
     ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,groundY+2);const o=dist*par;
     for(let x=0;x<=W;x+=12){const wx=x+o;const y=baseY-amp*(0.6*Math.sin(wx/wl)+0.4*Math.sin(wx/(wl*0.47)+1.3))*0.5-amp*0.5;ctx.lineTo(x,y)}
     ctx.lineTo(W,groundY+2);ctx.closePath();ctx.fill();
   }
-  function drawEar(x,y,droop,color,side){
-    ctx.save();ctx.translate(x,y);ctx.rotate(side*(-0.35+1.6*droop));
-    ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(-6,-22,2,-30);ctx.quadraticCurveTo(12,-18,8,2);ctx.closePath();ctx.fill();
+  function capsule(a,b,w,color){ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+  function drawLeg(L,hipP,color,shoeColor,near){
+    const ankle={x:L.x,y:L.y};
+    const {knee,end}=ik(hipP,ankle,THIGH,SHIN,+1);
+    const w=11*girth*(0.8+0.2*L.strength)*(0.85+0.15*m.muscles);
+    capsule(hipP,knee,w*1.25,color);
+    capsule(knee,end,w*0.95,color);
+    // foot: rotate about the ankle, positive theta = heel up
+    const th=L.theta*D2R,c=Math.cos(th),sn=Math.sin(th);
+    const R=(px,py)=>({x:end.x+px*c-py*sn,y:end.y+px*sn+py*c});
+    const heel=R(-7,ANKLE_H-1),toe=R(19,ANKLE_H),top=R(6,1),toeTop=R(17,ANKLE_H-5);
+    ctx.fillStyle=shoeColor;ctx.beginPath();ctx.moveTo(heel.x,heel.y-5);ctx.lineTo(top.x,top.y);ctx.quadraticCurveTo(toeTop.x,toeTop.y,toe.x,toe.y);ctx.lineTo(heel.x,heel.y);ctx.closePath();ctx.fill();
+    if(near){ctx.strokeStyle=hsl(0,0,100,0.18);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(heel.x+2,heel.y-1.5);ctx.lineTo(toe.x-3,toe.y-1.5);ctx.stroke()}
+  }
+  function drawArm(A,sleeve,handSkin){
+    const w=8.5*girth;
+    capsule(shoulderJ,A.E,w*1.2,sleeve);
+    capsule(A.E,A.Wr,w*0.95,sleeve);
+    const hand={x:A.Wr.x+9*Math.sin(A.a2),y:A.Wr.y+9*Math.cos(A.a2)};
+    capsule(A.Wr,hand,w*0.8,handSkin);
+  }
+  function drawTorso(){
+    const back1={x:hip.x-9*girth,y:hip.y+2};
+    const back2={x:sh.x-9*girth-4*m.slump,y:sh.y+6};
+    const chest={x:sh.x+11*girth+1.6*breath,y:sh.y+14};
+    const bellyP={x:lerp(hip.x,sh.x,0.35)+10*girth+belly,y:lerp(hip.y,sh.y,0.35)+2};
+    const front1={x:hip.x+9*girth,y:hip.y+3};
+    ctx.beginPath();
+    ctx.moveTo(back1.x,back1.y);
+    ctx.quadraticCurveTo(lerp(back1.x,back2.x,0.5)-4*m.slump,lerp(back1.y,back2.y,0.5),back2.x,back2.y);
+    ctx.quadraticCurveTo(sh.x-6,sh.y-6-0.8*breath,sh.x+4,sh.y-4-0.8*breath);
+    ctx.quadraticCurveTo(chest.x+2,sh.y+2,chest.x,chest.y);
+    ctx.quadraticCurveTo(bellyP.x+4,bellyP.y-10,bellyP.x,bellyP.y);
+    ctx.quadraticCurveTo(bellyP.x-2,bellyP.y+12,front1.x,front1.y);
+    ctx.closePath();
+    const g=ctx.createLinearGradient(sh.x-12,0,sh.x+14,0);g.addColorStop(0,shirt2);g.addColorStop(1,shirt);
+    ctx.fillStyle=g;ctx.fill();
+    // belt / waistband
+    ctx.strokeStyle=trouser2;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(back1.x,back1.y);ctx.lineTo(front1.x,front1.y);ctx.stroke();
+    // collar
+    ctx.fillStyle=skinDark;ctx.beginPath();ctx.ellipse(neckBase.x,neckBase.y+2,5.5,3.5,lean,0,Math.PI*2);ctx.fill();
+    // pulse in the neck (carotid)
+    ctx.fillStyle=hsl(355,70,55,0.25*pulse);ctx.beginPath();ctx.ellipse(neckBase.x+4,neckBase.y-4,3,5,headTilt,0,Math.PI*2);ctx.fill();
+  }
+  function drawHead(){
+    // neck
+    capsule(neckBase,{x:headC.x-2*Math.sin(headTilt),y:headC.y+2*Math.cos(headTilt)},9,skin);
+    ctx.save();ctx.translate(headC.x,headC.y);ctx.rotate(headTilt);
+    // skull
+    ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(0,0,10.5,12,0,0,Math.PI*2);ctx.fill();
+    // jaw / chin
+    ctx.beginPath();ctx.moveTo(-6,6);ctx.quadraticCurveTo(2,14,8,6);ctx.closePath();ctx.fill();
+    // hair
+    ctx.fillStyle=hair;ctx.beginPath();ctx.ellipse(-1.5,-4,10.5,9,0,Math.PI*1.02,Math.PI*2.02);ctx.fill();
+    ctx.beginPath();ctx.moveTo(-11,-3);ctx.quadraticCurveTo(-13,6,-8,9);ctx.lineTo(-7,-1);ctx.closePath();ctx.fill();
+    // ear
+    ctx.fillStyle=skinDark;ctx.beginPath();ctx.ellipse(-4,1,2.2,3.2,0,0,Math.PI*2);ctx.fill();
+    // nose
+    ctx.fillStyle=skin;ctx.beginPath();ctx.moveTo(8,-1);ctx.lineTo(12.5,3);ctx.lineTo(8,4);ctx.closePath();ctx.fill();
+    // cheek flush
+    if(m.flush>0){ctx.fillStyle=hsl(0,70,60,0.35*m.flush);ctx.beginPath();ctx.ellipse(4,3,4,2.5,0,0,Math.PI*2);ctx.fill()}
+    // eye
+    blinkT+=dt;let blinkCover=0;if(blinkT>blinkNext){const b=(blinkT-blinkNext)/0.14;blinkCover=b<1?Math.sin(Math.PI*b):0;if(b>=1){blinkT=0;blinkNext=2.5+Math.random()*4}}
+    const lid=Math.max(m.eyeLid,blinkCover);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(5,-2,2.6,1.8,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#2a1c14';ctx.beginPath();ctx.arc(5.8,-1.9,1.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=skin;ctx.fillRect(2,-4.2,6.5,4.2*lid);
+    ctx.strokeStyle=skinDark;ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(2.4,-4.2+4.2*lid);ctx.lineTo(7.8,-4.2+4.2*lid);ctx.stroke();
+    // brow
+    ctx.strokeStyle=hair;ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(2.5,-5.2-1.5*m.slump);ctx.lineTo(8,-5.6);ctx.stroke();
+    // mouth
+    const open=m.panting?1.8+1.2*Math.sin(tSim*2*Math.PI*1.6):0;
+    ctx.strokeStyle=hsl(5,45,38);ctx.lineWidth=1.2;ctx.beginPath();
+    const mouthY=7.5,corner=(m.health-0.5)*2.2;
+    ctx.moveTo(4,mouthY+corner*0.6);ctx.quadraticCurveTo(7,mouthY+open*0.4-corner,10,mouthY-0.3);ctx.stroke();
+    if(open>0){ctx.fillStyle=hsl(5,55,35);ctx.beginPath();ctx.ellipse(7.2,mouthY+1,2.6,open,0,0,Math.PI*2);ctx.fill()}
     ctx.restore();
   }
-  function drawLeg(L,P,dir,color,m,near){
-    const {knee,foot}=ik(P,{x:L.x,y:L.y},62,62,dir);
-    const w=(9+7*L.strength)*(0.75+0.25*m.muscles);
-    ctx.lineCap='round';ctx.lineJoin='round';
-    ctx.strokeStyle=color;ctx.lineWidth=w*1.15;ctx.beginPath();ctx.moveTo(P.x,P.y);ctx.lineTo(knee.x,knee.y);ctx.stroke();
-    ctx.lineWidth=w*0.85;ctx.beginPath();ctx.moveTo(knee.x,knee.y);ctx.lineTo(foot.x,foot.y-4);ctx.stroke();
-    ctx.fillStyle=color;ctx.beginPath();ctx.ellipse(foot.x+4,foot.y-3,11,5.5,0,0,Math.PI*2);ctx.fill();
+  function ecgSample(ph){const p=ph;let v=0;
+    v+=0.12*Math.exp(-Math.pow((p-0.12)/0.03,2));
+    v-=0.15*Math.exp(-Math.pow((p-0.20)/0.008,2));
+    v+=1.0*Math.exp(-Math.pow((p-0.22)/0.012,2));
+    v-=0.25*Math.exp(-Math.pow((p-0.245)/0.01,2));
+    v+=0.28*Math.exp(-Math.pow((p-0.40)/0.05,2));
+    return v}
+  function drawTrace(c,el,buf,amp,color){
+    const w=el.width/DPR,h=el.height/DPR;c.setTransform(DPR,0,0,DPR,0,0);c.clearRect(0,0,w,h);
+    c.strokeStyle=css('--line');c.lineWidth=1;c.beginPath();c.moveTo(0,h*0.65);c.lineTo(w,h*0.65);c.stroke();
+    c.strokeStyle=color;c.lineWidth=1.6;c.lineJoin='round';c.beginPath();
+    for(let i=0;i<buf.length;i++){const x=i/(buf.length-1)*w,y=h*0.65-buf[i]*h*amp;if(i===0)c.moveTo(x,y);else c.lineTo(x,y)}
+    c.stroke();
   }
 }
 
@@ -585,22 +659,23 @@ function draw(now){
 let roTick=0;
 function updateReadouts(m){
   roTick++;if(roTick%6)return;
-  $('ro-gait').textContent=m.gait;$('legend').textContent=`${m.gait}ing, ${Math.round(m.cadenceSpm)} strides/min, heart ${Math.round(m.heartBpm)} bpm`;
-  $('ro-hr').innerHTML=Math.round(m.heartBpm)+'<small>bpm</small>';
-  $('ro-cad').innerHTML=Math.round(m.cadenceSpm)+'<small>strides/min</small>';
-  $('ro-stride').textContent=Math.round(m.strideFrac/1.6*100)+'%';
-  $('ro-breath').innerHTML=Math.round(m.breathHz*60)+'<small>/min'+(m.panting?', panting':'')+'</small>';
+  $('ro-gait').textContent=m.gait;
+  $('legend').textContent=`${m.gait}, ${m.kmh.toFixed(1)} km/h, ${Math.round(m.stepsPerMin)} steps/min, heart ${Math.round(m.heartBpm)} bpm`;
+  $('tr-hr').textContent=Math.round(m.heartBpm)+' bpm';$('tr-br').textContent=Math.round(m.breathHz*60)+'/min'+(m.panting?' · mouth open':'');
+  $('ro-speed').innerHTML=m.kmh.toFixed(1)+'<small>km/h</small>';
+  $('ro-cad').innerHTML=Math.round(m.stepsPerMin)+'<small>steps/min</small>';
+  $('ro-stride').innerHTML=m.strideM.toFixed(2)+'<small>m</small>';
+  const post=m.slump<0.25?'upright, shoulders back':m.slump<0.5?'slightly stooped':m.slump<0.75?'stooped, shoulders rounded':'hunched';
+  $('ro-posture').textContent=post+', lean '+Math.round(m.lean)+'°';
+  $('ro-gaze').textContent=m.gaze>0.75?'on the horizon':m.gaze>0.5?'a few metres ahead':m.gaze>0.3?'at the path':'at their feet';
   $('ro-stumble').innerHTML=stumbles+'<small>so far, '+Math.round(m.stumbleChance*100)+'% per stride</small>';
-  const limp=[];if(m.legs.front<0.5)limp.push('forelegs (delivery)');if(m.legs.hind<0.5)limp.push(m.legs.hind<0.25?'hind legs drag (invoicing)':'hind legs (invoicing)');
+  const limp=[];if(m.legs.L<0.5)limp.push(m.legs.L<0.25?'left drags (delivery)':'left (delivery)');if(m.legs.R<0.5)limp.push(m.legs.R<0.25?'right drags (invoicing)':'right (invoicing)');
   $('ro-limp').textContent=limp.length?limp.join(', '):'none';
   $('ro-react').innerHTML=m.reaction.toFixed(1)+'<small>s</small>';
-  const head=m.headCarriage>0.75?'head high':m.headCarriage>0.5?'head level':m.headCarriage>0.32?'head low':'head hanging';
-  const tail=m.tailUp>0.75?'tail wagging':m.tailUp>0.5?'tail level':m.tailUp>0.25?'tail low':'tail tucked';
-  $('ro-head').textContent=head+', '+tail;
-  $('ro-dist').innerHTML=Math.round(dist/BODY_LEN).toLocaleString('en-US')+'<small>lengths</small>';
+  $('ro-dist').innerHTML=Math.round(dist/100).toLocaleString('en-US')+'<small>m</small>';
 }
 
-/* ---------- department map & organ cards ---------- */
+/* ---------- department map & system cards ---------- */
 function renderMap(r){
   $('map-body').innerHTML=ORGANS.map(x=>{const s=r.o[x.id];const st=status(s);
     return `<tr><td><b>${x.dept}</b></td><td>${x.name}</td><td><div class="why">${x.biomimicry}</div></td><td class="num"><span class="pill ${st.k}">${st.i} ${Math.round(s)}</span></td><td>${x.visual}</td></tr>`}).join('');
@@ -686,7 +761,7 @@ function buildFlow(){
     {t:'Numbers',items:INPUTS.map(i=>({id:i.id,label:i.label}))},
     {t:'Derived',items:DERIVED.map(i=>({id:i.id,label:i.label}))},
     {t:'Body systems',items:ORGANS.map(i=>({id:i.id,label:i.name+' · '+i.dept}))},
-    {t:'Animal',items:VISUALS.map(v=>({id:'vis:'+v,label:v}))},
+    {t:'The walk',items:VISUALS.map(v=>({id:'vis:'+v,label:v}))},
   ];
   $('flow').innerHTML=cols.map((c,ci)=>`<div class="col"><h3>${c.t}<span class="n">${c.items.length}</span></h3><div class="nodes">${c.items.map(it=>`<span class="node" data-node="${it.id}" data-col="${ci}">${it.label}</span>`).join('')}</div></div>`).join('');
 }
@@ -699,8 +774,8 @@ function describeMoves(a,b){
   for(const i of INPUTS)if(!near(a.v[i.id],b.v[i.id])){moved.add(i.id);lines.push({l:i.label,from:fmtInput(i.id,a.v[i.id]),to:fmtInput(i.id,b.v[i.id]),up:b.v[i.id]>a.v[i.id]})}
   for(const x of DERIVED)if(!near(a.d[x.id],b.d[x.id])){moved.add(x.id);lines.push({l:x.label,from:x.fmt(a.d[x.id]),to:x.fmt(b.d[x.id]),up:b.d[x.id]>a.d[x.id]})}
   for(const x of ORGANS)if(Math.round(a.o[x.id])!==Math.round(b.o[x.id])){moved.add(x.id);x.visual.split(/, | \(/).forEach(v=>moved.add('vis:'+v.replace(/\)$/,'').trim()));lines.push({l:x.name+' ('+x.dept+')',from:Math.round(a.o[x.id]),to:Math.round(b.o[x.id]),up:b.o[x.id]>a.o[x.id]})}
-  if(Math.round(a.health)!==Math.round(b.health)){['coat','tail','gait'].forEach(v=>moved.add('vis:'+v));lines.push({l:'Overall health',from:Math.round(a.health),to:Math.round(b.health),up:b.health>a.health})}
-  if(moved.has('heart'))moved.add('vis:gait');
+  if(Math.round(a.health)!==Math.round(b.health)){['complexion','posture','gait'].forEach(v=>moved.add('vis:'+v));lines.push({l:'Overall health',from:Math.round(a.health),to:Math.round(b.health),up:b.health>a.health})}
+  if(moved.has('heart')){moved.add('vis:gait');moved.add('vis:arm swing')}
   if(moved.size)moved.add('src');
   return {moved,lines};
 }
