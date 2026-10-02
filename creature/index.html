@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Company Creature</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a clinic chart. The creature stands on the left as the patient, the organ vitals read down the right,
+   the numbers bench sits below, and the data-flow strip is the spine that shows what moved what. */
+:root{
+  --bg:#edf2f0; --surface:#ffffff; --surface-2:#e2eae7; --ink:#14262b; --ink-2:#4b6066; --ink-3:#7d9096; --line:#cdd9d5;
+  --accent:#1e6b86; --accent-ink:#ffffff; --accent-soft:#d9e9ef;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --skin:#c9a96e; --skin-edge:#8a7148; --organ-bg:#f3e6de; --shadow:rgba(20,38,43,.14);
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e191c; --surface:#152427; --surface-2:#1b2f34; --ink:#e3edef; --ink-2:#a7bbc0; --ink-3:#7b9096; --line:#27414a;
+  --accent:#64b8d3; --accent-ink:#0e191c; --accent-soft:#1a3d4a; --organ-bg:#2a2320; --shadow:rgba(0,0,0,.45); color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0e191c; --surface:#152427; --surface-2:#1b2f34; --ink:#e3edef; --ink-2:#a7bbc0; --ink-3:#7b9096; --line:#27414a;
+  --accent:#64b8d3; --accent-ink:#0e191c; --accent-soft:#1a3d4a; --organ-bg:#2a2320; --shadow:rgba(0,0,0,.45); color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:18px 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:20px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600}
+.muted{color:var(--ink-2)}
+.small{font-size:13px}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justify-content:space-between;margin-bottom:18px}
+.subject{font-size:14px;color:var(--ink-2);margin-top:6px}
+.healthbadge{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 16px}
+.healthbadge .score{font-family:var(--display);font-size:42px;font-weight:700;line-height:1}
+.healthbadge .label{font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+.pill.good{background:var(--good)} .pill.warn{background:var(--warn);color:#2b2000} .pill.serious{background:var(--serious);color:#2b1200} .pill.critical{background:var(--critical)}
+
+.scen{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.scen .eyebrow{margin-right:4px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+
+.stage{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:20px;align-items:start}
+@media (max-width:860px){.stage{grid-template-columns:1fr}}
+.patient{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;position:sticky;top:env(safe-area-inset-top,0px)}
+@media (max-width:860px){.patient{position:static}}
+.patient svg#creature{width:100%;height:auto;display:block;max-height:560px}
+.vitals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.vital{background:var(--surface-2);border-radius:10px;padding:8px 10px;min-width:0}
+.vital .v{font-family:var(--display);font-size:22px;font-weight:700;line-height:1.1}
+.vital .k{font-size:12px;color:var(--ink-2)}
+.ecg{margin-top:10px;background:var(--surface-2);border-radius:10px;padding:4px 8px}
+.ecg svg{width:100%;height:46px;display:block}
+.ecg path{fill:none;stroke:var(--accent);stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+
+.organs{display:grid;gap:10px}
+.organ{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;border-left:5px solid var(--line)}
+.organ.good{border-left-color:var(--good)} .organ.warn{border-left-color:var(--warn)} .organ.serious{border-left-color:var(--serious)} .organ.critical{border-left-color:var(--critical)}
+.organ .head{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.organ .name{font-family:var(--display);font-weight:700;font-size:17px}
+.organ .part{color:var(--ink-3);font-size:13px;margin-left:6px}
+.organ .score{font-family:var(--display);font-weight:700;font-size:22px;min-width:3ch;text-align:right}
+.bar{height:6px;background:var(--surface-2);border-radius:4px;margin:8px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;background:var(--ink-3);transition:width .5s ease}
+.organ.good .bar i{background:var(--good)} .organ.warn .bar i{background:var(--warn)} .organ.serious .bar i{background:var(--serious)} .organ.critical .bar i{background:var(--critical)}
+.organ .why{font-size:14px;color:var(--ink-2)}
+.organ details{margin-top:6px}
+.organ summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:600;list-style:none}
+.organ summary::before{content:"▸ ";}
+.organ details[open] summary::before{content:"▾ ";}
+.formula{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);border-radius:8px;padding:8px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.feeds{margin:6px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-2)}
+.feeds li{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px dashed var(--line)}
+.feeds li:last-child{border-bottom:0}
+.organ.moved{animation:flash 1.4s ease}
+@keyframes flash{0%{background:var(--accent-soft)}100%{background:var(--surface)}}
+
+section.block{margin-top:28px}
+section.block > .hd{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.bench{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
+.group h3{margin-bottom:8px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.group h3 .eyebrow{font-weight:600}
+.field{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.field:first-of-type{border-top:0}
+.field label{font-size:14px}
+.field .src{grid-column:1/-1;font-size:12px;color:var(--ink-3)}
+.field input[type=number]{width:11ch;font:inherit;font-family:var(--mono);font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);text-align:right}
+.field input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:2px 0 0}
+.field .unit{font-size:12px;color:var(--ink-3);margin-left:4px}
+.field .ctl{display:flex;align-items:center;justify-content:flex-end}
+.switch{display:inline-flex;align-items:center;gap:8px}
+.switch input{width:18px;height:18px;accent-color:var(--accent)}
+
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:860px){.flow{grid-template-columns:1fr}}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+.col h3{font-size:14px;margin-bottom:8px}
+.col .n{font-size:12px;color:var(--ink-3);font-weight:400;margin-left:4px}
+.nodes{display:flex;flex-wrap:wrap;gap:6px}
+.node{font-size:12px;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:var(--surface-2);color:var(--ink-2);transition:background .3s,color .3s,border-color .3s}
+.node.lit{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.moves{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.moves ul{margin:6px 0 0;padding-left:0;list-style:none;display:grid;gap:4px;font-size:14px}
+.moves li{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.moves li b{font-weight:600}
+.delta.up{color:var(--good)} .delta.down{color:var(--critical)}
+
+table.check{width:100%;border-collapse:collapse;font-size:14px}
+table.check th,table.check td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.check td:not(:first-child),table.check th:not(:first-child){text-align:right}
+.tablewrap{overflow-x:auto}
+.ok{color:var(--good);font-weight:600}
+footer{margin-top:36px;font-size:13px;color:var(--ink-2);max-width:70ch}
+footer p{margin:6px 0}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:13px}
+
+/* creature animation */
+#creature *{transform-box:fill-box}
+#heart{transform-origin:center;animation:beat var(--beat,.8s) ease-in-out infinite}
+#heart.arrhythmia{animation:beatIrregular calc(var(--beat,.8s)*2.6) ease-in-out infinite}
+#lungs{transform-origin:center;animation:breathe var(--breath,3.6s) ease-in-out infinite}
+#torso{transform-origin:50% 100%;animation:breatheBody var(--breath,3.6s) ease-in-out infinite}
+#nerves.jitter,#head.jitter{animation:jitter .22s steps(2,end) infinite}
+#fever-glow{transition:opacity .6s}
+@keyframes beat{0%{transform:scale(1)}14%{transform:scale(1.16)}28%{transform:scale(1)}42%{transform:scale(1.09)}56%{transform:scale(1)}100%{transform:scale(1)}}
+@keyframes beatIrregular{0%{transform:scale(1)}6%{transform:scale(1.14)}12%{transform:scale(1)}20%{transform:scale(1.1)}26%{transform:scale(1)}55%{transform:scale(1)}60%{transform:scale(1.16)}66%{transform:scale(1)}72%{transform:scale(1.07)}78%{transform:scale(1)}100%{transform:scale(1)}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(var(--breath-amp,1.07))}}
+@keyframes breatheBody{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.012)}}
+@keyframes jitter{0%{transform:translate(0,0)}50%{transform:translate(var(--jit,1px),calc(var(--jit,1px)*-1))}100%{transform:translate(0,0)}}
+.ecg path{stroke-dasharray:1200;animation:sweep calc(var(--beat,.8s)*3) linear infinite}
+@keyframes sweep{from{stroke-dashoffset:1200}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){#creature *,.ecg path,.organ.moved{animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">Company Creature</div>
+    <h1>AHD Group, as a living thing</h1>
+    <div class="subject">Invoices 1 Jan to 17 Sep 2026. Numbers taken from AHD Costing on 1 Oct 2026, 19:20. Change any number below and watch what it moves.</div>
+  </div>
+  <div class="healthbadge" aria-live="polite">
+    <div class="score num" id="health-score">—</div>
+    <div><div class="eyebrow">Overall health</div><div class="label" id="health-label">—</div><div class="small muted" id="health-sub">weighted from 10 organs</div></div>
+  </div>
+</header>
+
+<div class="scen" role="group" aria-label="Scenarios">
+  <span class="eyebrow">Scenario</span>
+  <button class="chip" data-scen="asis" aria-pressed="true">As invoiced</button>
+  <button class="chip" data-scen="si" aria-pressed="false">With the 14% S&amp;I they paid</button>
+  <button class="chip" data-scen="nodisc" aria-pressed="false">No discount</button>
+  <button class="chip" data-scen="full" aria-pressed="false">Full list + S&amp;I</button>
+  <button class="chip" data-scen="be" aria-pressed="false">Break-even discount</button>
+  <button class="ghost" id="reset" style="margin-left:auto">Reset to 1 Oct 2026</button>
+</div>
+
+<div class="stage">
+  <div class="patient">
+    <svg id="creature" viewBox="0 0 420 500" role="img" aria-labelledby="creature-title">
+      <title id="creature-title">The company drawn as a creature. Its colour, posture, heartbeat, breathing, belly, body width, eyes and skin follow the numbers.</title>
+      <defs>
+        <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="14"/></filter>
+        <clipPath id="bodyClip"><ellipse id="bodyClipShape" cx="210" cy="310" rx="105" ry="125"/></clipPath>
+        <clipPath id="lidL"><rect id="lidLRect" x="170" y="102" width="30" height="0"/></clipPath>
+        <clipPath id="lidR"><rect id="lidRRect" x="220" y="102" width="30" height="0"/></clipPath>
+      </defs>
+      <ellipse cx="210" cy="482" rx="92" ry="9" fill="var(--ink)" opacity=".13"/>
+      <g id="pose">
+        <g id="legs" stroke="var(--skin-edge)" stroke-width="2">
+          <rect x="166" y="415" width="34" height="62" rx="16" fill="var(--skin)"/>
+          <rect x="220" y="415" width="34" height="62" rx="16" fill="var(--skin)"/>
+        </g>
+        <g id="arms" fill="none" stroke="var(--skin)" stroke-linecap="round" stroke-width="22">
+          <path id="armL" d="M115 265 C 80 300, 70 340, 78 380"/>
+          <path id="armR" d="M305 265 C 340 300, 350 340, 342 380"/>
+        </g>
+        <g id="arms-edge" fill="none" stroke="var(--skin-edge)" stroke-linecap="round" stroke-width="1.5" opacity=".6">
+          <path id="armLe" d="M115 265 C 80 300, 70 340, 78 380"/>
+          <path id="armRe" d="M305 265 C 340 300, 350 340, 342 380"/>
+        </g>
+        <g id="torso">
+          <ellipse id="bodyShape" cx="210" cy="310" rx="105" ry="125" fill="var(--skin)" stroke="var(--skin-edge)" stroke-width="2"/>
+          <ellipse id="bodyWindow" cx="210" cy="310" rx="105" ry="125" fill="var(--organ-bg)" opacity=".55"/>
+          <g id="organs" clip-path="url(#bodyClip)">
+            <g id="nerves" fill="none" stroke="var(--accent)" stroke-width="1.6" opacity=".35">
+              <path d="M210 190 V 410 M210 232 L162 292 M210 232 L258 292 M210 296 L170 376 M210 296 L250 376 M162 292 L150 330 M258 292 L270 330"/>
+            </g>
+            <g id="lungs" fill="#e8a6a0" stroke="#b86b63" stroke-width="1.5">
+              <ellipse cx="168" cy="242" rx="22" ry="40"/>
+              <ellipse cx="252" cy="242" rx="22" ry="40"/>
+            </g>
+            <g id="heart" transform="translate(210 252) scale(1.7)">
+              <path id="heartPath" d="M0 12 C-13 1 -18 -13 -8 -18 C-2 -21 0 -14 0 -12 C0 -14 2 -21 8 -18 C18 -13 13 1 0 12 Z" fill="#c62f3c" stroke="#7d1621" stroke-width="1"/>
+            </g>
+            <ellipse id="stomach" cx="222" cy="338" rx="36" ry="28" fill="#e2c38f" stroke="#9c7a3b" stroke-width="1.5"/>
+            <g id="rash" fill="var(--serious)" opacity=".75"></g>
+          </g>
+          <ellipse cx="210" cy="310" rx="105" ry="125" id="bodyOutline" fill="none" stroke="var(--skin-edge)" stroke-width="2"/>
+        </g>
+        <g id="head">
+          <circle id="fever-glow" cx="210" cy="125" r="88" fill="var(--critical)" filter="url(#blur)" opacity="0"/>
+          <circle cx="210" cy="125" r="70" fill="var(--skin)" stroke="var(--skin-edge)" stroke-width="2"/>
+          <g id="eyes">
+            <ellipse cx="185" cy="118" rx="14" ry="16" fill="#fff" stroke="var(--skin-edge)" stroke-width="1.2"/>
+            <ellipse cx="235" cy="118" rx="14" ry="16" fill="#fff" stroke="var(--skin-edge)" stroke-width="1.2"/>
+            <circle id="pupilL" cx="188" cy="120" r="6" fill="#1a1a1a"/>
+            <circle id="pupilR" cx="232" cy="120" r="6" fill="#1a1a1a"/>
+            <ellipse cx="185" cy="118" rx="14.5" ry="16.5" fill="var(--skin)" clip-path="url(#lidL)"/>
+            <ellipse cx="235" cy="118" rx="14.5" ry="16.5" fill="var(--skin)" clip-path="url(#lidR)"/>
+          </g>
+          <path id="mouth" d="M188 160 Q210 160 232 160" fill="none" stroke="var(--skin-edge)" stroke-width="3" stroke-linecap="round"/>
+          <g id="sweat" fill="var(--accent)" opacity="0">
+            <path d="M138 110 c-4 8 -4 14 0 14 s4 -6 0 -14z"/>
+            <path d="M284 96 c-4 8 -4 14 0 14 s4 -6 0 -14z"/>
+          </g>
+        </g>
+      </g>
+    </svg>
+    <div class="vitals">
+      <div class="vital"><div class="v num" id="v-pulse">—</div><div class="k">pulse, bpm</div></div>
+      <div class="vital"><div class="v num" id="v-temp">—</div><div class="k">temperature, °C</div></div>
+      <div class="vital"><div class="v num" id="v-weight">—</div><div class="k">overhead weight, % of paid</div></div>
+    </div>
+    <div class="ecg" aria-hidden="true"><svg viewBox="0 0 320 46" preserveAspectRatio="none"><path id="ecgPath" d="M0 30 H 36 l 6 -6 l 6 6 H 60 l 5 -22 l 6 36 l 5 -14 H 100 l 6 -6 l 6 6 H 142 l 6 -6 l 6 6 H 166 l 5 -22 l 6 36 l 5 -14 H 206 l 6 -6 l 6 6 H 248 l 6 -6 l 6 6 H 272 l 5 -22 l 6 36 l 5 -14 H 312 l 6 -6 l 2 2"/></svg></div>
+  </div>
+  <div class="organs" id="organs"></div>
+</div>
+
+<section class="block">
+  <div class="hd"><h2>The numbers</h2><span class="small muted">Each one names where it comes from in AHD Costing. Edit any of them.</span></div>
+  <div class="bench" id="bench"></div>
+</section>
+
+<section class="block">
+  <div class="hd"><h2>How the data moves</h2><span class="small muted">Sources feed numbers, numbers feed derived figures, those feed organs, organs draw the creature.</span></div>
+  <div class="flow" id="flow"></div>
+  <div class="moves" id="moves"><div class="eyebrow">What moved</div><div class="small muted" id="moves-empty">Nothing yet. Change a number or pick a scenario.</div><ul id="moves-list"></ul></div>
+</section>
+
+<section class="block">
+  <div class="hd"><h2>Check against AHD Costing</h2><span class="small muted">The model's figures beside the dashboard's own, material-absorption method.</span></div>
+  <div class="tablewrap"><table class="check" id="check"><thead><tr><th>Figure</th><th>This model</th><th>AHD Costing home page</th></tr></thead><tbody></tbody></table></div>
+</section>
+
+<footer>
+  <p><strong>How it is built.</strong> The same shape as the costing database: sources are imported with a date and fingerprint, each number keeps its evidence, rules turn numbers into scores, and a recalculation runs through the whole chain after any change. Here the whole chain is in the page, so it runs instantly.</p>
+  <p>Seed values are reconstructed from the AHD Costing home page of 1 Oct 2026 and reproduce its material-method margins within half a percentage point. Organ thresholds are first guesses to be tuned with the management team.</p>
+</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const fmtEGP=x=>Math.round(x).toLocaleString('en-US')+' EGP';
+const fmtM=x=>(x/1e6).toLocaleString('en-US',{maximumFractionDigits:2})+' M EGP';
+const fmtPct=(x,d=1)=>(x*100).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';
+const fmtN=x=>Math.round(x).toLocaleString('en-US');
+const fmt1=x=>x.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+
+/* ---------- 1. Numbers (the facts), each with its source ---------- */
+const INPUTS=[
+ {id:'list_value',group:'Sales',label:'List value of everything invoiced',unit:'EGP',value:62900000,step:100000,min:0,fmt:fmtM,source:'Home page, reconstructed from the discount and profit figures'},
+ {id:'discount',group:'Sales',label:'Average discount given',unit:'%',value:32.3,step:0.1,min:0,max:90,slider:true,source:'Home page: "average discount 32%"'},
+ {id:'si_on',group:'Sales',label:'Customer pays shipping & installation on top',unit:'',value:0,type:'toggle',source:'Home page: GL shipping income = 14% of sales'},
+ {id:'si_rate',group:'Sales',label:'Shipping & installation rate',unit:'%',value:14,step:0.5,min:0,max:50,source:'Home page'},
+ {id:'material',group:'Costs',label:'Material in everything sold',unit:'EGP',value:17000000,step:100000,min:0,fmt:fmtM,source:'Overhead page: register material, rate 2.382× gives the 40.5 M pool'},
+ {id:'oh_month',group:'Costs',label:'Company overhead per month',unit:'EGP',value:4760952,step:10000,min:0,max:12000000,slider:true,fmt:fmtM,source:'Overhead page: GP ledger 2026-01 to 07, Milano and income tax excluded'},
+ {id:'months',group:'Costs',label:'Months in the period',unit:'months',value:8.51,step:0.01,min:0.1,source:'1 Jan to 17 Sep 2026'},
+ {id:'open_orders',group:'Production',label:'Open GP orders',unit:'',value:560,step:1,min:0,source:'Orders & plans, 2 Oct 2026'},
+ {id:'no_plan',group:'Production',label:'Open orders with no factory plan',unit:'',value:303,step:1,min:0,source:'Orders & plans: "need planning"'},
+ {id:'late',group:'Production',label:'Open orders past their due date',unit:'',value:264,step:1,min:0,source:'Orders & plans: 47 up to 30 days + 217 over 30 days'},
+ {id:'plans',group:'Production',label:'Open factory plans',unit:'',value:281,step:1,min:0,source:'Orders & plans: production board'},
+ {id:'should_start',group:'Production',label:'Plans past start date, not released',unit:'',value:90,step:1,min:0,source:'Orders & plans: "should have started"'},
+ {id:'items_priced',group:'Items',label:'Priced sales items',unit:'',value:568,step:1,min:1,source:'Home page'},
+ {id:'items_losing',group:'Items',label:'Items losing money at full list price',unit:'',value:237,step:1,min:0,source:'Home page, material method (per-unit method says 296)'},
+ {id:'cost_coverage',group:'Data quality',label:'Sales value that has a cost',unit:'%',value:86,step:1,min:0,max:100,source:'Home page'},
+ {id:'audit_high',group:'Data quality',label:'High-severity audit findings',unit:'',value:606,step:1,min:0,source:'Audit page'},
+ {id:'matches_pending',group:'Data quality',label:'GP to factory matches to confirm',unit:'',value:1984,step:1,min:0,source:'Match review'},
+ {id:'price_decisions',group:'Data quality',label:'Material prices waiting for a decision',unit:'',value:9,step:1,min:0,source:'Home page'},
+ {id:'inflation_items',group:'Market',label:'Purchased items up 10% or more in a year',unit:'',value:322,step:1,min:0,source:'Purchasing: price changes vs 12 months ago'},
+ {id:'fx_market',group:'Market',label:'EGP per USD, market',unit:'',value:51.97,step:0.01,min:1,source:'Rules: xe.com 30 Sep 2026'},
+ {id:'fx_card',group:'Market',label:'EGP per USD, GP cost card',unit:'',value:47,step:0.01,min:1,source:'Rules: standard cost on 14,557 items'},
+];
+const SOURCES=['FCMaster factory DB','Asmaa’s model files','GP ledger & invoices','GP item price list','Purchasing Google sheet','Audit & match decisions'];
+
+/* ---------- 2. Derived figures ---------- */
+const DERIVED=[
+ {id:'discount_egp',label:'Discount given away',deps:['list_value','discount'],fmt:fmtM,fn:v=>v.list_value*v.discount/100},
+ {id:'net_sales',label:'What customers paid',deps:['list_value','discount_egp'],fmt:fmtM,fn:(v,d)=>v.list_value-d.discount_egp},
+ {id:'si_income',label:'Shipping & installation income',deps:['si_on','si_rate','net_sales'],fmt:fmtM,fn:(v,d)=>v.si_on?d.net_sales*v.si_rate/100:0},
+ {id:'revenue',label:'Revenue',deps:['net_sales','si_income'],fmt:fmtM,fn:(v,d)=>d.net_sales+d.si_income},
+ {id:'overhead',label:'Overhead in the period',deps:['oh_month','months'],fmt:fmtM,fn:v=>v.oh_month*v.months},
+ {id:'cost',label:'Full cost (material + overhead)',deps:['material','overhead'],fmt:fmtM,fn:(v,d)=>v.material+d.overhead},
+ {id:'profit',label:'Profit',deps:['revenue','cost'],fmt:fmtM,fn:(v,d)=>d.revenue-d.cost},
+ {id:'margin',label:'Margin on revenue',deps:['profit','revenue'],fmt:x=>fmtPct(x),fn:(v,d)=>d.revenue>0?d.profit/d.revenue:-1},
+ {id:'break_even',label:'Largest discount that still breaks even',deps:['cost','list_value','si_on','si_rate'],fmt:x=>fmtPct(x),fn:(v,d)=>1-d.cost/(v.list_value*(v.si_on?1+v.si_rate/100:1))},
+ {id:'oh_share',label:'Overhead as share of what customers paid',deps:['overhead','net_sales'],fmt:x=>fmtPct(x,0),fn:(v,d)=>d.net_sales>0?d.overhead/d.net_sales:9},
+ {id:'oh_rate',label:'Overhead per EGP of material',deps:['overhead','material'],fmt:x=>x.toFixed(2)+'×',fn:(v,d)=>v.material>0?d.overhead/v.material:0},
+ {id:'unplanned_share',label:'Open orders without a plan',deps:['no_plan','open_orders'],fmt:x=>fmtPct(x,0),fn:v=>v.open_orders>0?clamp(v.no_plan/v.open_orders):0},
+ {id:'late_share',label:'Open orders that are late',deps:['late','open_orders'],fmt:x=>fmtPct(x,0),fn:v=>v.open_orders>0?clamp(v.late/v.open_orders):0},
+ {id:'stuck_share',label:'Plans stuck before release',deps:['should_start','plans'],fmt:x=>fmtPct(x,0),fn:v=>v.plans>0?clamp(v.should_start/v.plans):0},
+ {id:'profitable_share',label:'Items that make money at list',deps:['items_priced','items_losing'],fmt:x=>fmtPct(x,0),fn:v=>clamp((v.items_priced-v.items_losing)/v.items_priced)},
+ {id:'fx_gap',label:'Market rate above the cost-card rate',deps:['fx_market','fx_card'],fmt:x=>fmtPct(x),fn:v=>v.fx_market/v.fx_card-1},
+];
+
+/* ---------- 3. Organs: rules that turn figures into a 0–100 score ---------- */
+const ORGANS=[
+ {id:'heart',name:'Heart',part:'profit',weight:20,deps:['margin'],visual:'heartbeat & pulse',
+  score:d=>100*clamp((d.margin+0.5)/0.65),
+  why:(v,d)=>`Margin ${fmtPct(d.margin)} on ${fmtM(d.revenue)} revenue. Profit ${fmtM(d.profit)}.`,
+  formula:'score = (margin + 50%) ÷ 65%, so −50% → 0 and +15% → 100\npulse = 60 + 0.6 × (100 − score) bpm'},
+ {id:'fat',name:'Fat',part:'overhead weight',weight:15,deps:['oh_share'],visual:'body width',
+  score:d=>100*clamp((1-d.oh_share)/0.70),
+  why:(v,d)=>`Overhead of ${fmtM(d.overhead)} is ${fmtPct(d.oh_share,0)} of what customers paid, ${d.oh_rate.toFixed(2)}× the material.`,
+  formula:'score = (100% − overhead ÷ paid) ÷ 70%, so 30% → 100 and 100% → 0\nbody width grows as the score falls'},
+ {id:'fever',name:'Temperature',part:'discounting',weight:15,deps:['discount','break_even'],visual:'red glow & sweat',
+  score:(d,v)=>100*(1-clamp((v.discount/100-d.break_even)/0.40)),
+  why:(v,d)=>`Discount ${fmtPct(v.discount/100)} against a break-even of ${fmtPct(d.break_even)}. Every point above it is fever.`,
+  formula:'excess = discount − break-even discount (not below 0)\nscore = 100 − excess ÷ 40%\ntemperature = 37.0 + 10 × excess °C'},
+ {id:'blood',name:'Blood',part:'items that carry profit',weight:10,deps:['profitable_share'],visual:'heart colour',
+  score:d=>100*d.profitable_share,
+  why:(v,d)=>`${fmtN(v.items_priced-v.items_losing)} of ${fmtN(v.items_priced)} priced items make money at full list price.`,
+  formula:'score = items profitable at list ÷ priced items'},
+ {id:'stomach',name:'Stomach',part:'digesting orders',weight:10,deps:['late_share'],visual:'belly size',
+  score:d=>100*(1-d.late_share),
+  why:(v,d)=>`${fmtN(v.late)} of ${fmtN(v.open_orders)} open orders are past due (${fmtPct(d.late_share,0)}). What is not delivered sits in the belly.`,
+  formula:'score = 100 − late orders ÷ open orders\nbelly grows with the late share'},
+ {id:'nerves',name:'Nerves',part:'data quality',weight:10,deps:['audit_high','matches_pending','price_decisions'],visual:'twitching',
+  score:(d,v)=>100-60*clamp(v.audit_high/1000)-30*clamp(v.matches_pending/4000)-10*clamp(v.price_decisions/50),
+  why:(v)=>`${fmtN(v.audit_high)} high audit findings, ${fmtN(v.matches_pending)} matches unconfirmed, ${fmtN(v.price_decisions)} prices undecided. Signals the brain cannot trust.`,
+  formula:'score = 100 − 60 × (findings ÷ 1000) − 30 × (matches ÷ 4000) − 10 × (decisions ÷ 50), each term capped\nbelow 60 the nerves twitch'},
+ {id:'lungs',name:'Lungs',part:'intake of orders',weight:5,deps:['unplanned_share'],visual:'breathing depth',
+  score:d=>100*(1-d.unplanned_share),
+  why:(v,d)=>`${fmtN(v.no_plan)} of ${fmtN(v.open_orders)} open orders have no factory plan (${fmtPct(d.unplanned_share,0)}). Orders taken in but not yet breathed into the factory.`,
+  formula:'score = 100 − unplanned orders ÷ open orders\nbreathing gets shallow and fast as the score falls'},
+ {id:'muscles',name:'Muscles',part:'factory flow',weight:5,deps:['stuck_share'],visual:'arm thickness',
+  score:d=>100*(1-d.stuck_share),
+  why:(v,d)=>`${fmtN(v.should_start)} of ${fmtN(v.plans)} open plans are past their start date and not released (${fmtPct(d.stuck_share,0)}).`,
+  formula:'score = 100 − stuck plans ÷ open plans'},
+ {id:'eyes',name:'Eyes',part:'cost visibility',weight:5,deps:['cost_coverage'],visual:'eyelids',
+  score:(d,v)=>clamp(v.cost_coverage/100)*100,
+  why:(v)=>`${fmtPct(v.cost_coverage/100,0)} of the sales value has a known cost. The rest is sold blind.`,
+  formula:'score = share of sales value with a cost\nthe eyelids close over the share without one'},
+ {id:'immune',name:'Immune system',part:'price shocks from outside',weight:5,deps:['inflation_items','fx_gap'],visual:'rash spots',
+  score:(d,v)=>100-70*clamp(v.inflation_items/500)-30*clamp(d.fx_gap/0.30),
+  why:(v,d)=>`${fmtN(v.inflation_items)} purchased items rose 10% or more in a year; the market dollar is ${fmtPct(d.fx_gap)} above the cost-card rate.`,
+  formula:'score = 100 − 70 × (items up ≥10% ÷ 500) − 30 × (FX gap ÷ 30%), each term capped'},
+];
+const VISUALS=['skin colour','posture','mouth','heartbeat & pulse','breathing depth','belly size','body width','eyelids','red glow & sweat','twitching','arm thickness','rash spots','heart colour'];
+
+/* ---------- engine ---------- */
+const DEFAULTS=Object.fromEntries(INPUTS.map(i=>[i.id,i.value]));
+let values={...DEFAULTS};
+let prev=null;
+
+function compute(v){
+  const d={};
+  for(const x of DERIVED) d[x.id]=x.fn(v,d);
+  const o={};
+  for(const x of ORGANS) o[x.id]=clamp(x.score(d,v),0,100);
+  const wsum=ORGANS.reduce((s,x)=>s+x.weight,0);
+  const health=ORGANS.reduce((s,x)=>s+x.weight*o[x.id],0)/wsum;
+  return {v:{...v},d,o,health};
+}
+function status(s){return s>=75?{k:'good',t:'Healthy',i:'✓'}:s>=50?{k:'warn',t:'Strained',i:'!'}:s>=25?{k:'serious',t:'Sick',i:'!!'}:{k:'critical',t:'Critical',i:'✕'}}
+function healthLabel(h){return h>=75?'Thriving':h>=50?'Stable':h>=25?'Sick':'Critical'}
+const INPUT_BY=Object.fromEntries(INPUTS.map(i=>[i.id,i]));
+const DERIVED_BY=Object.fromEntries(DERIVED.map(i=>[i.id,i]));
+function allDeps(ids,acc=new Set()){for(const id of ids){if(DERIVED_BY[id]){acc.add(id);allDeps(DERIVED_BY[id].deps,acc)}else acc.add(id)}return acc}
+
+/* ---------- render: organ cards ---------- */
+const organsEl=document.getElementById('organs');
+function buildOrgans(){
+  organsEl.innerHTML='';
+  for(const x of ORGANS){
+    const deps=[...allDeps(x.deps)];
+    const inputs=deps.filter(id=>INPUT_BY[id]);
+    const derived=deps.filter(id=>DERIVED_BY[id]);
+    const el=document.createElement('article');el.className='organ';el.id='card-'+x.id;
+    el.innerHTML=`<div class="head"><div><span class="name">${x.name}</span><span class="part">${x.part}</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span class="pill" data-pill></span><span class="score num" data-score>—</span></div></div>
+      <div class="bar"><i data-bar style="width:0"></i></div>
+      <div class="why" data-why></div>
+      <details><summary>How it is computed, and what feeds it</summary>
+        <div class="formula">${x.formula}</div>
+        <ul class="feeds">${derived.map(id=>`<li><span>${DERIVED_BY[id].label}</span><span class="num" data-dv="${id}"></span></li>`).join('')}
+        ${inputs.map(id=>`<li><span>${INPUT_BY[id].label} <span class="muted">· ${INPUT_BY[id].source}</span></span><span class="num" data-iv="${id}"></span></li>`).join('')}</ul>
+        <div class="small muted" style="margin-top:6px">Weight in overall health: ${x.weight}%. Draws: ${x.visual}.</div></details>`;
+    organsEl.appendChild(el);
+  }
+}
+function fmtInput(id,val){const i=INPUT_BY[id];if(i.type==='toggle')return val?'yes':'no';if(i.fmt)return i.fmt(val);return (i.unit==='%'?fmt1(val)+'%':val.toLocaleString('en-US',{maximumFractionDigits:2}))+(i.unit&&i.unit!=='%'&&i.unit!=='EGP'?' '+i.unit:'')}
+function renderOrgans(r,moved){
+  for(const x of ORGANS){
+    const el=document.getElementById('card-'+x.id);const s=r.o[x.id];const st=status(s);
+    el.className='organ '+st.k+(moved&&moved.has(x.id)?' moved':'');
+    el.querySelector('[data-score]').textContent=Math.round(s);
+    const pill=el.querySelector('[data-pill]');pill.className='pill '+st.k;pill.textContent=st.i+' '+st.t;
+    el.querySelector('[data-bar]').style.width=s+'%';
+    el.querySelector('[data-why]').textContent=x.why(r.v,r.d);
+    el.querySelectorAll('[data-dv]').forEach(n=>n.textContent=DERIVED_BY[n.dataset.dv].fmt(r.d[n.dataset.dv]));
+    el.querySelectorAll('[data-iv]').forEach(n=>n.textContent=fmtInput(n.dataset.iv,r.v[n.dataset.iv]));
+  }
+}
+
+/* ---------- render: creature ---------- */
+const $=id=>document.getElementById(id);
+function skinFor(h,dark){const hue=8+122*(h/100);return {skin:`hsl(${hue} 48% ${dark?44:60}%)`,edge:`hsl(${hue} 40% ${dark?26:34}%)`}}
+function isDark(){const t=document.documentElement.getAttribute('data-theme');if(t)return t==='dark';return matchMedia('(prefers-color-scheme: dark)').matches}
+function renderCreature(r){
+  const o=r.o,h=r.health,root=document.documentElement.style;
+  const c=skinFor(h,isDark());root.setProperty('--skin',c.skin);root.setProperty('--skin-edge',c.edge);
+  // posture
+  const slump=10*(1-h/100);
+  $('pose').setAttribute('transform',`rotate(${slump.toFixed(2)} 210 478)`);
+  $('head').setAttribute('transform',`translate(0 ${(7*(1-h/100)).toFixed(1)}) rotate(${(-slump*0.8).toFixed(2)} 210 190)`);
+  // mouth
+  const k=((h-50)/50)*14;$('mouth').setAttribute('d',`M188 162 Q210 ${(162+k).toFixed(1)} 232 162`);
+  // fat → body width
+  const rx=105*(1+0.45*(1-o.fat/100));
+  for(const id of ['bodyShape','bodyWindow','bodyOutline','bodyClipShape'])$(id).setAttribute('rx',rx.toFixed(1));
+  const lx=210-rx+8,rxp=210+rx-8;
+  $('armL').setAttribute('d',`M${lx} 265 C ${lx-35} 300, ${lx-45} 340, ${lx-37} 380`);$('armLe').setAttribute('d',$('armL').getAttribute('d'));
+  $('armR').setAttribute('d',`M${rxp} 265 C ${rxp+35} 300, ${rxp+45} 340, ${rxp+37} 380`);$('armRe').setAttribute('d',$('armR').getAttribute('d'));
+  // muscles → arm thickness
+  const aw=14+14*(o.muscles/100);$('arms').setAttribute('stroke-width',aw.toFixed(1));
+  // heart → beat and colour (blood)
+  const bpm=60+0.6*(100-o.heart);root.setProperty('--beat',(60/bpm).toFixed(3)+'s');
+  $('heart').classList.toggle('arrhythmia',o.heart<30);
+  const bl=o.blood/100;$('heartPath').setAttribute('fill',`hsl(${352} ${Math.round(35+55*bl)}% ${Math.round(70-25*bl)}%)`);
+  const hs=1.5+0.4*(o.heart/100);$('heart').setAttribute('transform',`translate(210 252) scale(${hs.toFixed(2)})`);
+  // lungs → breathing
+  root.setProperty('--breath',(1.8+2.2*(o.lungs/100)).toFixed(2)+'s');root.setProperty('--breath-amp',(1.02+0.08*(o.lungs/100)).toFixed(3));
+  // stomach → belly
+  const bloat=1+0.9*r.d.late_share;$('stomach').setAttribute('rx',(34*bloat).toFixed(1));$('stomach').setAttribute('ry',(26*bloat).toFixed(1));
+  // nerves → jitter
+  const jit=o.nerves<60;$('nerves').classList.toggle('jitter',jit);$('head').classList.toggle('jitter',jit&&o.nerves<40);
+  root.setProperty('--jit',(2.5*(1-o.nerves/100)).toFixed(2)+'px');$('nerves').setAttribute('opacity',(0.25+0.6*(1-o.nerves/100)).toFixed(2));
+  // eyes → lids
+  const lid=33*(1-o.eyes/100);$('lidLRect').setAttribute('height',lid.toFixed(1));$('lidRRect').setAttribute('height',lid.toFixed(1));
+  // fever → glow + sweat
+  const fv=1-o.fever/100;$('fever-glow').setAttribute('opacity',(0.7*fv).toFixed(2));$('sweat').setAttribute('opacity',o.fever<60?'0.9':'0');
+  // immune → rash
+  const n=Math.round(14*(1-o.immune/100));const rash=$('rash');rash.innerHTML='';
+  for(let i=0;i<n;i++){const t=i*2.399;const rr=0.45+0.4*((i*7)%5)/5;const cx=210+Math.cos(t)*rx*rr*0.85,cy=310+Math.sin(t)*125*rr*0.85;rash.innerHTML+=`<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="${(3+(i%3)).toFixed(1)}"/>`}
+  // vitals
+  $('v-pulse').textContent=Math.round(bpm);
+  const excess=Math.max(0,r.v.discount/100-r.d.break_even);$('v-temp').textContent=fmt1(37+10*excess);
+  $('v-weight').textContent=Math.round(r.d.oh_share*100)+'%';
+  $('health-score').textContent=Math.round(h);$('health-label').textContent=healthLabel(h);
+  const worst=[...ORGANS].sort((a,b)=>o[a.id]-o[b.id])[0];$('health-sub').textContent=`weakest: ${worst.name.toLowerCase()} (${worst.part})`;
+}
+
+/* ---------- render: numbers bench ---------- */
+function buildBench(){
+  const bench=$('bench');bench.innerHTML='';
+  const groups=[...new Set(INPUTS.map(i=>i.group))];
+  for(const g of groups){
+    const box=document.createElement('div');box.className='group';
+    box.innerHTML=`<h3>${g}</h3>`;
+    for(const i of INPUTS.filter(x=>x.group===g)){
+      const f=document.createElement('div');f.className='field';
+      if(i.type==='toggle'){
+        f.innerHTML=`<label for="in-${i.id}">${i.label}</label><div class="ctl"><label class="switch"><input type="checkbox" id="in-${i.id}" ${values[i.id]?'checked':''}><span class="small" data-tog>${values[i.id]?'yes':'no'}</span></label></div><div class="src">${i.source}</div>`;
+      }else{
+        f.innerHTML=`<label for="in-${i.id}">${i.label}</label><div class="ctl"><input type="number" id="in-${i.id}" value="${values[i.id]}" step="${i.step}" min="${i.min??''}" ${i.max!=null?`max="${i.max}"`:''}><span class="unit">${i.unit}</span></div>
+          ${i.slider?`<input type="range" id="rg-${i.id}" min="${i.min}" max="${i.max}" step="${i.step}" value="${values[i.id]}" aria-label="${i.label}">`:''}<div class="src">${i.source}</div>`;
+      }
+      box.appendChild(f);
+    }
+    bench.appendChild(box);
+  }
+  bench.addEventListener('input',e=>{
+    const t=e.target;const id=t.id.replace(/^(in|rg)-/,'');const i=INPUT_BY[id];if(!i)return;
+    let val;
+    if(i.type==='toggle'){val=t.checked?1:0;t.parentElement.querySelector('[data-tog]').textContent=val?'yes':'no'}
+    else{val=parseFloat(t.value);if(!isFinite(val))return;if(i.min!=null)val=Math.max(i.min,val);if(i.max!=null)val=Math.min(i.max,val);
+      const other=$(t.id.startsWith('in-')?'rg-'+id:'in-'+id);if(other)other.value=val}
+    values[id]=val;setScenarioPressed(null);update();
+  });
+}
+function syncBench(){for(const i of INPUTS){const el=$('in-'+i.id);if(!el)continue;if(i.type==='toggle'){el.checked=!!values[i.id];el.parentElement.querySelector('[data-tog]').textContent=values[i.id]?'yes':'no'}else{el.value=values[i.id];const rg=$('rg-'+i.id);if(rg)rg.value=values[i.id]}}}
+
+/* ---------- render: flow strip ---------- */
+function buildFlow(){
+  const flow=$('flow');
+  const cols=[
+    {t:'Sources',n:SOURCES.length,items:SOURCES.map(s=>({id:'src',label:s}))},
+    {t:'Numbers',n:INPUTS.length,items:INPUTS.map(i=>({id:i.id,label:i.label}))},
+    {t:'Derived',n:DERIVED.length,items:DERIVED.map(i=>({id:i.id,label:i.label}))},
+    {t:'Organs',n:ORGANS.length,items:ORGANS.map(i=>({id:i.id,label:i.name}))},
+    {t:'Creature',n:VISUALS.length,items:VISUALS.map(v=>({id:'vis:'+v,label:v}))},
+  ];
+  flow.innerHTML=cols.map((c,ci)=>`<div class="col"><h3>${c.t}<span class="n">${c.n}</span></h3><div class="nodes">${c.items.map(it=>`<span class="node" data-node="${it.id}" data-col="${ci}">${it.label}</span>`).join('')}</div></div>`).join('');
+}
+function lightFlow(moved){
+  document.querySelectorAll('.node.lit').forEach(n=>n.classList.remove('lit'));
+  const nodes=[...document.querySelectorAll('.node')].filter(n=>moved.has(n.dataset.node));
+  for(const n of nodes){const delay=120*parseInt(n.dataset.col,10);setTimeout(()=>n.classList.add('lit'),delay);setTimeout(()=>n.classList.remove('lit'),delay+2200)}
+}
+
+/* ---------- what moved ---------- */
+function describeMoves(a,b){
+  const moved=new Set();const lines=[];
+  const near=(x,y)=>Math.abs(x-y)<1e-9;
+  for(const i of INPUTS){if(!near(a.v[i.id],b.v[i.id])){moved.add(i.id);lines.push({l:i.label,from:fmtInput(i.id,a.v[i.id]),to:fmtInput(i.id,b.v[i.id]),up:b.v[i.id]>a.v[i.id]})}}
+  for(const x of DERIVED){if(!near(a.d[x.id],b.d[x.id])){moved.add(x.id);lines.push({l:x.label,from:x.fmt(a.d[x.id]),to:x.fmt(b.d[x.id]),up:b.d[x.id]>a.d[x.id]})}}
+  for(const x of ORGANS){if(Math.round(a.o[x.id])!==Math.round(b.o[x.id])){moved.add(x.id);moved.add('vis:'+x.visual);lines.push({l:x.name+' score',from:Math.round(a.o[x.id]),to:Math.round(b.o[x.id]),up:b.o[x.id]>a.o[x.id],organ:true})}}
+  if(Math.round(a.health)!==Math.round(b.health)){for(const v of ['skin colour','posture','mouth'])moved.add('vis:'+v);lines.push({l:'Overall health',from:Math.round(a.health),to:Math.round(b.health),up:b.health>a.health,organ:true})}
+  if(moved.size)moved.add('src');
+  return {moved,lines};
+}
+function renderMoves(lines){
+  const ul=$('moves-list');ul.innerHTML='';$('moves-empty').hidden=lines.length>0;
+  for(const m of lines){const li=document.createElement('li');li.innerHTML=`<b>${m.l}</b><span class="num">${m.from} → ${m.to} <span class="delta ${m.up?'up':'down'}">${m.up?'▲':'▼'}</span></span>`;ul.appendChild(li)}
+}
+
+/* ---------- check table ---------- */
+const DASH=[
+ {l:'Loss or profit, as invoiced',dash:'−35.3%',fn:r=>fmtPct(compute({...r.v,discount:DEFAULTS.discount,si_on:0}).d.margin)},
+ {l:'Loss or profit, with the 14% S&I they paid',dash:'−18.7%',fn:r=>fmtPct(compute({...r.v,discount:DEFAULTS.discount,si_on:1}).d.margin)},
+ {l:'Profit if no discount had been given',dash:'+8.5%',fn:r=>fmtPct(compute({...r.v,discount:0,si_on:0}).d.margin)},
+ {l:'Profit at full list + 14% S&I',dash:'+19.8%',fn:r=>fmtPct(compute({...r.v,discount:0,si_on:1}).d.margin)},
+ {l:'Largest discount that still breaks even',dash:'8.5%',fn:r=>fmtPct(compute({...r.v,si_on:0}).d.break_even)},
+ {l:'Discounts gave away',dash:'20.34 M EGP',fn:r=>fmtM(compute({...r.v,discount:DEFAULTS.discount}).d.discount_egp)},
+ {l:'Monthly overhead pool',dash:'4.76 M EGP',fn:r=>fmtM(r.v.oh_month)},
+];
+function renderCheck(r){
+  const tb=document.querySelector('#check tbody');
+  tb.innerHTML=DASH.map(x=>{const m=x.fn(r);return `<tr><td>${x.l}</td><td class="num">${m.replace('-','−')}</td><td class="num">${x.dash}</td></tr>`}).join('');
+}
+
+/* ---------- scenarios ---------- */
+function setScenarioPressed(key){document.querySelectorAll('.chip[data-scen]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.scen===key)))}
+document.querySelector('.scen').addEventListener('click',e=>{
+  const b=e.target.closest('.chip[data-scen]');if(!b)return;
+  const k=b.dataset.scen;
+  if(k==='asis'){values.discount=DEFAULTS.discount;values.si_on=0}
+  else if(k==='si'){values.discount=DEFAULTS.discount;values.si_on=1}
+  else if(k==='nodisc'){values.discount=0;values.si_on=0}
+  else if(k==='full'){values.discount=0;values.si_on=1}
+  else if(k==='be'){values.si_on=0;const be=compute(values).d.break_even;values.discount=Math.max(0,Math.round(be*1000)/10)}
+  setScenarioPressed(k);syncBench();update();
+});
+$('reset').addEventListener('click',()=>{values={...DEFAULTS};setScenarioPressed('asis');syncBench();update()});
+
+/* ---------- update ---------- */
+function update(){
+  const r=compute(values);
+  let moved=new Set(),lines=[];
+  if(prev){({moved,lines}=describeMoves(prev,r))}
+  renderOrgans(r,moved);renderCreature(r);renderCheck(r);
+  if(prev){renderMoves(lines);lightFlow(moved)}
+  prev=r;
+}
+buildOrgans();buildBench();buildFlow();update();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>renderCreature(prev));
+new MutationObserver(()=>renderCreature(prev)).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+})();
+</script>
+</body>
+</html>
