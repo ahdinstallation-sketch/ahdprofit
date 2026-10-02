@@ -1,6 +1,6 @@
 # Company Creature
 
-A company drawn as a person who walks on their own. Each department is the
+A company drawn as a person who walks, or runs, on their own. A healthy company runs; a sick one shuffles. Each department is the
 body system that does the same job in a person (biomimicry), the department's
 numbers set that system's score, and the score is visible in the walk: speed,
 stride, cadence, posture, gaze, breathing, pulse, stumbles, limp, tremor,
@@ -37,8 +37,10 @@ The person is drawn procedurally on a canvas every frame at human scale
 
 - Gait cycle: steps per minute from the Finance and Sales/Factory scores,
   stride in metres from Finance, speed in km/h from the two; the gait name
-  (shuffle, walk, brisk walk, jog) follows the speed, with a shorter double
-  support when jogging.
+  (shuffle, walk, brisk walk, jog, run) follows the speed. A strong heart in
+  a sound body (Finance high and overall health above the middle) breaks into
+  a run: higher cadence and stride, a flight phase, bent arms, high knees, a
+  heel kick and a forward athletic lean.
 - Legs: two-bone inverse kinematics from hip to ankle; the stance foot moves
   back at ground speed with heel strike, flat foot and toe-off rotation; the
   swing foot arcs forward with a clearance set by Muscles and Fat. A weak leg
@@ -56,6 +58,8 @@ The person is drawn procedurally on a canvas every frame at human scale
   the Brain score, so a company with many open decisions visibly takes longer
   to respond.
 - Monitor: live ECG and breathing traces at the current heart and breath rate.
+- Layout: the walker stays pinned at the top while the sliders beside it
+  scroll, so a change and its effect are visible together.
 
 ## Data model
 

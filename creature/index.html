@@ -44,40 +44,43 @@ button{font:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 header.top{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
-.subject{font-size:14px;color:var(--ink-2);margin-top:6px;max-width:72ch}
 .healthbadge{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 16px}
 .healthbadge .score{font-family:var(--display);font-size:42px;font-weight:700;line-height:1}
 .healthbadge .label{font-weight:600}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
 .pill.good{background:var(--good)} .pill.warn{background:var(--warn);color:#2b2000} .pill.serious{background:var(--serious);color:#2b1200} .pill.critical{background:var(--critical)}
 
-.scen{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px}
-.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:6px 10px;font-size:13px}
-
-.field-stage{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;align-items:stretch}
-@media (max-width:900px){.field-stage{grid-template-columns:1fr}}
-.canvasbox{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--sky1);min-height:320px}
+.field-stage{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+@media (max-width:900px){.field-stage{grid-template-columns:1fr;gap:10px}}
+.stick{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;display:grid;gap:8px}
+@media (max-width:900px){.stick{background:var(--bg);padding-bottom:6px}}
+.canvasbox{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--sky1);min-height:220px}
 canvas#field{display:block;width:100%;height:100%}
 .canvasbox .legend{position:absolute;left:12px;top:10px;font-size:12px;color:var(--ink-2);background:color-mix(in srgb,var(--surface) 80%,transparent);border-radius:8px;padding:4px 8px;max-width:calc(100% - 24px)}
-.monitor{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:6px;align-content:start}
-.monitor .traces{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
-.trace{background:var(--surface-2);border-radius:10px;padding:6px 8px 2px}
-.trace .k{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
-.trace canvas{display:block;width:100%;height:38px}
-.ro{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:baseline;border-top:1px solid var(--line);padding-top:5px}
-.ro .k{font-size:13px;color:var(--ink-2)}
-.ro .k small{display:block;color:var(--ink-3);font-size:11.5px}
-.ro .v{font-family:var(--display);font-weight:700;font-size:19px;text-align:right}
-.ro .v small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--ink-3);margin-left:3px}
-
-.quick{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px 18px}
+.monitor{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.monitor .trace{grid-column:span 3;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px 2px;min-width:0}
+.trace .k{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trace canvas{display:block;width:100%;height:34px}
+.monitor .ro{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;min-width:0;display:block}
+.monitor .ro.wide{grid-column:span 2}
+.ro .k{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.ro .v{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.15;overflow-wrap:anywhere}
+.ro .v small{font-family:var(--body);font-weight:500;font-size:11px;color:var(--ink-3);margin-left:3px}
+@media (max-width:900px){.monitor{grid-template-columns:repeat(4,minmax(0,1fr))}.monitor .trace{grid-column:span 2}.monitor .ro.wide,.monitor .ro:nth-child(n+9){display:none}}
+.controls{display:grid;gap:10px;min-width:0}
+.scen{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.scen .eyebrow{width:100%}
+.chip{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:5px 10px;font-size:12.5px}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 10px;font-size:12.5px}
+.quick{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:9px}
+.quick .dept{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:600;margin-top:4px}
 .quick .q label{font-size:13px;display:flex;justify-content:space-between;gap:8px}
-.quick .q label b{font-family:var(--mono);font-weight:500}
-.quick .q input[type=range]{width:100%;accent-color:var(--accent);margin:4px 0 0}
-
-.map{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.quick .q label b{font-family:var(--mono);font-weight:500;white-space:nowrap}
+.quick .q input[type=range]{width:100%;accent-color:var(--accent);margin:2px 0 0;display:block}
+section.intro{margin-top:22px}
+.subject{font-size:14px;color:var(--ink-2);max-width:72ch}
+.map{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .map table{width:100%;border-collapse:collapse;font-size:14px}
 .map th,.map td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 .map td.num{text-align:right;white-space:nowrap}
@@ -150,7 +153,6 @@ footer p{margin:6px 0}
   <div>
     <div class="eyebrow">Company Creature</div>
     <h1>AHD Group, as a person walking</h1>
-    <div class="subject">Each department is the body system that does the same job in a person: sales is the mouth and temperature, purchasing the lungs, the factory the stomach and muscles, finance the heart, planning the sense of balance, delivery the legs, data the nerves, management the brain. The department's numbers set that system's score, and the score is in the way they walk. Figures from AHD Costing, 1 Oct 2026.</div>
   </div>
   <div class="healthbadge" aria-live="polite">
     <div class="score num" id="health-score">—</div>
@@ -158,40 +160,44 @@ footer p{margin:6px 0}
   </div>
 </header>
 
-<div class="scen" role="group" aria-label="Scenarios">
-  <span class="eyebrow">Scenario</span>
-  <button class="chip" data-scen="asis" aria-pressed="true">As invoiced</button>
-  <button class="chip" data-scen="si" aria-pressed="false">With the 14% S&amp;I they paid</button>
-  <button class="chip" data-scen="nodisc" aria-pressed="false">No discount</button>
-  <button class="chip" data-scen="full" aria-pressed="false">Full list + S&amp;I</button>
-  <button class="chip" data-scen="be" aria-pressed="false">Break-even discount</button>
-  <button class="ghost" id="reset" style="margin-left:auto">Reset to 1 Oct 2026</button>
-</div>
-
 <div class="field-stage">
-  <div class="canvasbox">
-    <canvas id="field" role="img" aria-label="A person walking across a field. Their pace, stride, posture, breathing, stumbles and limp follow the company's numbers."></canvas>
-    <div class="legend" id="legend">walking</div>
-  </div>
-  <div class="monitor" id="monitor">
-    <div class="traces">
+  <div class="stick">
+    <div class="canvasbox">
+      <canvas id="field" role="img" aria-label="A person walking across a field. Their pace, stride, posture, breathing, stumbles and limp follow the company's numbers."></canvas>
+      <div class="legend" id="legend">walking</div>
+    </div>
+    <div class="monitor" id="monitor">
       <div class="trace"><div class="k">Heart <span class="num" id="tr-hr"></span></div><canvas id="ecg"></canvas></div>
       <div class="trace"><div class="k">Breath <span class="num" id="tr-br"></span></div><canvas id="resp"></canvas></div>
+      <div class="ro"><div class="k">Gait</div><div class="v" id="ro-gait">—</div></div>
+      <div class="ro"><div class="k">Speed</div><div class="v num" id="ro-speed">—<small>km/h</small></div></div>
+      <div class="ro"><div class="k">Cadence</div><div class="v num" id="ro-cad">—<small>steps/min</small></div></div>
+      <div class="ro"><div class="k">Stride</div><div class="v num" id="ro-stride">—<small>m</small></div></div>
+      <div class="ro wide"><div class="k">Posture</div><div class="v" id="ro-posture">—</div></div>
+      <div class="ro wide"><div class="k">Gaze</div><div class="v" id="ro-gaze">—</div></div>
+      <div class="ro"><div class="k">Stumbles</div><div class="v num" id="ro-stumble">—</div></div>
+      <div class="ro"><div class="k">Reaction</div><div class="v num" id="ro-react">—<small>s</small></div></div>
+      <div class="ro wide"><div class="k">Limp</div><div class="v" id="ro-limp">—</div></div>
     </div>
-    <div class="ro"><div class="k">Gait<small>from the speed the numbers allow</small></div><div class="v" id="ro-gait">—</div></div>
-    <div class="ro"><div class="k">Speed<small>stride × cadence</small></div><div class="v num" id="ro-speed">—<small>km/h</small></div></div>
-    <div class="ro"><div class="k">Cadence<small>sales fever + factory backlog</small></div><div class="v num" id="ro-cad">—<small>steps/min</small></div></div>
-    <div class="ro"><div class="k">Stride<small>finance: margin</small></div><div class="v num" id="ro-stride">—<small>m</small></div></div>
-    <div class="ro"><div class="k">Posture<small>finance + overall health</small></div><div class="v" id="ro-posture" style="font-size:15px">—</div></div>
-    <div class="ro"><div class="k">Gaze<small>management: decisions waiting</small></div><div class="v" id="ro-gaze" style="font-size:15px">—</div></div>
-    <div class="ro"><div class="k">Stumbles<small>planning: orders with no plan</small></div><div class="v num" id="ro-stumble">—</div></div>
-    <div class="ro"><div class="k">Limp<small>left leg: delivery · right leg: invoicing</small></div><div class="v" id="ro-limp" style="font-size:15px">—</div></div>
-    <div class="ro"><div class="k">Reaction time<small>management</small></div><div class="v num" id="ro-react">—<small>s</small></div></div>
-    <div class="ro"><div class="k">Distance walked<small>since the page opened</small></div><div class="v num" id="ro-dist">—<small>m</small></div></div>
+  </div>
+  <div class="controls">
+    <div class="scen" role="group" aria-label="Scenarios">
+      <span class="eyebrow">Scenario</span>
+      <button class="chip" data-scen="asis" aria-pressed="true">As invoiced</button>
+      <button class="chip" data-scen="si" aria-pressed="false">With 14% S&amp;I</button>
+      <button class="chip" data-scen="nodisc" aria-pressed="false">No discount</button>
+      <button class="chip" data-scen="full" aria-pressed="false">Full list + S&amp;I</button>
+      <button class="chip" data-scen="be" aria-pressed="false">Break-even</button>
+      <button class="chip" data-scen="fit" aria-pressed="false">Everything fixed</button>
+      <button class="ghost" id="reset">Reset to 1 Oct 2026</button>
+    </div>
+    <div class="quick" id="quick"></div>
   </div>
 </div>
 
-<div class="quick" id="quick"></div>
+<section class="block intro">
+  <div class="subject">Each department is the body system that does the same job in a person: sales is the mouth and temperature, purchasing the lungs, the factory the stomach and muscles, finance the heart, planning the sense of balance, delivery the legs, data the nerves, management the brain. The department's numbers set that system's score, and the score is in the way they move: a healthy company runs, a sick one shuffles. Figures from AHD Costing, 1 Oct 2026. Slide anything on the right and watch; how quickly he responds is the brain's score.</div>
+</section>
 
 <div class="map">
   <div class="eyebrow" style="margin-bottom:6px">Departments and their body systems</div>
@@ -245,22 +251,22 @@ const INPUTS=[
  {id:'material',group:'Finance & administration',label:'Material in everything sold',unit:'EGP',value:17000000,step:100000,min:0,fmt:fmtM,source:'Overhead page: register material, rate 2.382× gives the 40.5 M pool'},
  {id:'oh_month',group:'Finance & administration',label:'Company overhead per month',unit:'EGP',value:4760952,step:10000,min:0,max:12000000,slider:true,quick:true,fmt:fmtM,source:'Overhead page: GP ledger 2026-01 to 07, Milano and income tax excluded'},
  {id:'months',group:'Finance & administration',label:'Months in the period',unit:'months',value:8.51,step:0.01,min:0.1,source:'1 Jan to 17 Sep 2026'},
- {id:'cost_coverage',group:'Costing (Asmaa)',label:'Sales value that has a cost',unit:'%',value:86,step:1,min:0,max:100,source:'Home page'},
+ {id:'cost_coverage',group:'Costing (Asmaa)',label:'Sales value that has a cost',unit:'%',value:86,step:1,min:0,max:100,slider:true,quick:true,source:'Home page'},
  {id:'items_priced',group:'Costing (Asmaa)',label:'Priced sales items',unit:'',value:568,step:1,min:1,source:'Home page'},
- {id:'items_losing',group:'Costing (Asmaa)',label:'Items losing money at full list price',unit:'',value:237,step:1,min:0,source:'Home page, material method (per-unit method says 296)'},
+ {id:'items_losing',group:'Costing (Asmaa)',label:'Items losing money at full list price',unit:'',value:237,step:1,min:0,max:568,slider:true,quick:true,source:'Home page, material method (per-unit method says 296)'},
  {id:'inflation_items',group:'Purchasing (Yahya)',label:'Purchased items up 10% or more in a year',unit:'',value:322,step:1,min:0,max:800,slider:true,quick:true,source:'Purchasing: price changes vs 12 months ago'},
  {id:'fx_market',group:'Purchasing (Yahya)',label:'EGP per USD, market',unit:'',value:51.97,step:0.01,min:1,source:'Rules: xe.com 30 Sep 2026'},
  {id:'fx_card',group:'Purchasing (Yahya)',label:'EGP per USD, GP cost card',unit:'',value:47,step:0.01,min:1,source:'Rules: standard cost on 14,557 items'},
  {id:'open_orders',group:'Planning',label:'Open GP orders',unit:'',value:560,step:1,min:1,source:'Orders & plans, 2 Oct 2026'},
  {id:'no_plan',group:'Planning',label:'Open orders with no factory plan',unit:'',value:303,step:1,min:0,max:560,slider:true,quick:true,source:'Orders & plans: "need planning"'},
  {id:'plans',group:'Factory (Badr, Road 9)',label:'Open factory plans',unit:'',value:281,step:1,min:1,source:'Orders & plans: production board'},
- {id:'should_start',group:'Factory (Badr, Road 9)',label:'Plans past start date, not released',unit:'',value:90,step:1,min:0,source:'Orders & plans: "should have started"'},
- {id:'late_30',group:'Delivery & invoicing',label:'Open orders late up to 30 days',unit:'',value:47,step:1,min:0,max:560,source:'Orders & plans'},
+ {id:'should_start',group:'Factory (Badr, Road 9)',label:'Plans past start date, not released',unit:'',value:90,step:1,min:0,max:281,slider:true,quick:true,source:'Orders & plans: "should have started"'},
+ {id:'late_30',group:'Delivery & invoicing',label:'Open orders late up to 30 days',unit:'',value:47,step:1,min:0,max:560,slider:true,quick:true,source:'Orders & plans'},
  {id:'late_over30',group:'Delivery & invoicing',label:'Open orders late over 30 days',unit:'',value:217,step:1,min:0,max:560,slider:true,quick:true,source:'Orders & plans: "probably delivered, not invoiced"'},
  {id:'audit_high',group:'Data & IT',label:'High-severity audit findings',unit:'',value:606,step:1,min:0,max:2000,slider:true,quick:true,source:'Audit page'},
- {id:'matches_pending',group:'Data & IT',label:'GP to factory matches to confirm',unit:'',value:1984,step:1,min:0,source:'Match review'},
+ {id:'matches_pending',group:'Data & IT',label:'GP to factory matches to confirm',unit:'',value:1984,step:1,min:0,max:4000,slider:true,quick:true,source:'Match review'},
  {id:'todos',group:'Management',label:'Links waiting to be confirmed',unit:'',value:1573,step:1,min:0,max:4000,slider:true,quick:true,source:'Notifications: 655 sold products + 918 order matches'},
- {id:'price_decisions',group:'Management',label:'Material prices waiting for a decision',unit:'',value:9,step:1,min:0,source:'Home page'},
+ {id:'price_decisions',group:'Management',label:'Material prices waiting for a decision',unit:'',value:9,step:1,min:0,max:50,slider:true,quick:true,source:'Home page'},
  {id:'approvals',group:'Management',label:'Price approvals waiting',unit:'',value:0,step:1,min:0,source:'Approvals page'},
 ];
 const SOURCES=['FCMaster factory DB','Asmaa’s model files','GP ledger & invoices','GP item price list','Purchasing Google sheet','Audit, match & approval decisions'];
@@ -373,27 +379,31 @@ function motionFrom(r){
   const o=r.o,h=r.health/100;
   const vigor=o.heart/100, fever=1-o.fever/100, late=r.d.late_share, lungs=o.lungs/100, nerves=o.nerves/100, fat=1-o.fat/100, muscles=o.muscles/100, brain=o.brain/100;
   const stress=clamp(0.6*fever+0.4*late);
-  const stepsPerMin=70+35*vigor+25*stress;
-  const strideM=0.6+0.9*vigor;                 // metres per full gait cycle (two steps)
-  const speed=strideM*100*stepsPerMin/2/60;    // cm/s
+  // fitness: a strong heart with a sound body breaks into a run
+  const fit=clamp((vigor-0.55)/0.35)*clamp((h-0.45)/0.35);
+  const run=fit*fit*(3-2*fit);
+  const stepsPerMin=80+30*vigor+20*stress+60*run;
+  const strideM=0.6+0.9*vigor+1.0*run;           // metres per full gait cycle (two steps)
+  const speed=strideM*100*stepsPerMin/2/60;      // cm/s
   const kmh=speed*0.036;
-  const gait=kmh<2.6?'shuffle':kmh<4.2?'walk':kmh<6.5?'brisk walk':'jog';
-  const duty=gait==='jog'?0.42:0.62;
-  return {vigor,stress,fever,fat,nerves,lungs,muscles,health:h,late,brain,
+  const gait=kmh<2.6?'shuffle':kmh<4.5?'walk':kmh<6.5?'brisk walk':kmh<9.5?'jog':'run';
+  const duty=lerp(0.62,0.36,run);
+  return {vigor,stress,fever,fat,nerves,lungs,muscles,health:h,late,brain,run,
     cadenceHz:stepsPerMin/120,stepsPerMin,strideCm:strideM*100,strideM,speed,kmh,gait,duty,
-    bob:(1.8+1.6*vigor)*(1-0.5*fat),
-    lift:(9+13*vigor)*(0.45+0.55*muscles)*(1-0.4*fat),
-    heartBpm:62+0.55*(100-o.heart),
-    breathHz:(12+24*(1-lungs))/60,breathDepth:0.45+0.55*lungs,panting:o.fever<50,
-    lean:4+16*(1-0.6*vigor-0.4*h),            // degrees of forward torso lean
-    slump:(1-0.6*vigor-0.4*h),                // 0 upright shoulders → 1 rounded
-    gaze:brain,                               // 1 horizon → 0 ground
-    armSwing:8+24*vigor,
+    bob:(1.8+1.6*vigor)*(1-0.5*fat)+5*run,
+    lift:(9+13*vigor)*(0.45+0.55*muscles)*(1-0.4*fat)+22*run,
+    heartBpm:62+0.55*(100-o.heart)+70*run,
+    breathHz:(12+24*(1-lungs)+26*run)/60,breathDepth:0.45+0.55*lungs,panting:o.fever<50,
+    lean:4+16*(1-0.6*vigor-0.4*h)+7*run,
+    slump:clamp(1-0.6*vigor-0.4*h),
+    gaze:brain,
+    armSwing:8+24*vigor+20*run,
+    armBend:28+62*run,
     tremor:nerves<0.6?(0.6-nerves)/0.6:0,
     rhythmJitter:(1-o.balance/100)*0.10,
     stumbleChance:0.30*r.d.unplanned_share,
     eyeLid:0.85*(1-o.eyes/100),
-    flush:clamp((fever-0.3)/0.7),
+    flush:clamp((fever-0.3)/0.7)*0.8+0.3*run,
     reaction:0.4+4*(1-brain),
     legs:{...r.legs}};
 }
@@ -410,7 +420,7 @@ const ecgBuf=new Float32Array(160).fill(0),respBuf=new Float32Array(160).fill(0)
 
 function resize(){
   const box=cv.parentElement.getBoundingClientRect();
-  W=Math.max(320,box.width);H=Math.max(320,Math.min(480,W*0.5));
+  W=Math.max(300,box.width);H=W<700?Math.max(200,Math.min(W*0.62,window.innerHeight*0.38)):Math.max(300,Math.min(440,W*0.5));
   DPR=Math.min(2,window.devicePixelRatio||1);
   cv.width=W*DPR;cv.height=H*DPR;cv.style.height=H+'px';cv.parentElement.style.height=H+'px';
   for(const c of [ecg,resp]){const r=c.getBoundingClientRect();c.width=Math.max(60,r.width)*DPR;c.height=38*DPR}
@@ -445,7 +455,7 @@ function legState(id,m,cyc){
     const u=(phi-beta)/(1-beta);x=S*(-0.5+u);
     const lift=m.lift*(1-0.8*sev);
     y=-ANKLE_H-lift*Math.sin(Math.PI*u);
-    theta=lerp(30,-14,u)*(1-0.5*sev);
+    theta=lerp(30+30*m.run,-14,u)*(1-0.5*sev);
     if(sev>0.5){drag=true;theta=22;y=-ANKLE_H-1.5}
   }
   return {x,y,theta,phi,beta,sev,strength,bump,drag};
@@ -497,7 +507,7 @@ function draw(now){
   const pulse=Math.exp(-beatPhase*10)*0.7+Math.exp(-(((beatPhase-0.32)%1+1)%1)*16)*0.3;
   const legs={L:legState('L',m,cycle),R:legState('R',m,cycle)};
   const dip=5*(legs.L.sev*legs.L.bump+legs.R.sev*legs.R.bump)+6*st;
-  const hipY=-(THIGH+SHIN-1)+m.bob*Math.cos(4*Math.PI*cycle)+dip;
+  const hipY=-(THIGH+SHIN-1)+m.bob*Math.cos(4*Math.PI*cycle)+dip-4*m.run;
   const hip={x:0,y:hipY};
   const lean=(m.lean+22*st)*D2R;
   const girth=1+0.5*m.fat;
@@ -510,7 +520,7 @@ function draw(now){
   // arms: near (right) arm swings with the left leg
   const swing=(m.armSwing*D2R)*Math.cos(2*Math.PI*cycle);
   const armR=swing+1.2*st, armL=-swing+1.2*st;
-  const bend=(28+12*Math.max(0,Math.cos(2*Math.PI*cycle)))*D2R;
+  const bend=(m.armBend+12*Math.max(0,Math.cos(2*Math.PI*cycle)))*D2R;
   const shoulderJ={x:sh.x-2,y:sh.y+4};
   const handTremor=m.tremor*0.9;
   function arm(angle,bendSign){
@@ -660,19 +670,19 @@ let roTick=0;
 function updateReadouts(m){
   roTick++;if(roTick%6)return;
   $('ro-gait').textContent=m.gait;
-  $('legend').textContent=`${m.gait}, ${m.kmh.toFixed(1)} km/h, ${Math.round(m.stepsPerMin)} steps/min, heart ${Math.round(m.heartBpm)} bpm`;
+  $('legend').textContent=`${m.gait} · ${m.kmh.toFixed(1)} km/h · ${Math.round(m.stepsPerMin)} steps/min · heart ${Math.round(m.heartBpm)} bpm · ${Math.round(dist/100).toLocaleString('en-US')} m so far`;
   $('tr-hr').textContent=Math.round(m.heartBpm)+' bpm';$('tr-br').textContent=Math.round(m.breathHz*60)+'/min'+(m.panting?' · mouth open':'');
   $('ro-speed').innerHTML=m.kmh.toFixed(1)+'<small>km/h</small>';
   $('ro-cad').innerHTML=Math.round(m.stepsPerMin)+'<small>steps/min</small>';
   $('ro-stride').innerHTML=m.strideM.toFixed(2)+'<small>m</small>';
   const post=m.slump<0.25?'upright, shoulders back':m.slump<0.5?'slightly stooped':m.slump<0.75?'stooped, shoulders rounded':'hunched';
-  $('ro-posture').textContent=post+', lean '+Math.round(m.lean)+'°';
+  $('ro-posture').textContent=(m.run>0.5?'running form, ':'')+post;
   $('ro-gaze').textContent=m.gaze>0.75?'on the horizon':m.gaze>0.5?'a few metres ahead':m.gaze>0.3?'at the path':'at their feet';
   $('ro-stumble').innerHTML=stumbles+'<small>so far, '+Math.round(m.stumbleChance*100)+'% per stride</small>';
   const limp=[];if(m.legs.L<0.5)limp.push(m.legs.L<0.25?'left drags (delivery)':'left (delivery)');if(m.legs.R<0.5)limp.push(m.legs.R<0.25?'right drags (invoicing)':'right (invoicing)');
   $('ro-limp').textContent=limp.length?limp.join(', '):'none';
   $('ro-react').innerHTML=m.reaction.toFixed(1)+'<small>s</small>';
-  $('ro-dist').innerHTML=Math.round(dist/100).toLocaleString('en-US')+'<small>m</small>';
+  
 }
 
 /* ---------- department map & system cards ---------- */
@@ -729,8 +739,9 @@ function buildBench(){
     }
     bench.appendChild(box);
   }
-  const quick=$('quick');quick.innerHTML='';
+  const quick=$('quick');quick.innerHTML='';let lastG=null;
   for(const i of INPUTS.filter(x=>x.quick)){
+    if(i.group!==lastG){lastG=i.group;const d=document.createElement('div');d.className='dept';d.textContent=i.group;quick.appendChild(d)}
     const q=document.createElement('div');q.className='q';
     q.innerHTML=`<label for="qk-${i.id}"><span>${i.label}</span><b data-qv>${fmtInput(i.id,values[i.id])}</b></label><input type="range" id="qk-${i.id}" min="${i.min}" max="${i.max}" step="${i.step}" value="${values[i.id]}">`;
     quick.appendChild(q);
@@ -805,6 +816,7 @@ document.querySelector('.scen').addEventListener('click',e=>{
   else if(k==='nodisc'){values.discount=0;values.si_on=0}
   else if(k==='full'){values.discount=0;values.si_on=1}
   else if(k==='be'){values.si_on=0;values.discount=Math.max(0,Math.round(compute(values).d.break_even*1000)/10)}
+  else if(k==='fit'){Object.assign(values,{discount:5,si_on:1,oh_month:2400000,no_plan:30,late_30:12,late_over30:6,should_start:10,audit_high:40,matches_pending:120,todos:60,price_decisions:0,approvals:0,inflation_items:60,cost_coverage:100,items_losing:60})}
   setScenarioPressed(k);syncBench();update();
 });
 $('reset').addEventListener('click',()=>{values={...DEFAULTS};setScenarioPressed('asis');syncBench();update()});
