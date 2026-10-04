@@ -91,3 +91,16 @@ lists what moved and lights the path through the flow strip.
 2. History: a snapshot per day so the walk can be scrubbed through time.
 3. Backend: the same tables in Django next to the costing app, with the rules
    page editable and logged like the costing Rules page.
+
+## Company as a Human (multi-company app)
+
+`app/index.html` is the general version of the walker: anyone enters their own company's numbers
+(money in any currency plus percentages of orders, items and records), names the company, and watches it walk.
+Published at https://claude.ai/artifact/32aR8yJzoqce4b7WBbeD2C with the artifact database enabled:
+
+- **Save** keeps companies per signed-in user under `data/users/<id>/profile/companies/<slug>` (private).
+- **Share link** writes one public record per user to `shared/<user id>` and gives a `#c-<slug>` link.
+- **Companies people shared** lists `shared` newest first.
+- Presets: "Typical company" and "Demo: AHD Group, Oct 2026".
+
+Same engine as `index.html`: eleven department-to-body-system scores drive a procedurally animated runner/walker.

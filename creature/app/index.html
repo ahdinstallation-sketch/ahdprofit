@@ -1,0 +1,776 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>Company as a Human</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a gait lab. The person walks across the full width at the top with the monitor beside them,
+   the live controls sit under it, then the department-to-system map, the system cards, the numbers bench and the data-flow strip. */
+:root{
+  --bg:#edf2f0; --surface:#ffffff; --surface-2:#e2eae7; --ink:#14262b; --ink-2:#4b6066; --ink-3:#7d9096; --line:#cdd9d5;
+  --accent:#1e6b86; --accent-ink:#ffffff; --accent-soft:#d9e9ef;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --sky1:#dfeaf2; --sky2:#f3f0e6; --hill1:#b9c9bd; --hill2:#9fb3a6; --ground:#cfc3a3; --ground2:#b8ab89; --path:#d9cfb4; --shadow:rgba(20,38,43,.18);
+  --shirt:#3b6b8c; --shirt2:#2c5169; --trouser:#3a3f4b; --trouser2:#2a2e37; --shoe:#1f1a17; --hair:#2b1d14;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",sans-serif;
+  --body:"IBM Plex Sans","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e191c; --surface:#152427; --surface-2:#1b2f34; --ink:#e3edef; --ink-2:#a7bbc0; --ink-3:#7b9096; --line:#27414a;
+  --accent:#64b8d3; --accent-ink:#0e191c; --accent-soft:#1a3d4a;
+  --sky1:#0f1f2a; --sky2:#1d2b30; --hill1:#1f3238; --hill2:#2a4047; --ground:#3a3a2f; --ground2:#2d2d24; --path:#45443a; --shadow:rgba(0,0,0,.5);
+  --shirt:#5a93b8; --shirt2:#3f6f8f; --trouser:#4b5160; --trouser2:#363b47; --shoe:#15110f; --hair:#1c130d; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0e191c; --surface:#152427; --surface-2:#1b2f34; --ink:#e3edef; --ink-2:#a7bbc0; --ink-3:#7b9096; --line:#27414a;
+  --accent:#64b8d3; --accent-ink:#0e191c; --accent-soft:#1a3d4a;
+  --sky1:#0f1f2a; --sky2:#1d2b30; --hill1:#1f3238; --hill2:#2a4047; --ground:#3a3a2f; --ground2:#2d2d24; --path:#45443a; --shadow:rgba(0,0,0,.5);
+  --shirt:#5a93b8; --shirt2:#3f6f8f; --trouser:#4b5160; --trouser2:#363b47; --shoe:#15110f; --hair:#1c130d; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:18px 48px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h1{font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:20px;font-weight:700}
+h3{font-size:16px;font-weight:700}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600}
+.muted{color:var(--ink-2)}
+.small{font-size:13px}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}
+.healthbadge{display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 16px}
+.healthbadge .score{font-family:var(--display);font-size:42px;font-weight:700;line-height:1}
+.healthbadge .label{font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+.pill.good{background:var(--good)} .pill.warn{background:var(--warn);color:#2b2000} .pill.serious{background:var(--serious);color:#2b1200} .pill.critical{background:var(--critical)}
+
+.field-stage{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;align-items:start}
+@media (max-width:900px){.field-stage{grid-template-columns:1fr;gap:10px}}
+.stick{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;display:grid;gap:8px}
+@media (max-width:900px){.stick{background:var(--bg);padding-bottom:6px}}
+.canvasbox{position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--sky1);min-height:220px}
+canvas#field{display:block;width:100%;height:100%}
+.canvasbox .legend{position:absolute;left:12px;top:10px;font-size:12px;color:var(--ink-2);background:color-mix(in srgb,var(--surface) 80%,transparent);border-radius:8px;padding:4px 8px;max-width:calc(100% - 24px)}
+.monitor{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.monitor .trace{grid-column:span 3;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px 2px;min-width:0}
+.trace .k{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trace canvas{display:block;width:100%;height:34px}
+.monitor .ro{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;min-width:0;display:block}
+.monitor .ro.wide{grid-column:span 2}
+.ro .k{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.ro .v{font-family:var(--display);font-weight:700;font-size:17px;line-height:1.15;overflow-wrap:anywhere}
+.ro .v small{font-family:var(--body);font-weight:500;font-size:11px;color:var(--ink-3);margin-left:3px}
+@media (max-width:900px){.monitor{grid-template-columns:repeat(4,minmax(0,1fr))}.monitor .trace{grid-column:span 2}.monitor .ro.wide,.monitor .ro:nth-child(n+9){display:none}}
+.controls{display:grid;gap:10px;min-width:0}
+.scen{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.scen .eyebrow{width:100%}
+.chip{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:5px 10px;font-size:12.5px}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 10px;font-size:12.5px}
+.quick{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:9px}
+.quick .dept{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-3);font-weight:600;margin-top:4px}
+.quick .q label{font-size:13px;display:flex;justify-content:space-between;gap:8px}
+.quick .q label b{font-family:var(--mono);font-weight:500;white-space:nowrap}
+.quick .q input[type=range]{width:100%;accent-color:var(--accent);margin:2px 0 0;display:block}
+section.intro{margin-top:22px}
+.subject{font-size:14px;color:var(--ink-2);max-width:72ch}
+.map{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.map table{width:100%;border-collapse:collapse;font-size:14px}
+.map th,.map td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.map td.num{text-align:right;white-space:nowrap}
+.map tr:last-child td{border-bottom:0}
+.map td .why{color:var(--ink-2);font-size:13px}
+.tablewrap{overflow-x:auto}
+
+section.block{margin-top:28px}
+section.block > .hd{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.organs{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px}
+.organ{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;border-left:5px solid var(--line);min-width:0}
+.organ.good{border-left-color:var(--good)} .organ.warn{border-left-color:var(--warn)} .organ.serious{border-left-color:var(--serious)} .organ.critical{border-left-color:var(--critical)}
+.organ .head{display:flex;gap:10px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.organ .name{font-family:var(--display);font-weight:700;font-size:17px}
+.organ .part{color:var(--ink-3);font-size:13px;margin-left:6px}
+.organ .score{font-family:var(--display);font-weight:700;font-size:22px;min-width:3ch;text-align:right}
+.bar{height:6px;background:var(--surface-2);border-radius:4px;margin:8px 0 6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:4px;background:var(--ink-3);transition:width .5s ease}
+.organ.good .bar i{background:var(--good)} .organ.warn .bar i{background:var(--warn)} .organ.serious .bar i{background:var(--serious)} .organ.critical .bar i{background:var(--critical)}
+.organ .why{font-size:14px;color:var(--ink-2)}
+.organ .motion{font-size:13px;color:var(--accent);margin-top:4px}
+.organ details{margin-top:6px}
+.organ summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:600;list-style:none}
+.organ summary::before{content:"▸ "} .organ details[open] summary::before{content:"▾ "}
+.formula{font-family:var(--mono);font-size:12.5px;background:var(--surface-2);border-radius:8px;padding:8px 10px;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+.feeds{margin:6px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink-2)}
+.feeds li{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px dashed var(--line)}
+.feeds li:last-child{border-bottom:0}
+.organ.moved{animation:flash 1.4s ease}
+@keyframes flash{0%{background:var(--accent-soft)}100%{background:var(--surface)}}
+
+.bench{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.group{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;min-width:0}
+.group h3{margin-bottom:8px}
+.field{display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.field:first-of-type{border-top:0}
+.field label{font-size:14px}
+.field .src{grid-column:1/-1;font-size:12px;color:var(--ink-3)}
+.field input[type=number]{width:11ch;font:inherit;font-family:var(--mono);font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);text-align:right}
+.field .unit{font-size:12px;color:var(--ink-3);margin-left:4px}
+.field .ctl{display:flex;align-items:center;justify-content:flex-end}
+.switch{display:inline-flex;align-items:center;gap:8px}
+.switch input{width:18px;height:18px;accent-color:var(--accent)}
+
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+@media (max-width:860px){.flow{grid-template-columns:1fr}}
+.col{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;min-width:0}
+.col h3{font-size:14px;margin-bottom:8px}
+.col .n{font-size:12px;color:var(--ink-3);font-weight:400;margin-left:4px}
+.nodes{display:flex;flex-wrap:wrap;gap:6px}
+.node{font-size:12px;border:1px solid var(--line);border-radius:8px;padding:3px 8px;background:var(--surface-2);color:var(--ink-2);transition:background .3s,color .3s,border-color .3s}
+.node.lit{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.moves{margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.moves ul{margin:6px 0 0;padding-left:0;list-style:none;display:grid;gap:4px;font-size:14px}
+.moves li{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap}
+.moves li b{font-weight:600}
+.delta.up{color:var(--good)} .delta.down{color:var(--critical)}
+
+table.check{width:100%;border-collapse:collapse;font-size:14px}
+table.check th,table.check td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line)}
+table.check td:not(:first-child),table.check th:not(:first-child){text-align:right}
+footer{margin-top:36px;font-size:13px;color:var(--ink-2);max-width:72ch}
+footer p{margin:6px 0}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:12px}
+.toolbar .status{font-size:12.5px;color:var(--ink-3);margin-left:auto}
+.btn{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:13px}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+select.btn{padding:6px 10px}
+.namebox{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.namebox input{font:inherit;font-family:var(--display);font-weight:700;font-size:clamp(22px,3.4vw,32px);border:0;border-bottom:2px dashed var(--line);background:transparent;color:var(--ink);padding:2px 4px;min-width:12ch;max-width:100%}
+.namebox input:focus{outline:none;border-bottom-color:var(--accent)}
+.quick .q .help{font-size:11.5px;color:var(--ink-3);margin-top:1px}
+.quick .q input[type=number]{width:14ch;font:inherit;font-family:var(--mono);font-size:13px;padding:4px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);text-align:right}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:4px;min-width:0}
+.gcard:hover{border-color:var(--accent)}
+.gcard .n{font-family:var(--display);font-weight:700;font-size:16px;overflow-wrap:anywhere}
+.gcard .s{font-size:12.5px;color:var(--ink-2)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:999px;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9}
+.toast.show{opacity:1}
+.howto{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:14px;color:var(--ink-2);max-width:none}
+.howto ol{margin:6px 0 0;padding-left:20px}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">Company as a Human</div>
+    <div class="namebox"><input id="cname" value="A typical company" aria-label="Company name" maxlength="60"><span class="small muted">walks like this</span></div>
+  </div>
+  <div class="healthbadge" aria-live="polite">
+    <div class="score num" id="health-score">—</div>
+    <div><div class="eyebrow">Overall health</div><div class="label" id="health-label">—</div><div class="small muted" id="health-sub">weighted from 11 systems</div></div>
+  </div>
+</header>
+
+<div class="toolbar" role="toolbar" aria-label="Company actions">
+  <button class="btn" id="b-typical">Typical company</button>
+  <button class="btn" id="b-demo">Demo: AHD Group, Oct 2026</button>
+  <button class="btn primary" id="b-save" title="Save this company to your account">Save</button>
+  <select class="btn" id="s-mine" aria-label="My saved companies"><option value="">My companies…</option></select>
+  <button class="btn" id="b-share">Share link</button>
+  <button class="btn" id="b-gallery">Companies people shared</button>
+  <span class="status" id="status">Numbers stay in this browser until you save.</span>
+</div>
+
+<div class="field-stage">
+  <div class="stick">
+    <div class="canvasbox">
+      <canvas id="field" role="img" aria-label="A person walking across a field. Their pace, stride, posture, breathing, stumbles and limp follow the company's numbers."></canvas>
+      <div class="legend" id="legend">walking</div>
+    </div>
+    <div class="monitor" id="monitor">
+      <div class="trace"><div class="k">Heart <span class="num" id="tr-hr"></span></div><canvas id="ecg"></canvas></div>
+      <div class="trace"><div class="k">Breath <span class="num" id="tr-br"></span></div><canvas id="resp"></canvas></div>
+      <div class="ro"><div class="k">Gait</div><div class="v" id="ro-gait">—</div></div>
+      <div class="ro"><div class="k">Speed</div><div class="v num" id="ro-speed">—<small>km/h</small></div></div>
+      <div class="ro"><div class="k">Cadence</div><div class="v num" id="ro-cad">—<small>steps/min</small></div></div>
+      <div class="ro"><div class="k">Stride</div><div class="v num" id="ro-stride">—<small>m</small></div></div>
+      <div class="ro wide"><div class="k">Posture</div><div class="v" id="ro-posture">—</div></div>
+      <div class="ro wide"><div class="k">Gaze</div><div class="v" id="ro-gaze">—</div></div>
+      <div class="ro"><div class="k">Stumbles</div><div class="v num" id="ro-stumble">—</div></div>
+      <div class="ro"><div class="k">Reaction</div><div class="v num" id="ro-react">—<small>s</small></div></div>
+      <div class="ro wide"><div class="k">Limp</div><div class="v" id="ro-limp">—</div></div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="quick" id="quick"></div>
+  </div>
+</div>
+
+<section class="block" id="gallery-block" hidden>
+  <div class="hd"><h2>Companies people shared</h2><span class="small muted">Tap one to watch it walk. Only what each person chose to share.</span></div>
+  <div class="gallery" id="gallery"></div>
+</section>
+
+<section class="block">
+  <div class="hd"><h2>How to read the person</h2></div>
+  <div class="howto">
+    Each department is the body system that does the same job in a person. Its numbers set that system's score from 0 to 100, and the score is in the way the person moves. A healthy company runs; a sick one shuffles.
+    <ol>
+      <li><b>Enter your numbers</b> on the right. Money fields are in any currency; only the ratios matter. Percentages are shares of your open orders, items or records.</li>
+      <li><b>Watch the walk change</b> at the speed the brain allows: a company with many decisions waiting takes seconds to respond.</li>
+      <li><b>Save</b> keeps the company in your account, <b>Share link</b> lets others watch it, and the gallery shows what people chose to share.</li>
+    </ol>
+  </div>
+</section>
+
+<div class="map">
+  <div class="eyebrow" style="margin-bottom:6px">Departments and their body systems</div>
+  <div class="tablewrap"><table><thead><tr><th>Department</th><th>Body system</th><th>Why this system</th><th>Score</th><th>Seen in the walk as</th></tr></thead><tbody id="map-body"></tbody></table></div>
+</div>
+
+<section class="block">
+  <div class="hd"><h2>The systems</h2><span class="small muted">Each one scores a department's numbers and drives one part of the body.</span></div>
+  <div class="organs" id="organs"></div>
+</section>
+
+<footer>
+  <p><strong>How it works.</strong> Numbers feed derived figures, rules turn them into eleven system scores, and the person is drawn procedurally every frame at human scale: a gait cycle with heel strike and toe-off, two-bone leg and arm kinematics, breathing, pulse, stumbles, tremor and limp, all set by the scores. Thresholds and weights are first settings; nothing here is financial advice.</p>
+</footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+
+(function(){
+'use strict';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const lerp=(a,b,t)=>a+(b-a)*t;
+const fmtPct=(x,d=1)=>(x*100).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';
+const fmtN=x=>Math.round(x).toLocaleString('en-US');
+const fmt1=x=>x.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
+const D2R=Math.PI/180;
+
+/* ---------- the numbers anyone can enter ---------- */
+const INPUTS=[
+ {id:'revenue',group:'Finance',label:'Money customers actually paid you in the period',unit:'money',value:100000,min:1,step:1000,help:'any currency; only ratios matter'},
+ {id:'cogs',group:'Finance',label:'Direct cost of what you sold',unit:'money',value:40000,min:0,step:1000,help:'materials, bought-in goods, direct labour'},
+ {id:'opex',group:'Administration',label:'Running costs for the same period',unit:'money',value:45000,min:0,step:1000,help:'salaries, rent, admin, marketing, utilities'},
+ {id:'discount',group:'Sales',label:'Average discount given off list price',unit:'%',value:15,min:0,max:80,step:0.5,help:'0 = everyone pays list'},
+ {id:'coverage',group:'Costing',label:'Share of sales where the real cost is known',unit:'%',value:85,min:0,max:100,step:1},
+ {id:'profitable',group:'Costing',label:'Share of products that make money at list price',unit:'%',value:70,min:0,max:100,step:1},
+ {id:'inflation',group:'Purchasing',label:'Purchased items whose price rose 10%+ in a year',unit:'%',value:30,min:0,max:100,step:1},
+ {id:'fxgap',group:'Purchasing',label:'Real exchange rate above the rate used in your costs',unit:'%',value:0,min:0,max:100,step:0.5,help:'0 if you buy in your own currency'},
+ {id:'unplanned',group:'Planning',label:'Open orders with no production plan',unit:'%',value:20,min:0,max:100,step:1},
+ {id:'late',group:'Operations',label:'Open orders past their due date',unit:'%',value:20,min:0,max:100,step:1},
+ {id:'stuck',group:'Operations',label:'Jobs past their start date and not started',unit:'%',value:15,min:0,max:100,step:1},
+ {id:'late30',group:'Delivery & invoicing',label:'Open orders late by up to 30 days',unit:'%',value:8,min:0,max:60,step:0.5},
+ {id:'over30',group:'Delivery & invoicing',label:'Open orders late by over 30 days',unit:'%',value:5,min:0,max:60,step:0.5,help:'often delivered but not invoiced'},
+ {id:'issues',group:'Data & IT',label:'Records your audits flag as wrong or doubtful',unit:'%',value:10,min:0,max:100,step:1},
+ {id:'unconfirmed',group:'Data & IT',label:'Links between your systems still unconfirmed',unit:'%',value:10,min:0,max:100,step:1},
+ {id:'backlog',group:'Management',label:'Decisions and approvals older than a month',unit:'%',value:20,min:0,max:100,step:1},
+ {id:'undecided',group:'Management',label:'Open price or policy decisions',unit:'%',value:10,min:0,max:100,step:1},
+];
+const INPUT_BY=Object.fromEntries(INPUTS.map(i=>[i.id,i]));
+const TYPICAL={name:'A typical company',values:Object.fromEntries(INPUTS.map(i=>[i.id,i.value]))};
+const DEMO={name:'AHD Group (demo, Oct 2026)',values:{revenue:42583300,cogs:17000000,opex:40515702,discount:32.3,coverage:86,profitable:58.3,inflation:64.4,fxgap:10.6,unplanned:54.1,late:47.1,stuck:32.0,late30:8.4,over30:38.8,issues:60.6,unconfirmed:49.6,backlog:52.4,undecided:18}};
+
+/* ---------- derived figures ---------- */
+function derive(v){
+  const d={};
+  d.list_rev=v.revenue/Math.max(0.01,1-v.discount/100);
+  d.cost=v.cogs+v.opex;
+  d.margin=v.revenue>0?(v.revenue-d.cost)/v.revenue:-1;
+  d.break_even=1-d.cost/d.list_rev;
+  d.oh_share=v.revenue>0?v.opex/v.revenue:9;
+  d.late_share=clamp(v.late/100); d.unplanned_share=clamp(v.unplanned/100); d.stuck_share=clamp(v.stuck/100);
+  d.late30_share=clamp(v.late30/100); d.over30_share=clamp(v.over30/100);
+  return d;
+}
+
+/* ---------- body systems ---------- */
+const ORGANS=[
+ {id:'heart',name:'Heart & blood',dept:'Finance',part:'margin',weight:20,visual:'heart rate, stride length, posture',
+  bio:'The heart pushes oxygen round the body; margin pushes cash round the company. A weak margin is a weak pulse: short steps, rounded shoulders, head down.',
+  score:(d,v)=>100*clamp((d.margin+0.5)/0.65),why:(v,d)=>`Margin ${fmtPct(d.margin)} after direct and running costs.`,
+  formula:'score = (margin + 50%) ÷ 65%, so −50% → 0 and +15% → 100'},
+ {id:'fat',name:'Fat',dept:'Administration',part:'overhead weight',weight:15,visual:'build, foot clearance',
+  bio:'Fat is stored cost the body carries everywhere. Running costs are the cost the company carries on every sale.',
+  score:(d,v)=>100*clamp((1-d.oh_share)/0.70),why:(v,d)=>`Running costs are ${fmtPct(d.oh_share,0)} of what customers paid.`,
+  formula:'score = (100% − running costs ÷ revenue) ÷ 70%, so 30% → 100 and 100% → 0'},
+ {id:'fever',name:'Mouth & temperature',dept:'Sales',part:'discounting',weight:10,visual:'cadence, open-mouth breathing, sweat, flushed face',
+  bio:'The mouth takes in food; sales takes in orders. Selling below break-even is a fever: agitated, flushed, breathing through the mouth.',
+  score:(d,v)=>100*(1-clamp((v.discount/100-d.break_even)/0.40)),why:(v,d)=>`Discount ${fmtPct(v.discount/100)} against a break-even discount of ${fmtPct(d.break_even)}.`,
+  formula:'excess = discount − break-even discount (not below 0); score = 100 − excess ÷ 40%'},
+ {id:'eyes',name:'Eyes',dept:'Costing',part:'seeing costs',weight:5,visual:'eyelids',
+  bio:'Eyes tell a person what is in front of them; costing tells the company what a sale really costs before it is made.',
+  score:(d,v)=>50*clamp(v.coverage/100)+50*clamp(v.profitable/100),why:(v)=>`${fmtPct(v.coverage/100,0)} of sales have a known cost; ${fmtPct(v.profitable/100,0)} of products make money at list.`,
+  formula:'score = 50 × cost coverage + 50 × share profitable at list'},
+ {id:'lungs',name:'Lungs',dept:'Purchasing',part:'material intake',weight:10,visual:'breathing rate and depth',
+  bio:'Lungs draw in the air the body runs on; purchasing draws in the material the company runs on. Rising prices are thin air: faster, shallower breaths.',
+  score:(d,v)=>100-60*clamp(v.inflation/65)-40*clamp(v.fxgap/30),why:(v)=>`${fmtPct(v.inflation/100,0)} of purchased items rose 10%+ in a year; exchange-rate gap ${fmtPct(v.fxgap/100)}.`,
+  formula:'score = 100 − 60 × (items up 10%+ ÷ 65%) − 40 × (FX gap ÷ 30%), each capped'},
+ {id:'balance',name:'Balance',dept:'Planning',part:'coordination',weight:10,visual:'stumbles, uneven rhythm',
+  bio:'The inner ear places each foot before the body arrives; planning places each order before it is due. Without it the person trips.',
+  score:(d,v)=>100*(1-d.unplanned_share),why:(v)=>`${fmtPct(v.unplanned/100,0)} of open orders have no plan.`,
+  formula:'score = 100 − unplanned share; chance of a stumble per stride = 30% × unplanned share'},
+ {id:'stomach',name:'Stomach',dept:'Operations',part:'digesting orders',weight:10,visual:'belly, cadence',
+  bio:'The stomach turns food into the body; operations turn orders into delivered work. Orders sitting undelivered are undigested food.',
+  score:(d,v)=>100*(1-d.late_share),why:(v)=>`${fmtPct(v.late/100,0)} of open orders are past due.`,
+  formula:'score = 100 − late share'},
+ {id:'muscles',name:'Muscles',dept:'Operations',part:'flow through the work',weight:5,visual:'foot clearance, knee lift, limb bulk',
+  bio:'Muscle is what moves the body; the floor is what moves the work. Jobs past their start date are muscle that will not fire.',
+  score:(d,v)=>100*(1-d.stuck_share),why:(v)=>`${fmtPct(v.stuck/100,0)} of jobs are past their start date and not started.`,
+  formula:'score = 100 − stuck share'},
+ {id:'legs',name:'Legs',dept:'Delivery & invoicing',part:'getting it to the customer',weight:5,visual:'limp (left: delivery, right: invoicing)',
+  bio:'Legs carry a person to where they are going; delivery and invoicing carry the order to the customer and the money back. Late deliveries weaken the left leg; delivered-but-not-invoiced weakens the right.',
+  score:(d)=>50*(1-clamp(d.late30_share*3))+50*(1-clamp(d.over30_share*2)),why:(v)=>`${fmtPct(v.late30/100)} late up to 30 days, ${fmtPct(v.over30/100)} over 30 days.`,
+  formula:'left leg = 1 − 3 × late ≤30d share; right leg = 1 − 2 × late >30d share; under 50 the step shortens, under 25 the foot drags'},
+ {id:'nerves',name:'Nerves',dept:'Data & IT',part:'signals the brain can trust',weight:5,visual:'hand tremor',
+  bio:'Nerves carry signals from body to brain; data carries numbers from the floor to management. Bad data is a noisy nerve: the hands shake.',
+  score:(d,v)=>100-65*clamp(v.issues/60)-35*clamp(v.unconfirmed/50),why:(v)=>`${fmtPct(v.issues/100,0)} of records flagged; ${fmtPct(v.unconfirmed/100,0)} of links unconfirmed.`,
+  formula:'score = 100 − 65 × (flagged ÷ 60%) − 35 × (unconfirmed ÷ 50%), each capped'},
+ {id:'brain',name:'Brain',dept:'Management',part:'decisions',weight:5,visual:'reaction time, gaze',
+  bio:'The brain decides and the body follows; management decides and the company follows. Decisions left waiting are a slow brain: eyes on the ground, slow to react to anything that changes.',
+  score:(d,v)=>100-70*clamp(v.backlog/100)-30*clamp(v.undecided/100),why:(v)=>`${fmtPct(v.backlog/100,0)} of decisions older than a month; ${fmtPct(v.undecided/100,0)} price or policy decisions open.`,
+  formula:'score = 100 − 70 × backlog share − 30 × undecided share; reaction time = 0.4 + 4 × (1 − score) s'},
+];
+function compute(v){
+  const d=derive(v);const o={};for(const x of ORGANS)o[x.id]=clamp(x.score(d,v),0,100);
+  const wsum=ORGANS.reduce((s,x)=>s+x.weight,0);const health=ORGANS.reduce((s,x)=>s+x.weight*o[x.id],0)/wsum;
+  return {v:{...v},d,o,health,legs:{L:1-clamp(d.late30_share*3),R:1-clamp(d.over30_share*2)}};
+}
+function status(s){return s>=75?{k:'good',t:'Healthy',i:'✓'}:s>=50?{k:'warn',t:'Strained',i:'!'}:s>=25?{k:'serious',t:'Sick',i:'!!'}:{k:'critical',t:'Critical',i:'✕'}}
+function healthLabel(h){return h>=75?'Thriving':h>=50?'Stable':h>=25?'Sick':'Critical'}
+const $=id=>document.getElementById(id);
+let values={...TYPICAL.values},prev=null,company={name:TYPICAL.name,slug:null};
+
+/* ---------- motion parameters from the scores (human scale, cm) ---------- */
+function motionFrom(r){
+  const o=r.o,h=r.health/100;
+  const vigor=o.heart/100, fever=1-o.fever/100, late=r.d.late_share, lungs=o.lungs/100, nerves=o.nerves/100, fat=1-o.fat/100, muscles=o.muscles/100, brain=o.brain/100;
+  const stress=clamp(0.6*fever+0.4*late);
+  // fitness: a strong heart with a sound body breaks into a run
+  const fit=clamp((vigor-0.55)/0.35)*clamp((h-0.45)/0.35);
+  const run=fit*fit*(3-2*fit);
+  const stepsPerMin=80+30*vigor+20*stress+60*run;
+  const strideM=0.6+0.9*vigor+1.0*run;           // metres per full gait cycle (two steps)
+  const speed=strideM*100*stepsPerMin/2/60;      // cm/s
+  const kmh=speed*0.036;
+  const gait=kmh<2.6?'shuffle':kmh<4.5?'walk':kmh<6.5?'brisk walk':kmh<9.5?'jog':'run';
+  const duty=lerp(0.62,0.36,run);
+  return {vigor,stress,fever,fat,nerves,lungs,muscles,health:h,late,brain,run,
+    cadenceHz:stepsPerMin/120,stepsPerMin,strideCm:strideM*100,strideM,speed,kmh,gait,duty,
+    bob:(1.8+1.6*vigor)*(1-0.5*fat)+5*run,
+    lift:(9+13*vigor)*(0.45+0.55*muscles)*(1-0.4*fat)+22*run,
+    heartBpm:62+0.55*(100-o.heart)+70*run,
+    breathHz:(12+24*(1-lungs)+26*run)/60,breathDepth:0.45+0.55*lungs,panting:o.fever<50,
+    lean:4+16*(1-0.6*vigor-0.4*h)+7*run,
+    slump:clamp(1-0.6*vigor-0.4*h),
+    gaze:brain,
+    armSwing:8+24*vigor+20*run,
+    armBend:28+62*run,
+    tremor:nerves<0.6?(0.6-nerves)/0.6:0,
+    rhythmJitter:(1-o.balance/100)*0.10,
+    stumbleChance:0.30*r.d.unplanned_share,
+    eyeLid:0.85*(1-o.eyes/100),
+    flush:clamp((fever-0.3)/0.7)*0.8+0.3*run,
+    reaction:0.4+4*(1-brain),
+    legs:{...r.legs}};
+}
+
+/* ---------- the person (canvas) ---------- */
+const cv=$('field'),ctx=cv.getContext('2d');
+const ecg=$('ecg'),ecgCtx=ecg.getContext('2d'),resp=$('resp'),respCtx=resp.getContext('2d');
+let W=0,H=0,DPR=1,motion=null,targetMotion=null;
+let tSim=0,cycle=0,dist=0,lastT=performance.now(),lastCycleInt=0,stumble=0,stumbles=0;
+const legPhasePrev={L:0,R:0};
+const particles=[];const sweat=[];
+let blinkT=0,blinkNext=3;
+const ecgBuf=new Float32Array(160).fill(0),respBuf=new Float32Array(160).fill(0);let bufT=0;
+
+function resize(){
+  const box=cv.parentElement.getBoundingClientRect();
+  W=Math.max(300,box.width);H=W<700?Math.max(200,Math.min(W*0.62,window.innerHeight*0.38)):Math.max(300,Math.min(440,W*0.5));
+  DPR=Math.min(2,window.devicePixelRatio||1);
+  cv.width=W*DPR;cv.height=H*DPR;cv.style.height=H+'px';cv.parentElement.style.height=H+'px';
+  for(const c of [ecg,resp]){const r=c.getBoundingClientRect();c.width=Math.max(60,r.width)*DPR;c.height=38*DPR}
+}
+window.addEventListener('resize',resize);
+function css(name){return getComputedStyle(document.documentElement).getPropertyValue(name).trim()}
+function hsl(h,s,l,a=1){return `hsla(${h} ${s}% ${l}% / ${a})`}
+
+function ik(P,F,a,b,dir){
+  let dx=F.x-P.x,dy=F.y-P.y;let d=Math.hypot(dx,dy);const max=a+b-0.3,min=Math.abs(a-b)+0.3;
+  if(d>max){dx*=max/d;dy*=max/d;d=max}if(d<min)d=min;
+  const base=Math.atan2(dy,dx);
+  const A=Math.acos(clamp((a*a+d*d-b*b)/(2*a*d),-1,1));
+  const k1={x:P.x+a*Math.cos(base-A),y:P.y+a*Math.sin(base-A)};
+  const k2={x:P.x+a*Math.cos(base+A),y:P.y+a*Math.sin(base+A)};
+  const knee=dir*(k1.x-P.x)>dir*(k2.x-P.x)?k1:k2;
+  return {knee,end:{x:P.x+dx,y:P.y+dy}};
+}
+const ANKLE_H=8,THIGH=44,SHIN=43,UPPER_ARM=30,FOREARM=26;
+function legState(id,m,cyc){
+  const strength=m.legs[id];
+  const sev=strength<0.5?clamp((0.5-strength)/0.5):0;
+  const beta=m.duty*(1-0.4*sev);
+  const phi=((cyc+(id==='L'?0:0.5))%1+1)%1;
+  const S=beta*m.strideCm;
+  let x,y,theta,bump=0,drag=false;
+  if(phi<beta){
+    const u=phi/beta;x=S*(0.5-u);bump=Math.sin(Math.PI*u);
+    theta=u<0.15?-14*(1-u/0.15):u>0.62?38*((u-0.62)/0.38)*(1-0.5*sev):0;   // heel strike → flat → toe-off
+    y=-ANKLE_H-18*Math.sin(Math.max(0,theta)*D2R);
+  }else{
+    const u=(phi-beta)/(1-beta);x=S*(-0.5+u);
+    const lift=m.lift*(1-0.8*sev);
+    y=-ANKLE_H-lift*Math.sin(Math.PI*u);
+    theta=lerp(30+30*m.run,-14,u)*(1-0.5*sev);
+    if(sev>0.5){drag=true;theta=22;y=-ANKLE_H-1.5}
+  }
+  return {x,y,theta,phi,beta,sev,strength,bump,drag};
+}
+
+function draw(now){
+  const dt=Math.min(0.05,(now-lastT)/1000);lastT=now;
+  if(!motion)return requestAnimationFrame(draw);
+  const k=1-Math.exp(-dt/Math.max(0.15,motion.reaction));
+  for(const key of Object.keys(targetMotion)){
+    const tv=targetMotion[key];
+    if(typeof tv==='number')motion[key]=lerp(motion[key],tv,k);
+    else if(key==='legs'){for(const l in tv)motion.legs[l]=lerp(motion.legs[l],tv[l],k)}
+    else motion[key]=tv;
+  }
+  const m=motion;
+  tSim+=dt;
+  const jitter=1+m.rhythmJitter*Math.sin(tSim*7.3)*Math.sin(tSim*2.1);
+  cycle+=dt*m.cadenceHz*jitter;
+  dist+=dt*m.speed;
+  const ci=Math.floor(cycle*2);
+  if(ci!==lastCycleInt){lastCycleInt=ci;if(stumble<=0&&Math.random()<m.stumbleChance/2){stumble=0.6;stumbles++}}
+  let st=0;if(stumble>0){st=Math.sin(Math.PI*(1-stumble/0.6));stumble-=dt}
+
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  ctx.clearRect(0,0,W,H);
+  const groundY=H*0.84;
+  const sky=ctx.createLinearGradient(0,0,0,groundY);sky.addColorStop(0,css('--sky1'));sky.addColorStop(1,css('--sky2'));
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,groundY);
+  drawHills(groundY-44,0.1,css('--hill1'),60,240);
+  drawHills(groundY-16,0.26,css('--hill2'),30,150);
+  ctx.fillStyle=css('--ground');ctx.fillRect(0,groundY,W,H-groundY);
+  ctx.fillStyle=css('--path');ctx.fillRect(0,groundY-3,W,10);
+  ctx.fillStyle=css('--ground2');
+  const sp=80,off=-(dist*0.55%sp);
+  for(let x=off-sp;x<W+sp;x+=sp){const i=Math.round((x-off)/sp);ctx.fillRect(x,groundY+14+((i*13)%11),12+((i*5)%9),2);ctx.beginPath();ctx.moveTo(x+40,groundY+9);ctx.lineTo(x+43,groundY+1-((i*7)%5));ctx.lineTo(x+46,groundY+9);ctx.fill()}
+  ctx.fillStyle=css('--ink');ctx.globalAlpha=.1;ctx.fillRect(0,groundY+7,W,1.5);ctx.globalAlpha=1;
+
+  // scale: 1 unit = 1 cm; the person is 175 cm
+  const s=Math.min((groundY-26)/200,W/420);
+  const cx=W*0.5;
+  ctx.save();ctx.translate(cx,groundY+6);ctx.scale(s,s);
+  const bodyTremor=m.tremor>0.5?(m.tremor-0.5)*2:0;
+  if(bodyTremor>0)ctx.translate((Math.random()-0.5)*1.2*bodyTremor,(Math.random()-0.5)*1.2*bodyTremor);
+
+  // kinematics
+  const breath=Math.sin(2*Math.PI*m.breathHz*tSim)*m.breathDepth;
+  const beatPhase=(tSim*m.heartBpm/60)%1;
+  const pulse=Math.exp(-beatPhase*10)*0.7+Math.exp(-(((beatPhase-0.32)%1+1)%1)*16)*0.3;
+  const legs={L:legState('L',m,cycle),R:legState('R',m,cycle)};
+  const dip=5*(legs.L.sev*legs.L.bump+legs.R.sev*legs.R.bump)+6*st;
+  const hipY=-(THIGH+SHIN-1)+m.bob*Math.cos(4*Math.PI*cycle)+dip-4*m.run;
+  const hip={x:0,y:hipY};
+  const lean=(m.lean+22*st)*D2R;
+  const girth=1+0.5*m.fat;
+  const belly=3+15*m.late+7*m.fat;
+  const spineLen=50;
+  const sh={x:hip.x+spineLen*Math.sin(lean)+6*m.slump,y:hip.y-spineLen*Math.cos(lean)+5*m.slump-0.8*breath};
+  const headTilt=lean+(8+28*(1-m.gaze)+18*st)*D2R;
+  const neckBase={x:sh.x+3,y:sh.y-3};
+  const headC={x:neckBase.x+15*Math.sin(headTilt),y:neckBase.y-15*Math.cos(headTilt)};
+  // arms: near (right) arm swings with the left leg
+  const swing=(m.armSwing*D2R)*Math.cos(2*Math.PI*cycle);
+  const armR=swing+1.2*st, armL=-swing+1.2*st;
+  const bend=(m.armBend+12*Math.max(0,Math.cos(2*Math.PI*cycle)))*D2R;
+  const shoulderJ={x:sh.x-2,y:sh.y+4};
+  const handTremor=m.tremor*0.9;
+  function arm(angle,bendSign){
+    const E={x:shoulderJ.x+UPPER_ARM*Math.sin(angle),y:shoulderJ.y+UPPER_ARM*Math.cos(angle)};
+    const a2=angle+bend*bendSign;
+    const Wr={x:E.x+FOREARM*Math.sin(a2)+(Math.random()-0.5)*handTremor,y:E.y+FOREARM*Math.cos(a2)+(Math.random()-0.5)*handTremor};
+    return {E,Wr,a2};
+  }
+  const AR=arm(armR,1),AL=arm(armL,1);
+
+  // colours
+  const skinH=22,skinS=42+18*m.health,skinL=62+6*m.health-6*(1-m.health);
+  const skin=hsl(skinH-8*m.flush,skinS+25*m.flush,skinL-4*m.flush),skinDark=hsl(skinH,skinS,skinL-14);
+  const shirt=css('--shirt'),shirt2=css('--shirt2'),trouser=css('--trouser'),trouser2=css('--trouser2'),shoe=css('--shoe'),hair=css('--hair');
+
+  // shadow
+  ctx.fillStyle=css('--shadow');ctx.beginPath();ctx.ellipse(4,-2,34+6*Math.abs(Math.sin(2*Math.PI*cycle)),4,0,0,Math.PI*2);ctx.fill();
+
+  // far limbs
+  drawArm(AL,shirt2,skinDark);
+  drawLeg(legs.L,hip,trouser2,shoe,false);
+  // torso
+  drawTorso();
+  // head
+  drawHead();
+  // near limbs
+  drawLeg(legs.R,hip,trouser,shoe,true);
+  drawArm(AR,shirt,skin);
+
+  // sweat
+  if(m.fever>0.5&&Math.random()<dt*2.5*m.fever){sweat.push({x:headC.x+2+Math.random()*8,y:headC.y-8,vy:6,life:1})}
+  ctx.fillStyle=css('--accent');for(let i=sweat.length-1;i>=0;i--){const d=sweat[i];d.life-=dt*1.2;d.y+=d.vy*dt;d.vy+=25*dt;if(d.life<=0){sweat.splice(i,1);continue}ctx.globalAlpha=d.life*0.8;ctx.beginPath();ctx.ellipse(d.x,d.y,0.9,1.5,0,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+  // dust at heel strike
+  for(const id in legs){const L=legs[id];if(legPhasePrev[id]>0.9&&L.phi<0.1&&m.speed>90){for(let i=0;i<3;i++)particles.push({x:L.x+4,y:-1,vx:-m.speed*0.2-Math.random()*20,vy:-12-Math.random()*18,life:1})}legPhasePrev[id]=L.phi}
+  if(stumble>0.55)for(let i=0;i<5;i++)particles.push({x:legs.R.x,y:-1,vx:-m.speed*0.3-Math.random()*30,vy:-18-Math.random()*20,life:1});
+  ctx.fillStyle=css('--ground2');for(let i=particles.length-1;i>=0;i--){const p=particles[i];p.life-=dt*1.8;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=40*dt;if(p.life<=0){particles.splice(i,1);continue}ctx.globalAlpha=p.life*0.5;ctx.beginPath();ctx.arc(p.x,Math.min(p.y,0),1.5+2*(1-p.life),0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
+
+  ctx.restore();
+  // status vignette: hue from red (critical) through amber to green (thriving), pulsing with the heartbeat
+  {
+    const hue=4+116*Math.pow(m.health,1.4);
+    const sat=82-22*m.health;
+    const a=(0.30+0.34*pulse)*(1.1-0.35*m.health);
+    const R=Math.max(W,H);
+    const vg=ctx.createRadialGradient(W*0.5,H*0.5,R*0.16,W*0.5,H*0.5,R*0.74);
+    vg.addColorStop(0,hsl(hue,sat,45,0));vg.addColorStop(0.55,hsl(hue,sat,45,a*0.4));vg.addColorStop(1,hsl(hue,sat,38,a));
+    ctx.fillStyle=vg;ctx.fillRect(0,0,W,H);
+  }
+  // traces
+  bufT+=dt;if(bufT>0.03){bufT=0;ecgBuf.copyWithin(0,1);ecgBuf[ecgBuf.length-1]=ecgSample(beatPhase);respBuf.copyWithin(0,1);respBuf[respBuf.length-1]=breath/m.breathDepth}
+  drawTrace(ecgCtx,ecg,ecgBuf,0.5,css('--critical'));drawTrace(respCtx,resp,respBuf,0.45,css('--accent'));
+  updateReadouts(m);
+  requestAnimationFrame(draw);
+
+  /* ----- drawing helpers (closures over this frame) ----- */
+  function drawHills(baseY,par,color,amp,wl){
+    ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(0,groundY+2);const o=dist*par;
+    for(let x=0;x<=W;x+=12){const wx=x+o;const y=baseY-amp*(0.6*Math.sin(wx/wl)+0.4*Math.sin(wx/(wl*0.47)+1.3))*0.5-amp*0.5;ctx.lineTo(x,y)}
+    ctx.lineTo(W,groundY+2);ctx.closePath();ctx.fill();
+  }
+  function capsule(a,b,w,color){ctx.strokeStyle=color;ctx.lineWidth=w;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+  function drawLeg(L,hipP,color,shoeColor,near){
+    const ankle={x:L.x,y:L.y};
+    const {knee,end}=ik(hipP,ankle,THIGH,SHIN,+1);
+    const w=11*girth*(0.8+0.2*L.strength)*(0.85+0.15*m.muscles);
+    capsule(hipP,knee,w*1.25,color);
+    capsule(knee,end,w*0.95,color);
+    // foot: rotate about the ankle, positive theta = heel up
+    const th=L.theta*D2R,c=Math.cos(th),sn=Math.sin(th);
+    const R=(px,py)=>({x:end.x+px*c-py*sn,y:end.y+px*sn+py*c});
+    const heel=R(-7,ANKLE_H-1),toe=R(19,ANKLE_H),top=R(6,1),toeTop=R(17,ANKLE_H-5);
+    ctx.fillStyle=shoeColor;ctx.beginPath();ctx.moveTo(heel.x,heel.y-5);ctx.lineTo(top.x,top.y);ctx.quadraticCurveTo(toeTop.x,toeTop.y,toe.x,toe.y);ctx.lineTo(heel.x,heel.y);ctx.closePath();ctx.fill();
+    if(near){ctx.strokeStyle=hsl(0,0,100,0.18);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(heel.x+2,heel.y-1.5);ctx.lineTo(toe.x-3,toe.y-1.5);ctx.stroke()}
+  }
+  function drawArm(A,sleeve,handSkin){
+    const w=8.5*girth;
+    capsule(shoulderJ,A.E,w*1.2,sleeve);
+    capsule(A.E,A.Wr,w*0.95,sleeve);
+    const hand={x:A.Wr.x+9*Math.sin(A.a2),y:A.Wr.y+9*Math.cos(A.a2)};
+    capsule(A.Wr,hand,w*0.8,handSkin);
+  }
+  function drawTorso(){
+    const back1={x:hip.x-9*girth,y:hip.y+2};
+    const back2={x:sh.x-9*girth-4*m.slump,y:sh.y+6};
+    const chest={x:sh.x+11*girth+1.6*breath,y:sh.y+14};
+    const bellyP={x:lerp(hip.x,sh.x,0.35)+10*girth+belly,y:lerp(hip.y,sh.y,0.35)+2};
+    const front1={x:hip.x+9*girth,y:hip.y+3};
+    ctx.beginPath();
+    ctx.moveTo(back1.x,back1.y);
+    ctx.quadraticCurveTo(lerp(back1.x,back2.x,0.5)-4*m.slump,lerp(back1.y,back2.y,0.5),back2.x,back2.y);
+    ctx.quadraticCurveTo(sh.x-6,sh.y-6-0.8*breath,sh.x+4,sh.y-4-0.8*breath);
+    ctx.quadraticCurveTo(chest.x+2,sh.y+2,chest.x,chest.y);
+    ctx.quadraticCurveTo(bellyP.x+4,bellyP.y-10,bellyP.x,bellyP.y);
+    ctx.quadraticCurveTo(bellyP.x-2,bellyP.y+12,front1.x,front1.y);
+    ctx.closePath();
+    const g=ctx.createLinearGradient(sh.x-12,0,sh.x+14,0);g.addColorStop(0,shirt2);g.addColorStop(1,shirt);
+    ctx.fillStyle=g;ctx.fill();
+    // belt / waistband
+    ctx.strokeStyle=trouser2;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(back1.x,back1.y);ctx.lineTo(front1.x,front1.y);ctx.stroke();
+    // collar
+    ctx.fillStyle=skinDark;ctx.beginPath();ctx.ellipse(neckBase.x,neckBase.y+2,5.5,3.5,lean,0,Math.PI*2);ctx.fill();
+    // pulse in the neck (carotid)
+    ctx.fillStyle=hsl(355,70,55,0.25*pulse);ctx.beginPath();ctx.ellipse(neckBase.x+4,neckBase.y-4,3,5,headTilt,0,Math.PI*2);ctx.fill();
+  }
+  function drawHead(){
+    // neck
+    capsule(neckBase,{x:headC.x-2*Math.sin(headTilt),y:headC.y+2*Math.cos(headTilt)},9,skin);
+    ctx.save();ctx.translate(headC.x,headC.y);ctx.rotate(headTilt);
+    // skull
+    ctx.fillStyle=skin;ctx.beginPath();ctx.ellipse(0,0,10.5,12,0,0,Math.PI*2);ctx.fill();
+    // jaw / chin
+    ctx.beginPath();ctx.moveTo(-6,6);ctx.quadraticCurveTo(2,14,8,6);ctx.closePath();ctx.fill();
+    // hair
+    ctx.fillStyle=hair;ctx.beginPath();ctx.ellipse(-1.5,-4,10.5,9,0,Math.PI*1.02,Math.PI*2.02);ctx.fill();
+    ctx.beginPath();ctx.moveTo(-11,-3);ctx.quadraticCurveTo(-13,6,-8,9);ctx.lineTo(-7,-1);ctx.closePath();ctx.fill();
+    // ear
+    ctx.fillStyle=skinDark;ctx.beginPath();ctx.ellipse(-4,1,2.2,3.2,0,0,Math.PI*2);ctx.fill();
+    // nose
+    ctx.fillStyle=skin;ctx.beginPath();ctx.moveTo(8,-1);ctx.lineTo(12.5,3);ctx.lineTo(8,4);ctx.closePath();ctx.fill();
+    // cheek flush
+    if(m.flush>0){ctx.fillStyle=hsl(0,70,60,0.35*m.flush);ctx.beginPath();ctx.ellipse(4,3,4,2.5,0,0,Math.PI*2);ctx.fill()}
+    // eye
+    blinkT+=dt;let blinkCover=0;if(blinkT>blinkNext){const b=(blinkT-blinkNext)/0.14;blinkCover=b<1?Math.sin(Math.PI*b):0;if(b>=1){blinkT=0;blinkNext=2.5+Math.random()*4}}
+    const lid=Math.max(m.eyeLid,blinkCover);
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.ellipse(5,-2,2.6,1.8,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='#2a1c14';ctx.beginPath();ctx.arc(5.8,-1.9,1.2,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle=skin;ctx.fillRect(2,-4.2,6.5,4.2*lid);
+    ctx.strokeStyle=skinDark;ctx.lineWidth=0.8;ctx.beginPath();ctx.moveTo(2.4,-4.2+4.2*lid);ctx.lineTo(7.8,-4.2+4.2*lid);ctx.stroke();
+    // brow
+    ctx.strokeStyle=hair;ctx.lineWidth=1.1;ctx.beginPath();ctx.moveTo(2.5,-5.2-1.5*m.slump);ctx.lineTo(8,-5.6);ctx.stroke();
+    // mouth
+    const open=m.panting?1.8+1.2*Math.sin(tSim*2*Math.PI*1.6):0;
+    ctx.strokeStyle=hsl(5,45,38);ctx.lineWidth=1.2;ctx.beginPath();
+    const mouthY=7.5,corner=(m.health-0.5)*2.2;
+    ctx.moveTo(4,mouthY+corner*0.6);ctx.quadraticCurveTo(7,mouthY+open*0.4-corner,10,mouthY-0.3);ctx.stroke();
+    if(open>0){ctx.fillStyle=hsl(5,55,35);ctx.beginPath();ctx.ellipse(7.2,mouthY+1,2.6,open,0,0,Math.PI*2);ctx.fill()}
+    ctx.restore();
+  }
+  function ecgSample(ph){const p=ph;let v=0;
+    v+=0.12*Math.exp(-Math.pow((p-0.12)/0.03,2));
+    v-=0.15*Math.exp(-Math.pow((p-0.20)/0.008,2));
+    v+=1.0*Math.exp(-Math.pow((p-0.22)/0.012,2));
+    v-=0.25*Math.exp(-Math.pow((p-0.245)/0.01,2));
+    v+=0.28*Math.exp(-Math.pow((p-0.40)/0.05,2));
+    return v}
+  function drawTrace(c,el,buf,amp,color){
+    const w=el.width/DPR,h=el.height/DPR;c.setTransform(DPR,0,0,DPR,0,0);c.clearRect(0,0,w,h);
+    c.strokeStyle=css('--line');c.lineWidth=1;c.beginPath();c.moveTo(0,h*0.65);c.lineTo(w,h*0.65);c.stroke();
+    c.strokeStyle=color;c.lineWidth=1.6;c.lineJoin='round';c.beginPath();
+    for(let i=0;i<buf.length;i++){const x=i/(buf.length-1)*w,y=h*0.65-buf[i]*h*amp;if(i===0)c.moveTo(x,y);else c.lineTo(x,y)}
+    c.stroke();
+  }
+}
+
+/* ---------- readouts ---------- */
+let roTick=0;
+function updateReadouts(m){
+  roTick++;if(roTick%6)return;
+  $('ro-gait').textContent=m.gait;
+  $('legend').textContent=`${m.gait} · ${m.kmh.toFixed(1)} km/h · ${Math.round(m.stepsPerMin)} steps/min · heart ${Math.round(m.heartBpm)} bpm · ${Math.round(dist/100).toLocaleString('en-US')} m so far`;
+  $('tr-hr').textContent=Math.round(m.heartBpm)+' bpm';$('tr-br').textContent=Math.round(m.breathHz*60)+'/min'+(m.panting?' · mouth open':'');
+  $('ro-speed').innerHTML=m.kmh.toFixed(1)+'<small>km/h</small>';
+  $('ro-cad').innerHTML=Math.round(m.stepsPerMin)+'<small>steps/min</small>';
+  $('ro-stride').innerHTML=m.strideM.toFixed(2)+'<small>m</small>';
+  const post=m.slump<0.25?'upright, shoulders back':m.slump<0.5?'slightly stooped':m.slump<0.75?'stooped, shoulders rounded':'hunched';
+  $('ro-posture').textContent=(m.run>0.5?'running form, ':'')+post;
+  $('ro-gaze').textContent=m.gaze>0.75?'on the horizon':m.gaze>0.5?'a few metres ahead':m.gaze>0.3?'at the path':'at their feet';
+  $('ro-stumble').innerHTML=stumbles+'<small>so far, '+Math.round(m.stumbleChance*100)+'% per stride</small>';
+  const limp=[];if(m.legs.L<0.5)limp.push(m.legs.L<0.25?'left drags (delivery)':'left (delivery)');if(m.legs.R<0.5)limp.push(m.legs.R<0.25?'right drags (invoicing)':'right (invoicing)');
+  $('ro-limp').textContent=limp.length?limp.join(', '):'none';
+  $('ro-react').innerHTML=m.reaction.toFixed(1)+'<small>s</small>';
+  
+}
+
+
+
+/* ---------- cards & map ---------- */
+function buildOrgans(){
+  const el0=$('organs');el0.innerHTML='';
+  for(const x of ORGANS){
+    const el=document.createElement('article');el.className='organ';el.id='card-'+x.id;
+    el.innerHTML=`<div class="head"><div><span class="name">${x.name}</span><span class="part">${x.dept} · ${x.part}</span></div>
+      <div style="display:flex;gap:10px;align-items:center"><span class="pill" data-pill></span><span class="score num" data-score>—</span></div></div>
+      <div class="bar"><i data-bar style="width:0"></i></div><div class="why" data-why></div><div class="motion">Moves: ${x.visual}</div>
+      <details><summary>How it is computed</summary><div class="formula">${x.formula}</div><div class="small muted" style="margin-top:6px">${x.bio} Weight in overall health: ${x.weight}%.</div></details>`;
+    el0.appendChild(el);
+  }
+}
+function renderOrgans(r){
+  for(const x of ORGANS){const el=$('card-'+x.id);const s=r.o[x.id];const st=status(s);
+    el.className='organ '+st.k;el.querySelector('[data-score]').textContent=Math.round(s);
+    const pill=el.querySelector('[data-pill]');pill.className='pill '+st.k;pill.textContent=st.i+' '+st.t;
+    el.querySelector('[data-bar]').style.width=s+'%';el.querySelector('[data-why]').textContent=x.why(r.v,r.d)}
+  $('health-score').textContent=Math.round(r.health);$('health-label').textContent=healthLabel(r.health);
+  const worst=[...ORGANS].sort((a,b)=>r.o[a.id]-r.o[b.id])[0];$('health-sub').textContent=`weakest: ${worst.name.toLowerCase()} (${worst.dept})`;
+  $('map-body').innerHTML=ORGANS.map(x=>{const s=r.o[x.id];const st=status(s);return `<tr><td><b>${x.dept}</b></td><td>${x.name}</td><td><div class="why">${x.bio}</div></td><td class="num"><span class="pill ${st.k}">${st.i} ${Math.round(s)}</span></td><td>${x.visual}</td></tr>`}).join('');
+}
+/* ---------- the numbers panel ---------- */
+function fmtVal(i,v){return i.unit==='%'?fmt1(v)+'%':Math.round(v).toLocaleString('en-US')}
+function buildQuick(){
+  const q=$('quick');q.innerHTML='';let g=null;
+  for(const i of INPUTS){
+    if(i.group!==g){g=i.group;const d=document.createElement('div');d.className='dept';d.textContent=g;q.appendChild(d)}
+    const w=document.createElement('div');w.className='q';
+    if(i.unit==='money'){
+      w.innerHTML=`<label for="in-${i.id}"><span>${i.label}</span></label><input type="number" id="in-${i.id}" min="${i.min}" step="${i.step}" value="${values[i.id]}">${i.help?`<div class="help">${i.help}</div>`:''}`;
+    }else{
+      w.innerHTML=`<label for="in-${i.id}"><span>${i.label}</span><b data-v>${fmtVal(i,values[i.id])}</b></label><input type="range" id="in-${i.id}" min="${i.min}" max="${i.max}" step="${i.step}" value="${values[i.id]}">${i.help?`<div class="help">${i.help}</div>`:''}`;
+    }
+    q.appendChild(w);
+  }
+  q.addEventListener('input',e=>{const t=e.target;const id=t.id.replace(/^in-/,'');const i=INPUT_BY[id];if(!i)return;let val=parseFloat(t.value);if(!isFinite(val))return;
+    if(i.min!=null)val=Math.max(i.min,val);if(i.max!=null)val=Math.min(i.max,val);values[id]=val;const b=t.parentElement.querySelector('[data-v]');if(b)b.textContent=fmtVal(i,val);company.slug=null;update();remember()});
+}
+function syncQuick(){for(const i of INPUTS){const el=$('in-'+i.id);if(!el)continue;if(document.activeElement!==el)el.value=values[i.id];const b=el.parentElement.querySelector('[data-v]');if(b)b.textContent=fmtVal(i,values[i.id])}}
+function fitName(){const e=$('cname');e.size=Math.min(40,Math.max(12,e.value.length+1))}
+function setCompany(name,vals,slug){company={name,slug:slug||null};values={...TYPICAL.values,...vals};$('cname').value=name;fitName();syncQuick();update();remember()}
+/* ---------- update ---------- */
+function update(){const r=compute(values);renderOrgans(r);targetMotion=motionFrom(r);if(!motion)motion=JSON.parse(JSON.stringify(targetMotion));prev=r}
+/* ---------- per-browser memory (convenience only) ---------- */
+function remember(){try{localStorage.setItem('cah.v1',JSON.stringify({name:$('cname').value,values}))}catch(e){}}
+function recall(){try{const s=JSON.parse(localStorage.getItem('cah.v1'));if(s&&s.values){values={...TYPICAL.values,...s.values};$('cname').value=s.name||TYPICAL.name;company.name=$('cname').value}}catch(e){}}
+/* ---------- saving, sharing, gallery (db) ---------- */
+let toastT;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+function setStatus(s){$('status').textContent=s}
+let dbp=null,userp=null;
+function getDb(){if(!dbp)dbp=(window.claude&&claude.use)?claude.use('db'):Promise.resolve(null);return dbp}
+function getUser(){if(!userp)userp=(window.claude&&claude.use)?claude.use('user'):Promise.resolve(null);return userp}
+const slugify=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'company';
+const rnd=()=>Math.random().toString(36).slice(2,8);
+async function mineRef(){const db=await getDb();const user=await getUser();if(!db||!user)return null;const id=await user.id();if(!id)return null;return {db,id,col:db.doc('data/users/'+id+'/profile').collection('companies')}}
+async function save(){
+  const m=await mineRef();if(!m){toast('Sign in to claude.ai to save. Numbers stay in this browser meanwhile.');return}
+  const name=$('cname').value.trim()||'My company';const key=slugify(name);
+  try{await m.col.doc(key).set({name,values,savedAt:Date.now()});company.name=name;toast('Saved "'+name+'"');setStatus('Saved to your account.');await listMine()}
+  catch(e){toast(e&&e.code==='invalid_argument'?'Your access level on this page is view-only; saving is off.':'Could not save: '+(e&&e.code||'error'))}
+}
+async function listMine(){
+  const m=await mineRef();const sel=$('s-mine');if(!m)return;
+  try{const snap=await m.col.orderBy('savedAt','desc').limit(50).get();sel.innerHTML='<option value="">My companies…</option>'+snap.docs.map(d=>`<option value="${d.id}">${(d.data().name||d.id).replace(/</g,'&lt;')}</option>`).join('')}catch(e){}
+}
+async function loadMine(key){const m=await mineRef();if(!m)return;const d=await m.col.doc(key).get();if(d.exists){const x=d.data();setCompany(x.name,x.values);toast('Loaded "'+x.name+'"')}}
+async function share(){
+  const m=await mineRef();if(!m){toast('Sign in to claude.ai to share.');return}
+  const name=$('cname').value.trim()||'A company';const r=compute(values);const slug=company.slug||(slugify(name)+'-'+rnd());
+  try{await m.db.collection('shared').doc(m.id).set({name,values,slug,health:Math.round(r.health),gait:motion?motion.gait:'',savedAt:Date.now()});company.slug=slug;
+    const link=location.origin+location.pathname+'#c-'+slug;
+    try{await navigator.clipboard.writeText(link);toast('Share link copied')}catch(e){prompt('Copy this link',link)}
+    setStatus('Shared. Anyone with the link can watch this company.')}
+  catch(e){toast(e&&e.code==='invalid_argument'?'Your access level on this page is view-only; sharing is off.':'Could not share: '+(e&&e.code||'error'))}
+}
+async function openShared(slug){
+  const db=await getDb();if(!db){setStatus('Sign in to claude.ai to open a shared company.');return}
+  try{const snap=await db.collection('shared').where('slug','==',slug).limit(1).get();if(snap.empty){toast('That shared company was not found.');return}
+    const x=snap.docs[0].data();setCompany(x.name,x.values,x.slug);setStatus('Watching a shared company. Change a number to make it your own.')}catch(e){toast('Could not open the link.')}
+}
+async function gallery(){
+  const db=await getDb();const blk=$('gallery-block');blk.hidden=false;const g=$('gallery');
+  if(!db){g.innerHTML='<div class="small muted">Sign in to claude.ai to see shared companies.</div>';return}
+  try{const snap=await db.collection('shared').orderBy('savedAt','desc').limit(30).get();
+    if(snap.empty){g.innerHTML='<div class="small muted">Nobody has shared a company yet. Yours could be first.</div>';return}
+    g.innerHTML='';for(const d of snap.docs){const x=d.data();const c=document.createElement('div');c.className='gcard';c.setAttribute('role','button');c.tabIndex=0;
+      const st=status(x.health||0);c.innerHTML=`<div class="n"></div><div class="s"><span class="pill ${st.k}">${st.i} ${x.health??'—'}</span> ${healthLabel(x.health||0)} · ${x.gait||''}</div>`;c.querySelector('.n').textContent=x.name||'A company';
+      c.onclick=()=>{setCompany(x.name,x.values,x.slug);window.scrollTo({top:0,behavior:'smooth'})};c.onkeydown=e=>{if(e.key==='Enter')c.onclick()};g.appendChild(c)}
+    blk.scrollIntoView({behavior:'smooth',block:'start'})}catch(e){g.innerHTML='<div class="small muted">Could not load shared companies.</div>'}
+}
+/* ---------- wiring ---------- */
+$('b-typical').onclick=()=>setCompany(TYPICAL.name,TYPICAL.values);
+$('b-demo').onclick=()=>setCompany(DEMO.name,DEMO.values);
+$('b-save').onclick=save;$('b-share').onclick=share;$('b-gallery').onclick=gallery;
+$('s-mine').onchange=e=>{if(e.target.value)loadMine(e.target.value);e.target.value=''};
+$('s-mine').onfocus=listMine;
+$('cname').addEventListener('input',()=>{company.name=$('cname').value;company.slug=null;fitName();remember()});
+recall();fitName();buildOrgans();buildQuick();syncQuick();resize();update();requestAnimationFrame(draw);
+const mh=/^#c-([a-z0-9-]+)$/.exec(location.hash);if(mh)setTimeout(()=>openShared(mh[1]),600);
+getUser().then(async u=>{if(!u)return;const id=await u.id();if(id)setStatus('Signed in. Save keeps this company in your account; Share makes a link.')});
+})();
+
+</script>
+</body></html>
