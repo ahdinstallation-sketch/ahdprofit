@@ -103,4 +103,9 @@ Published at https://claude.ai/artifact/32aR8yJzoqce4b7WBbeD2C with the artifact
 - **Companies people shared** lists `shared` newest first.
 - Presets: "Typical company" and "Demo: AHD Group, Oct 2026".
 
-Same engine as `index.html`: eleven department-to-body-system scores drive a procedurally animated runner/walker.
+Version 2 replaces the 2D stick figure with a rigged, skinned character (three.js Soldier model, Mixamo rig, CC-BY,
+shipped base64-encoded in `app/models/soldier.glb.txt` because artifacts do not serve binary .glb) in a night street scene,
+and restyles the page as a tactical HUD (dark panels with corner brackets, orange accents, segmented bars, scanlines).
+The eleven scores still drive everything: walk/run clips blended by fitness, cadence from the heart, spine and head pitch
+for posture and gaze, chest scale for breathing, hand jitter for data quality, stumbles from planning, a hip drop over the
+weak leg for delivery/invoicing, and the orange wrist light pulsing with the heartbeat. `app/build.py` regenerates the page.

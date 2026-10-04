@@ -1,6 +1,35 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body><title>Company as a Human</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap">
-<style>
+# Builds the 3D, Division-style "Company as a Human" page.
+# Reuses the data model + db glue from app_build.py and motionFrom() from creature.html;
+# replaces the 2D stick figure with a rigged, skinned soldier (three.js) in a night street scene.
+import re, sys
+mode = sys.argv[1] if len(sys.argv) > 1 else 'publish'   # 'local' serves three.js from node_modules for testing
+
+ab = open('app_build.py', encoding='utf-8').read()
+model_js = re.search(r"model_js = r'''(.*?)'''", ab, re.S).group(1)
+glue_js = re.search(r"glue_js = r'''(.*?)'''", ab, re.S).group(1)
+src = open('creature.html', encoding='utf-8').read()
+motion_js = src[src.index('/* ---------- motion parameters'): src.index('/* ---------- the person (canvas)')]
+
+# small patches to the glue: ring gauge, slider fill, no 2D resize
+glue_js = glue_js.replace("$('health-score').textContent=Math.round(r.health);",
+    "$('health-score').textContent=Math.round(r.health);setRing(r.health);")
+glue_js = glue_js.replace("values[id]=val;const b=t.parentElement.querySelector('[data-v]');",
+    "values[id]=val;fillRange(t,i,val);const b=t.parentElement.querySelector('[data-v]');")
+glue_js = glue_js.replace("if(document.activeElement!==el)el.value=values[i.id];",
+    "if(document.activeElement!==el)el.value=values[i.id];fillRange(el,i,values[i.id]);")
+glue_js = glue_js.replace("recall();fitName();buildOrgans();buildQuick();syncQuick();resize();update();requestAnimationFrame(draw);",
+    "recall();fitName();buildOrgans();buildQuick();syncQuick();update();startEngine();")
+glue_js = glue_js.replace("(function(){\n'use strict';", "")  # model_js opens the IIFE; we close it ourselves
+model_js = model_js.replace("(function(){\n'use strict';", "")
+glue_js = glue_js.replace("})();\n", "")
+assert 'setRing' in glue_js and 'fillRange' in glue_js and 'startEngine' in glue_js
+
+if mode == 'local':
+    importmap = '{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}'
+else:
+    importmap = '{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}'
+
+css = r'''
 :root{
   --bg:#0a0c10; --surface:rgba(17,20,26,.88); --surface-2:#161a21; --ink:#e9edf1; --ink-2:#a8b1bb; --ink-3:#6c7682; --line:rgba(255,255,255,.13); --line-2:rgba(255,255,255,.26);
   --accent:#ff7a1a; --accent-2:#ffb366; --accent-ink:#0a0c10; --accent-soft:rgba(255,122,26,.14); --cyan:#7fd0ff;
@@ -149,8 +178,12 @@ section.block > .hd{display:flex;justify-content:space-between;align-items:basel
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--accent);color:var(--accent-ink);padding:8px 16px;font-family:var(--display);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 .toast.show{opacity:1}
 footer{margin-top:36px;font-size:13px;color:var(--ink-3);max-width:76ch;font-family:var(--mono);line-height:1.5}
-</style>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+'''
+
+html = r'''<title>Company as a Human</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&display=swap">
+<style>''' + css + r'''</style>
+<script type="importmap">''' + importmap + r'''</script>
 
 <div class="wrap">
 <header class="top">
@@ -241,147 +274,9 @@ footer{margin-top:36px;font-size:13px;color:var(--ink-3);max-width:76ch;font-fam
 </footer>
 </div>
 <div class="toast" id="toast" role="status"></div>
+'''
 
-<script type="module">
-
-
-const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
-const lerp=(a,b,t)=>a+(b-a)*t;
-const fmtPct=(x,d=1)=>(x*100).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})+'%';
-const fmtN=x=>Math.round(x).toLocaleString('en-US');
-const fmt1=x=>x.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1});
-const D2R=Math.PI/180;
-
-/* ---------- the numbers anyone can enter ---------- */
-const INPUTS=[
- {id:'revenue',group:'Finance',label:'Money customers actually paid you in the period',unit:'money',value:100000,min:1,step:1000,help:'any currency; only ratios matter'},
- {id:'cogs',group:'Finance',label:'Direct cost of what you sold',unit:'money',value:40000,min:0,step:1000,help:'materials, bought-in goods, direct labour'},
- {id:'opex',group:'Administration',label:'Running costs for the same period',unit:'money',value:45000,min:0,step:1000,help:'salaries, rent, admin, marketing, utilities'},
- {id:'discount',group:'Sales',label:'Average discount given off list price',unit:'%',value:15,min:0,max:80,step:0.5,help:'0 = everyone pays list'},
- {id:'coverage',group:'Costing',label:'Share of sales where the real cost is known',unit:'%',value:85,min:0,max:100,step:1},
- {id:'profitable',group:'Costing',label:'Share of products that make money at list price',unit:'%',value:70,min:0,max:100,step:1},
- {id:'inflation',group:'Purchasing',label:'Purchased items whose price rose 10%+ in a year',unit:'%',value:30,min:0,max:100,step:1},
- {id:'fxgap',group:'Purchasing',label:'Real exchange rate above the rate used in your costs',unit:'%',value:0,min:0,max:100,step:0.5,help:'0 if you buy in your own currency'},
- {id:'unplanned',group:'Planning',label:'Open orders with no production plan',unit:'%',value:20,min:0,max:100,step:1},
- {id:'late',group:'Operations',label:'Open orders past their due date',unit:'%',value:20,min:0,max:100,step:1},
- {id:'stuck',group:'Operations',label:'Jobs past their start date and not started',unit:'%',value:15,min:0,max:100,step:1},
- {id:'late30',group:'Delivery & invoicing',label:'Open orders late by up to 30 days',unit:'%',value:8,min:0,max:60,step:0.5},
- {id:'over30',group:'Delivery & invoicing',label:'Open orders late by over 30 days',unit:'%',value:5,min:0,max:60,step:0.5,help:'often delivered but not invoiced'},
- {id:'issues',group:'Data & IT',label:'Records your audits flag as wrong or doubtful',unit:'%',value:10,min:0,max:100,step:1},
- {id:'unconfirmed',group:'Data & IT',label:'Links between your systems still unconfirmed',unit:'%',value:10,min:0,max:100,step:1},
- {id:'backlog',group:'Management',label:'Decisions and approvals older than a month',unit:'%',value:20,min:0,max:100,step:1},
- {id:'undecided',group:'Management',label:'Open price or policy decisions',unit:'%',value:10,min:0,max:100,step:1},
-];
-const INPUT_BY=Object.fromEntries(INPUTS.map(i=>[i.id,i]));
-const TYPICAL={name:'A typical company',values:Object.fromEntries(INPUTS.map(i=>[i.id,i.value]))};
-const DEMO={name:'AHD Group (demo, Oct 2026)',values:{revenue:42583300,cogs:17000000,opex:40515702,discount:32.3,coverage:86,profitable:58.3,inflation:64.4,fxgap:10.6,unplanned:54.1,late:47.1,stuck:32.0,late30:8.4,over30:38.8,issues:60.6,unconfirmed:49.6,backlog:52.4,undecided:18}};
-
-/* ---------- derived figures ---------- */
-function derive(v){
-  const d={};
-  d.list_rev=v.revenue/Math.max(0.01,1-v.discount/100);
-  d.cost=v.cogs+v.opex;
-  d.margin=v.revenue>0?(v.revenue-d.cost)/v.revenue:-1;
-  d.break_even=1-d.cost/d.list_rev;
-  d.oh_share=v.revenue>0?v.opex/v.revenue:9;
-  d.late_share=clamp(v.late/100); d.unplanned_share=clamp(v.unplanned/100); d.stuck_share=clamp(v.stuck/100);
-  d.late30_share=clamp(v.late30/100); d.over30_share=clamp(v.over30/100);
-  return d;
-}
-
-/* ---------- body systems ---------- */
-const ORGANS=[
- {id:'heart',name:'Heart & blood',dept:'Finance',part:'margin',weight:20,visual:'heart rate, stride length, posture',
-  bio:'The heart pushes oxygen round the body; margin pushes cash round the company. A weak margin is a weak pulse: short steps, rounded shoulders, head down.',
-  score:(d,v)=>100*clamp((d.margin+0.5)/0.65),why:(v,d)=>`Margin ${fmtPct(d.margin)} after direct and running costs.`,
-  formula:'score = (margin + 50%) ÷ 65%, so −50% → 0 and +15% → 100'},
- {id:'fat',name:'Fat',dept:'Administration',part:'overhead weight',weight:15,visual:'build, foot clearance',
-  bio:'Fat is stored cost the body carries everywhere. Running costs are the cost the company carries on every sale.',
-  score:(d,v)=>100*clamp((1-d.oh_share)/0.70),why:(v,d)=>`Running costs are ${fmtPct(d.oh_share,0)} of what customers paid.`,
-  formula:'score = (100% − running costs ÷ revenue) ÷ 70%, so 30% → 100 and 100% → 0'},
- {id:'fever',name:'Mouth & temperature',dept:'Sales',part:'discounting',weight:10,visual:'cadence, open-mouth breathing, sweat, flushed face',
-  bio:'The mouth takes in food; sales takes in orders. Selling below break-even is a fever: agitated, flushed, breathing through the mouth.',
-  score:(d,v)=>100*(1-clamp((v.discount/100-d.break_even)/0.40)),why:(v,d)=>`Discount ${fmtPct(v.discount/100)} against a break-even discount of ${fmtPct(d.break_even)}.`,
-  formula:'excess = discount − break-even discount (not below 0); score = 100 − excess ÷ 40%'},
- {id:'eyes',name:'Eyes',dept:'Costing',part:'seeing costs',weight:5,visual:'eyelids',
-  bio:'Eyes tell a person what is in front of them; costing tells the company what a sale really costs before it is made.',
-  score:(d,v)=>50*clamp(v.coverage/100)+50*clamp(v.profitable/100),why:(v)=>`${fmtPct(v.coverage/100,0)} of sales have a known cost; ${fmtPct(v.profitable/100,0)} of products make money at list.`,
-  formula:'score = 50 × cost coverage + 50 × share profitable at list'},
- {id:'lungs',name:'Lungs',dept:'Purchasing',part:'material intake',weight:10,visual:'breathing rate and depth',
-  bio:'Lungs draw in the air the body runs on; purchasing draws in the material the company runs on. Rising prices are thin air: faster, shallower breaths.',
-  score:(d,v)=>100-60*clamp(v.inflation/65)-40*clamp(v.fxgap/30),why:(v)=>`${fmtPct(v.inflation/100,0)} of purchased items rose 10%+ in a year; exchange-rate gap ${fmtPct(v.fxgap/100)}.`,
-  formula:'score = 100 − 60 × (items up 10%+ ÷ 65%) − 40 × (FX gap ÷ 30%), each capped'},
- {id:'balance',name:'Balance',dept:'Planning',part:'coordination',weight:10,visual:'stumbles, uneven rhythm',
-  bio:'The inner ear places each foot before the body arrives; planning places each order before it is due. Without it the person trips.',
-  score:(d,v)=>100*(1-d.unplanned_share),why:(v)=>`${fmtPct(v.unplanned/100,0)} of open orders have no plan.`,
-  formula:'score = 100 − unplanned share; chance of a stumble per stride = 30% × unplanned share'},
- {id:'stomach',name:'Stomach',dept:'Operations',part:'digesting orders',weight:10,visual:'belly, cadence',
-  bio:'The stomach turns food into the body; operations turn orders into delivered work. Orders sitting undelivered are undigested food.',
-  score:(d,v)=>100*(1-d.late_share),why:(v)=>`${fmtPct(v.late/100,0)} of open orders are past due.`,
-  formula:'score = 100 − late share'},
- {id:'muscles',name:'Muscles',dept:'Operations',part:'flow through the work',weight:5,visual:'foot clearance, knee lift, limb bulk',
-  bio:'Muscle is what moves the body; the floor is what moves the work. Jobs past their start date are muscle that will not fire.',
-  score:(d,v)=>100*(1-d.stuck_share),why:(v)=>`${fmtPct(v.stuck/100,0)} of jobs are past their start date and not started.`,
-  formula:'score = 100 − stuck share'},
- {id:'legs',name:'Legs',dept:'Delivery & invoicing',part:'getting it to the customer',weight:5,visual:'limp (left: delivery, right: invoicing)',
-  bio:'Legs carry a person to where they are going; delivery and invoicing carry the order to the customer and the money back. Late deliveries weaken the left leg; delivered-but-not-invoiced weakens the right.',
-  score:(d)=>50*(1-clamp(d.late30_share*3))+50*(1-clamp(d.over30_share*2)),why:(v)=>`${fmtPct(v.late30/100)} late up to 30 days, ${fmtPct(v.over30/100)} over 30 days.`,
-  formula:'left leg = 1 − 3 × late ≤30d share; right leg = 1 − 2 × late >30d share; under 50 the step shortens, under 25 the foot drags'},
- {id:'nerves',name:'Nerves',dept:'Data & IT',part:'signals the brain can trust',weight:5,visual:'hand tremor',
-  bio:'Nerves carry signals from body to brain; data carries numbers from the floor to management. Bad data is a noisy nerve: the hands shake.',
-  score:(d,v)=>100-65*clamp(v.issues/60)-35*clamp(v.unconfirmed/50),why:(v)=>`${fmtPct(v.issues/100,0)} of records flagged; ${fmtPct(v.unconfirmed/100,0)} of links unconfirmed.`,
-  formula:'score = 100 − 65 × (flagged ÷ 60%) − 35 × (unconfirmed ÷ 50%), each capped'},
- {id:'brain',name:'Brain',dept:'Management',part:'decisions',weight:5,visual:'reaction time, gaze',
-  bio:'The brain decides and the body follows; management decides and the company follows. Decisions left waiting are a slow brain: eyes on the ground, slow to react to anything that changes.',
-  score:(d,v)=>100-70*clamp(v.backlog/100)-30*clamp(v.undecided/100),why:(v)=>`${fmtPct(v.backlog/100,0)} of decisions older than a month; ${fmtPct(v.undecided/100,0)} price or policy decisions open.`,
-  formula:'score = 100 − 70 × backlog share − 30 × undecided share; reaction time = 0.4 + 4 × (1 − score) s'},
-];
-function compute(v){
-  const d=derive(v);const o={};for(const x of ORGANS)o[x.id]=clamp(x.score(d,v),0,100);
-  const wsum=ORGANS.reduce((s,x)=>s+x.weight,0);const health=ORGANS.reduce((s,x)=>s+x.weight*o[x.id],0)/wsum;
-  return {v:{...v},d,o,health,legs:{L:1-clamp(d.late30_share*3),R:1-clamp(d.over30_share*2)}};
-}
-function status(s){return s>=75?{k:'good',t:'Healthy',i:'✓'}:s>=50?{k:'warn',t:'Strained',i:'!'}:s>=25?{k:'serious',t:'Sick',i:'!!'}:{k:'critical',t:'Critical',i:'✕'}}
-function healthLabel(h){return h>=75?'Thriving':h>=50?'Stable':h>=25?'Sick':'Critical'}
-const $=id=>document.getElementById(id);
-let values={...TYPICAL.values},prev=null,company={name:TYPICAL.name,slug:null};
-
-/* ---------- motion parameters from the scores (human scale, cm) ---------- */
-function motionFrom(r){
-  const o=r.o,h=r.health/100;
-  const vigor=o.heart/100, fever=1-o.fever/100, late=r.d.late_share, lungs=o.lungs/100, nerves=o.nerves/100, fat=1-o.fat/100, muscles=o.muscles/100, brain=o.brain/100;
-  const stress=clamp(0.6*fever+0.4*late);
-  // fitness: a strong heart with a sound body breaks into a run
-  const fit=clamp((vigor-0.55)/0.35)*clamp((h-0.45)/0.35);
-  const run=fit*fit*(3-2*fit);
-  const stepsPerMin=80+30*vigor+20*stress+60*run;
-  const strideM=0.6+0.9*vigor+1.0*run;           // metres per full gait cycle (two steps)
-  const speed=strideM*100*stepsPerMin/2/60;      // cm/s
-  const kmh=speed*0.036;
-  const gait=kmh<2.6?'shuffle':kmh<4.5?'walk':kmh<6.5?'brisk walk':kmh<9.5?'jog':'run';
-  const duty=lerp(0.62,0.36,run);
-  return {vigor,stress,fever,fat,nerves,lungs,muscles,health:h,late,brain,run,
-    cadenceHz:stepsPerMin/120,stepsPerMin,strideCm:strideM*100,strideM,speed,kmh,gait,duty,
-    bob:(1.8+1.6*vigor)*(1-0.5*fat)+5*run,
-    lift:(9+13*vigor)*(0.45+0.55*muscles)*(1-0.4*fat)+22*run,
-    heartBpm:62+0.55*(100-o.heart)+70*run,
-    breathHz:(12+24*(1-lungs)+26*run)/60,breathDepth:0.45+0.55*lungs,panting:o.fever<50,
-    lean:4+16*(1-0.6*vigor-0.4*h)+7*run,
-    slump:clamp(1-0.6*vigor-0.4*h),
-    gaze:brain,
-    armSwing:8+24*vigor+20*run,
-    armBend:28+62*run,
-    tremor:nerves<0.6?(0.6-nerves)/0.6:0,
-    rhythmJitter:(1-o.balance/100)*0.10,
-    stumbleChance:0.30*r.d.unplanned_share,
-    eyeLid:0.85*(1-o.eyes/100),
-    flush:clamp((fever-0.3)/0.7)*0.8+0.3*run,
-    reaction:0.4+4*(1-brain),
-    legs:{...r.legs}};
-}
-
-
-
+engine_js = r'''
 /* ---------- the agent (three.js) ---------- */
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
@@ -566,108 +461,10 @@ function updateReadouts(m){
   const h=Math.round(m.health*100);$('ab-fill').style.width=h+'%';$('ab-fill').style.background=h>=75?'#ff7a1a':h>=50?'#f2b233':h>=25?'#ff7a1a':'#ff3b3b';
   $('ab-name').textContent=$('cname').value||'AGENT';$('ab-st').textContent=(m.gait+' · '+(h>=75?'thriving':h>=50?'stable':h>=25?'sick':'critical')).toUpperCase();
 }
+'''
 
-
-/* ---------- cards & map ---------- */
-function buildOrgans(){
-  const el0=$('organs');el0.innerHTML='';
-  for(const x of ORGANS){
-    const el=document.createElement('article');el.className='organ';el.id='card-'+x.id;
-    el.innerHTML=`<div class="head"><div><span class="name">${x.name}</span><span class="part">${x.dept} · ${x.part}</span></div>
-      <div style="display:flex;gap:10px;align-items:center"><span class="pill" data-pill></span><span class="score num" data-score>—</span></div></div>
-      <div class="bar"><i data-bar style="width:0"></i></div><div class="why" data-why></div><div class="motion">Moves: ${x.visual}</div>
-      <details><summary>How it is computed</summary><div class="formula">${x.formula}</div><div class="small muted" style="margin-top:6px">${x.bio} Weight in overall health: ${x.weight}%.</div></details>`;
-    el0.appendChild(el);
-  }
-}
-function renderOrgans(r){
-  for(const x of ORGANS){const el=$('card-'+x.id);const s=r.o[x.id];const st=status(s);
-    el.className='organ '+st.k;el.querySelector('[data-score]').textContent=Math.round(s);
-    const pill=el.querySelector('[data-pill]');pill.className='pill '+st.k;pill.textContent=st.i+' '+st.t;
-    el.querySelector('[data-bar]').style.width=s+'%';el.querySelector('[data-why]').textContent=x.why(r.v,r.d)}
-  $('health-score').textContent=Math.round(r.health);setRing(r.health);$('health-label').textContent=healthLabel(r.health);
-  const worst=[...ORGANS].sort((a,b)=>r.o[a.id]-r.o[b.id])[0];$('health-sub').textContent=`weakest: ${worst.name.toLowerCase()} (${worst.dept})`;
-  $('map-body').innerHTML=ORGANS.map(x=>{const s=r.o[x.id];const st=status(s);return `<tr><td><b>${x.dept}</b></td><td>${x.name}</td><td><div class="why">${x.bio}</div></td><td class="num"><span class="pill ${st.k}">${st.i} ${Math.round(s)}</span></td><td>${x.visual}</td></tr>`}).join('');
-}
-/* ---------- the numbers panel ---------- */
-function fmtVal(i,v){return i.unit==='%'?fmt1(v)+'%':Math.round(v).toLocaleString('en-US')}
-function buildQuick(){
-  const q=$('quick');q.innerHTML='';let g=null;
-  for(const i of INPUTS){
-    if(i.group!==g){g=i.group;const d=document.createElement('div');d.className='dept';d.textContent=g;q.appendChild(d)}
-    const w=document.createElement('div');w.className='q';
-    if(i.unit==='money'){
-      w.innerHTML=`<label for="in-${i.id}"><span>${i.label}</span></label><input type="number" id="in-${i.id}" min="${i.min}" step="${i.step}" value="${values[i.id]}">${i.help?`<div class="help">${i.help}</div>`:''}`;
-    }else{
-      w.innerHTML=`<label for="in-${i.id}"><span>${i.label}</span><b data-v>${fmtVal(i,values[i.id])}</b></label><input type="range" id="in-${i.id}" min="${i.min}" max="${i.max}" step="${i.step}" value="${values[i.id]}">${i.help?`<div class="help">${i.help}</div>`:''}`;
-    }
-    q.appendChild(w);
-  }
-  q.addEventListener('input',e=>{const t=e.target;const id=t.id.replace(/^in-/,'');const i=INPUT_BY[id];if(!i)return;let val=parseFloat(t.value);if(!isFinite(val))return;
-    if(i.min!=null)val=Math.max(i.min,val);if(i.max!=null)val=Math.min(i.max,val);values[id]=val;fillRange(t,i,val);const b=t.parentElement.querySelector('[data-v]');if(b)b.textContent=fmtVal(i,val);company.slug=null;update();remember()});
-}
-function syncQuick(){for(const i of INPUTS){const el=$('in-'+i.id);if(!el)continue;if(document.activeElement!==el)el.value=values[i.id];fillRange(el,i,values[i.id]);const b=el.parentElement.querySelector('[data-v]');if(b)b.textContent=fmtVal(i,values[i.id])}}
-function fitName(){const e=$('cname');e.size=Math.min(40,Math.max(12,e.value.length+1))}
-function setCompany(name,vals,slug){company={name,slug:slug||null};values={...TYPICAL.values,...vals};$('cname').value=name;fitName();syncQuick();update();remember()}
-/* ---------- update ---------- */
-function update(){const r=compute(values);renderOrgans(r);targetMotion=motionFrom(r);if(!motion)motion=JSON.parse(JSON.stringify(targetMotion));prev=r}
-/* ---------- per-browser memory (convenience only) ---------- */
-function remember(){try{localStorage.setItem('cah.v1',JSON.stringify({name:$('cname').value,values}))}catch(e){}}
-function recall(){try{const s=JSON.parse(localStorage.getItem('cah.v1'));if(s&&s.values){values={...TYPICAL.values,...s.values};$('cname').value=s.name||TYPICAL.name;company.name=$('cname').value}}catch(e){}}
-/* ---------- saving, sharing, gallery (db) ---------- */
-let toastT;function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
-function setStatus(s){$('status').textContent=s}
-let dbp=null,userp=null;
-function getDb(){if(!dbp)dbp=(window.claude&&claude.use)?claude.use('db'):Promise.resolve(null);return dbp}
-function getUser(){if(!userp)userp=(window.claude&&claude.use)?claude.use('user'):Promise.resolve(null);return userp}
-const slugify=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,40)||'company';
-const rnd=()=>Math.random().toString(36).slice(2,8);
-async function mineRef(){const db=await getDb();const user=await getUser();if(!db||!user)return null;const id=await user.id();if(!id)return null;return {db,id,col:db.doc('data/users/'+id+'/profile').collection('companies')}}
-async function save(){
-  const m=await mineRef();if(!m){toast('Sign in to claude.ai to save. Numbers stay in this browser meanwhile.');return}
-  const name=$('cname').value.trim()||'My company';const key=slugify(name);
-  try{await m.col.doc(key).set({name,values,savedAt:Date.now()});company.name=name;toast('Saved "'+name+'"');setStatus('Saved to your account.');await listMine()}
-  catch(e){toast(e&&e.code==='invalid_argument'?'Your access level on this page is view-only; saving is off.':'Could not save: '+(e&&e.code||'error'))}
-}
-async function listMine(){
-  const m=await mineRef();const sel=$('s-mine');if(!m)return;
-  try{const snap=await m.col.orderBy('savedAt','desc').limit(50).get();sel.innerHTML='<option value="">My companies…</option>'+snap.docs.map(d=>`<option value="${d.id}">${(d.data().name||d.id).replace(/</g,'&lt;')}</option>`).join('')}catch(e){}
-}
-async function loadMine(key){const m=await mineRef();if(!m)return;const d=await m.col.doc(key).get();if(d.exists){const x=d.data();setCompany(x.name,x.values);toast('Loaded "'+x.name+'"')}}
-async function share(){
-  const m=await mineRef();if(!m){toast('Sign in to claude.ai to share.');return}
-  const name=$('cname').value.trim()||'A company';const r=compute(values);const slug=company.slug||(slugify(name)+'-'+rnd());
-  try{await m.db.collection('shared').doc(m.id).set({name,values,slug,health:Math.round(r.health),gait:motion?motion.gait:'',savedAt:Date.now()});company.slug=slug;
-    const link=location.origin+location.pathname+'#c-'+slug;
-    try{await navigator.clipboard.writeText(link);toast('Share link copied')}catch(e){prompt('Copy this link',link)}
-    setStatus('Shared. Anyone with the link can watch this company.')}
-  catch(e){toast(e&&e.code==='invalid_argument'?'Your access level on this page is view-only; sharing is off.':'Could not share: '+(e&&e.code||'error'))}
-}
-async function openShared(slug){
-  const db=await getDb();if(!db){setStatus('Sign in to claude.ai to open a shared company.');return}
-  try{const snap=await db.collection('shared').where('slug','==',slug).limit(1).get();if(snap.empty){toast('That shared company was not found.');return}
-    const x=snap.docs[0].data();setCompany(x.name,x.values,x.slug);setStatus('Watching a shared company. Change a number to make it your own.')}catch(e){toast('Could not open the link.')}
-}
-async function gallery(){
-  const db=await getDb();const blk=$('gallery-block');blk.hidden=false;const g=$('gallery');
-  if(!db){g.innerHTML='<div class="small muted">Sign in to claude.ai to see shared companies.</div>';return}
-  try{const snap=await db.collection('shared').orderBy('savedAt','desc').limit(30).get();
-    if(snap.empty){g.innerHTML='<div class="small muted">Nobody has shared a company yet. Yours could be first.</div>';return}
-    g.innerHTML='';for(const d of snap.docs){const x=d.data();const c=document.createElement('div');c.className='gcard';c.setAttribute('role','button');c.tabIndex=0;
-      const st=status(x.health||0);c.innerHTML=`<div class="n"></div><div class="s"><span class="pill ${st.k}">${st.i} ${x.health??'—'}</span> ${healthLabel(x.health||0)} · ${x.gait||''}</div>`;c.querySelector('.n').textContent=x.name||'A company';
-      c.onclick=()=>{setCompany(x.name,x.values,x.slug);window.scrollTo({top:0,behavior:'smooth'})};c.onkeydown=e=>{if(e.key==='Enter')c.onclick()};g.appendChild(c)}
-    blk.scrollIntoView({behavior:'smooth',block:'start'})}catch(e){g.innerHTML='<div class="small muted">Could not load shared companies.</div>'}
-}
-/* ---------- wiring ---------- */
-$('b-typical').onclick=()=>setCompany(TYPICAL.name,TYPICAL.values);
-$('b-demo').onclick=()=>setCompany(DEMO.name,DEMO.values);
-$('b-save').onclick=save;$('b-share').onclick=share;$('b-gallery').onclick=gallery;
-$('s-mine').onchange=e=>{if(e.target.value)loadMine(e.target.value);e.target.value=''};
-$('s-mine').onfocus=listMine;
-$('cname').addEventListener('input',()=>{company.name=$('cname').value;company.slug=null;fitName();remember()});
-recall();fitName();buildOrgans();buildQuick();syncQuick();update();startEngine();
-const mh=/^#c-([a-z0-9-]+)$/.exec(location.hash);if(mh)setTimeout(()=>openShared(mh[1]),600);
-getUser().then(async u=>{if(!u)return;const id=await u.id();if(id)setStatus('Signed in. Save keeps this company in your account; Share makes a link.')});
-
-</script>
-</body></html>
+page = html + '\n<script type="module">\n' + model_js + '\n' + motion_js + '\n' + engine_js + '\n' + glue_js + '\n</script>\n'
+open('company_human.html', 'w', encoding='utf-8').write(page)
+doc = '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>' + page + '</body></html>'
+open('company_human_standalone.html', 'w', encoding='utf-8').write(doc)
+print(mode, 'built', len(page))
