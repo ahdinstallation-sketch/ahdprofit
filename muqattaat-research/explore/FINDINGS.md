@@ -29,3 +29,16 @@ specific to each letter family and to this position. This is consistent with the
 material of the revelation, the ordinary letters of Arabic speech, followed at once by "this is the
 Book", as a challenge. It is also consistent with the letters acting as a heading for revelation
 sections. The data support the function; they cannot decide the intended meaning.
+
+## Batch 5: letter shapes and Arabic digit shapes
+
+| # | Hypothesis | Result | Verdict |
+|---|---|---|---|
+| H15a | The 14 letters avoid dots | only ق ن ي are dotted (3/14, vs 15/28 in the alphabet); P = 9e-4; holds when letter frequency is controlled (p = 0.008) | **supported** |
+| H15b | One letter per skeleton shape, always the undotted twin (ح not ج/خ, ر not ز, س not ش, ص not ض, ط not ظ, ع not غ) | 14 different shapes of 18 and no dotted twin; random P = 0.00028 | **supported** |
+| H16 | Read each letter as the Arabic digit it looks like (glyph similarity computed from rendered fonts) | 0/14 numbers match surah number, verse count, Abjad or order; random mean 0.56 | not supported |
+| H17 | Write the Abjad total in Arabic digits, read the digit shapes as letters | 5/14 give a real word, below random (7.2); p = 0.93 | not supported |
+
+All 8 dotted twins (ج خ ذ ز ش ض ظ غ) are absent. The other 6 unused letters are ب ت ث ف و د.
+So the set reads as a sample of the basic letter skeletons in their plain, undotted form. That fits
+the "these are the letters the Book is made of" reading supported by H5/H10.
