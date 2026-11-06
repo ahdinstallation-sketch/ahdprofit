@@ -1,0 +1,557 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd"><key id="d3" for="edge" attr.name="label" attr.type="string"/>
+<key id="d2" for="edge" attr.name="kind" attr.type="string"/>
+<key id="d1" for="node" attr.name="label" attr.type="string"/>
+<key id="d0" for="node" attr.name="kind" attr.type="string"/>
+<graph edgedefault="directed"><node id="الم">
+  <data key="d0">opening</data>
+  <data key="d1">الم  (2,3,29,30,31,32)</data>
+</node>
+<node id="v71">
+  <data key="d0">value</data>
+  <data key="d1">71</data>
+</node>
+<node id="المص">
+  <data key="d0">opening</data>
+  <data key="d1">المص  (7)</data>
+</node>
+<node id="v161">
+  <data key="d0">value</data>
+  <data key="d1">161</data>
+</node>
+<node id="الر">
+  <data key="d0">opening</data>
+  <data key="d1">الر  (10,11,12,14,15)</data>
+</node>
+<node id="v231">
+  <data key="d0">value</data>
+  <data key="d1">231</data>
+</node>
+<node id="المر">
+  <data key="d0">opening</data>
+  <data key="d1">المر  (13)</data>
+</node>
+<node id="v271">
+  <data key="d0">value</data>
+  <data key="d1">271</data>
+</node>
+<node id="كهيعص">
+  <data key="d0">opening</data>
+  <data key="d1">كهيعص  (19)</data>
+</node>
+<node id="v195">
+  <data key="d0">value</data>
+  <data key="d1">195</data>
+</node>
+<node id="طه">
+  <data key="d0">opening</data>
+  <data key="d1">طه  (20)</data>
+</node>
+<node id="v14">
+  <data key="d0">value</data>
+  <data key="d1">14</data>
+</node>
+<node id="طسم">
+  <data key="d0">opening</data>
+  <data key="d1">طسم  (26,28)</data>
+</node>
+<node id="v109">
+  <data key="d0">value</data>
+  <data key="d1">109</data>
+</node>
+<node id="طس">
+  <data key="d0">opening</data>
+  <data key="d1">طس  (27)</data>
+</node>
+<node id="v69">
+  <data key="d0">value</data>
+  <data key="d1">69</data>
+</node>
+<node id="يس">
+  <data key="d0">opening</data>
+  <data key="d1">يس  (36)</data>
+</node>
+<node id="v70">
+  <data key="d0">value</data>
+  <data key="d1">70</data>
+</node>
+<node id="ص">
+  <data key="d0">opening</data>
+  <data key="d1">ص  (38)</data>
+</node>
+<node id="v90">
+  <data key="d0">value</data>
+  <data key="d1">90</data>
+</node>
+<node id="حم">
+  <data key="d0">opening</data>
+  <data key="d1">حم  (40,41,43,44,45,46)</data>
+</node>
+<node id="v48">
+  <data key="d0">value</data>
+  <data key="d1">48</data>
+</node>
+<node id="حم عسق">
+  <data key="d0">opening</data>
+  <data key="d1">حم عسق  (42)</data>
+</node>
+<node id="v278">
+  <data key="d0">value</data>
+  <data key="d1">278</data>
+</node>
+<node id="ق">
+  <data key="d0">opening</data>
+  <data key="d1">ق  (50)</data>
+</node>
+<node id="v100">
+  <data key="d0">value</data>
+  <data key="d1">100</data>
+</node>
+<node id="ن">
+  <data key="d0">opening</data>
+  <data key="d1">ن  (68)</data>
+</node>
+<node id="v50">
+  <data key="d0">value</data>
+  <data key="d1">50</data>
+</node>
+<node id="يدي">
+  <data key="d0">root</data>
+  <data key="d1">يدي  hand</data>
+</node>
+<node id="S:طه">
+  <data key="d0">surah</data>
+  <data key="d1">surah 20</data>
+</node>
+<node id="علم">
+  <data key="d0">root</data>
+  <data key="d1">علم  knowledge</data>
+</node>
+<node id="S:الم">
+  <data key="d0">surah</data>
+  <data key="d1">surah 2,3,29,30,31,32</data>
+</node>
+<node id="مول">
+  <data key="d0">root</data>
+  <data key="d1">مول  wealth</data>
+</node>
+<node id="جحم">
+  <data key="d0">root</data>
+  <data key="d1">جحم  blazing fire (Hell)</data>
+</node>
+<node id="S:حم">
+  <data key="d0">surah</data>
+  <data key="d1">surah 40,41,43,44,45,46</data>
+</node>
+<node id="ابو">
+  <data key="d0">root</data>
+  <data key="d1">ابو  father</data>
+</node>
+<node id="S:الر">
+  <data key="d0">surah</data>
+  <data key="d1">surah 10,11,12,14,15</data>
+</node>
+<node id="مدن">
+  <data key="d0">root</data>
+  <data key="d1">مدن  city</data>
+</node>
+<node id="S:طسم">
+  <data key="d0">surah</data>
+  <data key="d1">surah 26,28</data>
+</node>
+<node id="قوم">
+  <data key="d0">root</data>
+  <data key="d1">قوم  people; stand</data>
+</node>
+<node id="S:المص">
+  <data key="d0">surah</data>
+  <data key="d1">surah 7</data>
+</node>
+<node id="ملك">
+  <data key="d0">root</data>
+  <data key="d1">ملك  king</data>
+</node>
+<node id="S:ص">
+  <data key="d0">surah</data>
+  <data key="d1">surah 38</data>
+</node>
+<node id="هدي">
+  <data key="d0">root</data>
+  <data key="d1">هدي  guidance</data>
+</node>
+<node id="صدق">
+  <data key="d0">root</data>
+  <data key="d1">صدق  truth</data>
+</node>
+<node id="S:كهيعص">
+  <data key="d0">surah</data>
+  <data key="d1">surah 19</data>
+</node>
+<node id="مسس">
+  <data key="d0">root</data>
+  <data key="d1">مسس  touch</data>
+</node>
+<node id="سبح">
+  <data key="d0">root</data>
+  <data key="d1">سبح  glorify; swim/float</data>
+</node>
+<node id="S:يس">
+  <data key="d0">surah</data>
+  <data key="d1">surah 36</data>
+</node>
+<node id="امم">
+  <data key="d0">root</data>
+  <data key="d1">امم  mother; nation; leader</data>
+</node>
+<node id="حمم">
+  <data key="d0">root</data>
+  <data key="d1">حمم  hot water; close friend</data>
+</node>
+<node id="سبط">
+  <data key="d0">root</data>
+  <data key="d1">سبط  tribe</data>
+</node>
+<node id="طلع">
+  <data key="d0">root</data>
+  <data key="d1">طلع  rise (sun); look into</data>
+</node>
+<node id="نجو">
+  <data key="d0">root</data>
+  <data key="d1">نجو  save</data>
+</node>
+<node id="S:طس">
+  <data key="d0">surah</data>
+  <data key="d1">surah 27</data>
+</node>
+<node id="هوي">
+  <data key="d0">root</data>
+  <data key="d1">هوي  desire</data>
+</node>
+<node id="سعي">
+  <data key="d0">root</data>
+  <data key="d1">سعي  strive</data>
+</node>
+<node id="رسو">
+  <data key="d0">root</data>
+  <data key="d1">رسو  be firmly fixed (mountains); anchor</data>
+</node>
+<node id="S:المر">
+  <data key="d0">surah</data>
+  <data key="d1">surah 13</data>
+</node>
+<node id="اوب">
+  <data key="d0">root</data>
+  <data key="d1">اوب  return</data>
+</node>
+<node id="قلب">
+  <data key="d0">root</data>
+  <data key="d1">قلب  heart; turn over</data>
+</node>
+<node id="S:حم عسق">
+  <data key="d0">surah</data>
+  <data key="d1">surah 42</data>
+</node>
+<node id="كلل">
+  <data key="d0">root</data>
+  <data key="d1">كلل  all</data>
+</node>
+<node id="S:ن">
+  <data key="d0">surah</data>
+  <data key="d1">surah 68</data>
+</node>
+<node id="صحب">
+  <data key="d0">root</data>
+  <data key="d1">صحب  companion</data>
+</node>
+<node id="S:ق">
+  <data key="d0">surah</data>
+  <data key="d1">surah 50</data>
+</node>
+<node id="حلي">
+  <data key="d0">root</data>
+  <data key="d1">حلي  ornament</data>
+</node>
+<node id="نفق">
+  <data key="d0">root</data>
+  <data key="d1">نفق  spend; hypocrisy; tunnel</data>
+</node>
+<node id="عزم">
+  <data key="d0">root</data>
+  <data key="d1">عزم  resolve</data>
+</node>
+<node id="قصو">
+  <data key="d0">root</data>
+  <data key="d1">قصو  farthest</data>
+</node>
+<node id="كلم">
+  <data key="d0">root</data>
+  <data key="d1">كلم  word</data>
+</node>
+<node id="عمل">
+  <data key="d0">root</data>
+  <data key="d1">عمل  deed</data>
+</node>
+<node id="حمد">
+  <data key="d0">root</data>
+  <data key="d1">حمد  praise</data>
+</node>
+<edge source="الم" target="v71">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v71" target="علم">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="v71" target="مول">
+  <data key="d2">M7</data>
+</edge>
+<edge source="v71" target="سبط">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v71" target="عمل">
+  <data key="d2">user discovery</data>
+</edge>
+<edge source="المص" target="v161">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v161" target="قوم">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="v161" target="مسس">
+  <data key="d2">M1</data>
+</edge>
+<edge source="الر" target="v231">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v231" target="ابو">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="v231" target="نفق">
+  <data key="d2">M1</data>
+</edge>
+<edge source="المر" target="v271">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v271" target="رسو">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v271" target="اوب">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="كهيعص" target="v195">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v195" target="صدق">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v195" target="قصو">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="طه" target="v14">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v14" target="يدي">
+  <data key="d2">M2</data>
+</edge>
+<edge source="v14" target="هدي">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="v14" target="هوي">
+  <data key="d2">M1</data>
+</edge>
+<edge source="طسم" target="v109">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v109" target="مدن">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v109" target="امم">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="v109" target="طلع">
+  <data key="d2">M6</data>
+</edge>
+<edge source="طس" target="v69">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v69" target="نجو">
+  <data key="d2">M1</data>
+</edge>
+<edge source="يس" target="v70">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v70" target="سبح">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v70" target="سعي">
+  <data key="d2">M8A</data>
+</edge>
+<edge source="ص" target="v90">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v90" target="ملك">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v90" target="كلم">
+  <data key="d2">user discovery</data>
+</edge>
+<edge source="حم" target="v48">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v48" target="جحم">
+  <data key="d2">M5</data>
+</edge>
+<edge source="v48" target="حمم">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="v48" target="حلي">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v48" target="حمد">
+  <data key="d2">user discovery</data>
+</edge>
+<edge source="حم عسق" target="v278">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v278" target="قلب">
+  <data key="d2">M1</data>
+</edge>
+<edge source="v278" target="عزم">
+  <data key="d2">M8B</data>
+</edge>
+<edge source="ق" target="v100">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v100" target="صحب">
+  <data key="d2">M1</data>
+</edge>
+<edge source="ن" target="v50">
+  <data key="d2">abjad</data>
+</edge>
+<edge source="v50" target="كلل">
+  <data key="d2">M1</data>
+</edge>
+<edge source="يدي" target="S:طه">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 1.5, p=0.325</data>
+</edge>
+<edge source="علم" target="S:الم">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 1.5, p=0.000</data>
+</edge>
+<edge source="مول" target="S:الم">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 1.1, p=0.383</data>
+</edge>
+<edge source="جحم" target="S:حم">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 2.2, p=0.169</data>
+</edge>
+<edge source="ابو" target="S:الر">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 4.1, p=0.000</data>
+</edge>
+<edge source="مدن" target="S:طسم">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 11.8, p=0.000</data>
+</edge>
+<edge source="قوم" target="S:المص">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 2.0, p=0.000</data>
+</edge>
+<edge source="ملك" target="S:ص">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 2.6, p=0.046</data>
+</edge>
+<edge source="هدي" target="S:طه">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 1.9, p=0.042</data>
+</edge>
+<edge source="صدق" target="S:كهيعص">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 2.0, p=0.149</data>
+</edge>
+<edge source="مسس" target="S:المص">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 1.6, p=0.266</data>
+</edge>
+<edge source="سبح" target="S:يس">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 3.8, p=0.048</data>
+</edge>
+<edge source="امم" target="S:طسم">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 2.0, p=0.051</data>
+</edge>
+<edge source="حمم" target="S:حم">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 5.4, p=0.005</data>
+</edge>
+<edge source="سبط" target="S:الم">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 8.0, p=0.031</data>
+</edge>
+<edge source="طلع" target="S:طسم">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 3.3, p=0.136</data>
+</edge>
+<edge source="نجو" target="S:طس">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 1.6, p=0.352</data>
+</edge>
+<edge source="هوي" target="S:طه">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 3.3, p=0.133</data>
+</edge>
+<edge source="سعي" target="S:يس">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 3.9, p=0.232</data>
+</edge>
+<edge source="رسو" target="S:المر">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 6.8, p=0.147</data>
+</edge>
+<edge source="اوب" target="S:المر">
+  <data key="d2">enriched</data>
+  <data key="d3">RR 11.7, p=0.015</data>
+</edge>
+<edge source="قلب" target="S:حم عسق">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 0.6, p=0.826</data>
+</edge>
+<edge source="كلل" target="S:ن">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 0.7, p=0.764</data>
+</edge>
+<edge source="صحب" target="S:ق">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 4.3, p=0.083</data>
+</edge>
+<edge source="حلي" target="S:حم">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 2.2, p=0.399</data>
+</edge>
+<edge source="نفق" target="S:الر">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 0.1, p=1.000</data>
+</edge>
+<edge source="عزم" target="S:حم عسق">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 12.0, p=0.089</data>
+</edge>
+<edge source="قصو" target="S:كهيعص">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 18.8, p=0.064</data>
+</edge>
+<edge source="كلم" target="S:ص">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 0.0, p=1.000</data>
+</edge>
+<edge source="عمل" target="S:الم">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 1.0, p=0.404</data>
+</edge>
+<edge source="حمد" target="S:حم">
+  <data key="d2">occurs</data>
+  <data key="d3">RR 1.5, p=0.264</data>
+</edge>
+</graph></graphml>

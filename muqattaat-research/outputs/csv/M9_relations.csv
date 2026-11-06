@@ -1,0 +1,34 @@
+relation,opening_a,opening_b,detail
+equal digital root,الم,المص,8
+difference is a letter value,الم,المص,90 = ص
+difference is a letter value,الم,المر,200 = ر
+difference is a letter value,الم,طس,2 = ب
+difference is a letter value,الم,يس,1 = ا
+equal digital root,الم,حم عسق,8
+difference is a letter value,المص,الر,70 = ع
+equal digital root,المص,حم عسق,8
+difference is a letter value,الر,المر,40 = م
+equal digital root,الر,كهيعص,6
+equal digital root,الر,طس,6
+equal digital root,المر,طسم,1
+difference is a letter value,المر,حم عسق,7 = ز
+equal digital root,المر,ق,1
+equal digital root,كهيعص,طس,6
+integer multiple,طه,يس,x5
+equal digital root,طه,ن,5
+difference is a letter value,طسم,طس,40 = م
+equal digital root,طسم,ق,1
+difference is a letter value,طسم,ق,9 = ط
+difference is a letter value,طس,يس,1 = ا
+difference is a letter value,يس,ص,20 = ك
+difference is a letter value,يس,ق,30 = ل
+difference is a letter value,يس,ن,20 = ك
+difference is a letter value,ص,ق,10 = ي
+difference is a letter value,ص,ن,40 = م
+difference is a letter value,حم,ن,2 = ب
+difference is a letter value,ق,ن,50 = ن
+integer multiple,ق,ن,x2
+total is itself a letter value,يس,,70 = ع
+total is itself a letter value,ص,,90 = ص
+total is itself a letter value,ق,,100 = ق
+total is itself a letter value,ن,,50 = ن

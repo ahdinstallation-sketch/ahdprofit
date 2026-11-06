@@ -1,0 +1,23 @@
+[    1.9s] corpus 77429 words; 49967 root-bearing tokens; 1642 roots
+[    2.0s] phase 2 ok; all verified: True
+[    4.8s] phase 3 ok
+[    4.9s] phase 4 candidates: 3551 rows; 2773 unique
+[    5.1s] phase 5 validation rows 2198
+[    6.9s] M9 ok
+[   13.3s] phase 6 pairs 660 robustly enriched: 0
+[   53.0s] null N2 done
+[  106.5s] null N1 done
+[  160.1s] null N3 done
+[  303.3s] label permutation done
+[  304.1s] phase 7 summary:
+   null method  T_observed  T_null_mean  T_null_sd         z  p_empirical  null_95th  p_holm_methods
+0   N2     M1   13.127720    19.769875   6.562134 -1.012194     0.852615  32.097761        1.000000
+1   N2     M2    0.487552     0.320746   0.747924  0.223025     0.187881   1.713493        1.000000
+2   N2     M3    0.000000     0.409006   1.352383 -0.302434     1.000000   2.072593        1.000000
+3   N2     M5    0.771773     0.662894   1.043244  0.104367     0.293771   2.771517        1.000000
+4   N2     M6    9.825666    18.252377   6.410453 -1.314527     0.946805  30.238474        1.000000
+5   N2     M7    0.416591     1.439086   1.946334 -0.525344     0.663434   5.235433        1.000000
+6   N2    M8A    1.405934     1.394488   1.619929  0.007066     0.362964   4.387373        1.000000
+7   N2    M8B   29.233685    20.701186   5.757923  1.481871     0.079292  30.985344        0.634337
+8   N2  UNION   35.961148    32.270450   7.504963  0.491768     0.291871  45.738707             NaN
+[  304.3s] saved results.pkl

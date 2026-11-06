@@ -1,0 +1,13 @@
+numpy>=2.0
+pandas>=2.2
+scipy>=1.13
+statsmodels>=0.14
+openpyxl>=3.1
+matplotlib>=3.11  # 3.11+ shapes Arabic natively; older versions need arabic_reshaper+bidi on labels
+networkx>=3.3
+reportlab>=4.0
+pillow>=10
+arabic-reshaper>=3.0
+python-bidi>=0.6
+arramooz-pysqlite>=0.4
+pyarabic>=0.6

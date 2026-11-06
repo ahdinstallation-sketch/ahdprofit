@@ -1,0 +1,37 @@
+opening,method,root,meaning,matched_forms,derivation,D1_mathematical_exactness,D1_grade,D2_linguistic_validity,D2_grade,D3_rule_consistency_openings_hit_of_14,D4_occurrences_in_target,D4_verses,D5_RR_vs_rest,D5_q_NB_GLM_global,D5_q_permutation_global,D6_p_vs_random_N2,D6_q_vs_random_N2,pareto_front,passes_all_statistical_bars
+طه,M2,يدي,hand,يد,14 -> place values -> ي + د = يد,exact (all letters / equal value),3,Qur'anic lemma,3,1,3,,1.506900993743099,1.0,1.0,0.022297770222977704,1.0,1,False
+الم,M8B,علم,"knowledge, know; sign; world","أعلم, عالم, علام, علم","الم (71) -> M2 عا; subset {ع ل م} of {ا ل م ع ا}, unused {ا ا}",subset (letters left unused),2,Qur'anic lemma,3,0,186,,1.482246213722896,0.7566855525395696,1.0,0.16298370162983702,1.0,1,False
+الم,M7,مول,wealth,مال,rearrange ا ل م,exact (all letters / equal value),3,Qur'anic lemma,3,0,15,,1.1246484220432695,1.0,1.0,0.1670832916708329,1.0,1,False
+حم,M5,جحم,blazing fire (Hell),جحم,حم (48) -> M4 ج; recon+original = جحم,exact (all letters / equal value),3,Qur'anic root only,2,1,3,,2.244723665863861,1.0,1.0,0.042495750424957505,1.0,2,False
+الر,M8B,ابو,father,أب,"الر (231) -> M3 بجا; subset {ا ب} of {ا ل ر ب ج ا}, unused {ا ل ر ج}",subset (letters left unused),2,Qur'anic lemma,3,0,33,,4.085785991330139,0.8261080997254824,1.0,0.0655934406559344,1.0,2,False
+طسم,M1,مدن,city,مدينة,Abjad(طسم) = 109 = Abjad(مدينة),exact (all letters / equal value),3,Qur'anic lemma,3,0,5,,11.80857310628303,,0.9352928343529282,0.10378962103789621,1.0,2,False
+المص,M8B,قوم,"people; stand, establish","أقام, إقام, قام","المص (161) -> M2 قسا; subset {ا ق م} of {ا ل م ص ق س ا}, unused {ا ل ص س}",subset (letters left unused),2,Qur'anic lemma,3,0,55,,2.027773066485753,1.0,1.0,0.12518748125187482,1.0,2,False
+ص,M1,ملك,"king, sovereignty, possess; angel",ملك,Abjad(ص) = 90 = Abjad(ملك),exact (all letters / equal value),3,Qur'anic lemma,3,0,5,,2.631022239231194,1.0,1.0,0.35566443355664434,1.0,2,False
+طسم,M2,قطط,"share, portion (record)",قط,109 -> place values -> ق + ط = قط,exact (all letters / equal value),3,Qur'anic lemma,3,1,0,,0.0,1.0,1.0,1.0,1.0,2,False
+طه,M8B,هدي,"guidance, guide; offering","هدى, هدي","طه (14) -> M2 يد; subset {د ه ي} of {ط ه ي د}, unused {ط}",subset (letters left unused),2,Qur'anic lemma,3,0,10,,1.9205600900647342,1.0,1.0,0.31386861313868614,1.0,3,False
+كهيعص,M1,صدق,"truth, sincerity; charity","أصدق, صادق, صداق",Abjad(كهيعص) = 195 = Abjad(صادق),exact (all letters / equal value),3,Qur'anic lemma,3,0,4,,1.9881661576300058,1.0,1.0,0.3524647535246475,1.0,3,False
+المص,M1,مسس,touch,مساس,Abjad(المص) = 161 = Abjad(مساس),exact (all letters / equal value),3,Qur'anic lemma,3,0,4,,1.5652985074626866,1.0,1.0,0.6615338466153384,1.0,3,False
+يس,M1,سبح,glorify; swim/float,سبح,Abjad(يس) = 70 = Abjad(سبح),exact (all letters / equal value),3,Qur'anic lemma,3,0,3,,3.811682314914576,1.0,1.0,0.39016098390160986,1.0,4,False
+طسم,M8B,امم,mother; nation; leader,أم,"طسم (109) -> M3 اط; subset {ا م} of {ط س م ا ط}, unused {ط ط س}",subset (letters left unused),2,Qur'anic lemma,3,0,8,,2.0425639967624702,1.0,1.0,0.6068393160683931,1.0,4,False
+حم,M8B,حمم,hot water; close friend,"حمم, محم","حم (48) -> M2 مح; subset {ح م م} of {ح م م ح}, unused {ح}",subset (letters left unused),2,Qur'anic root only,2,0,5,,5.377983782798834,1.0,1.0,0.1342865713428657,1.0,5,False
+الم,M1,سبط,tribe,سبط,Abjad(الم) = 71 = Abjad(سبط),exact (all letters / equal value),3,Qur'anic root only,2,0,3,,7.985003796507214,,1.0,0.49865013498650135,1.0,5,False
+طسم,M6,طلع,rise (sun); look into,طلع,109 = 9 + 30 + 70 -> {ط ل ع} (any order),exact (all letters / equal value),3,Qur'anic lemma,3,0,2,,3.3341853476563847,,1.0,0.5521447855214479,1.0,5,False
+طس,M1,نجو,"save, deliver; confide","أنجية, نجوى",Abjad(طس) = 69 = Abjad(نجوى),exact (all letters / equal value),3,Qur'anic lemma,3,0,2,,1.6292153423569513,1.0,1.0,0.646035396460354,1.0,5,False
+طه,M1,هوي,"desire, whim; fall",أهواء,Abjad(طه) = 14 = Abjad(أهواء),exact (all letters / equal value),3,Qur'anic lemma,3,0,2,,3.264952153110048,1.0,1.0,0.694030596940306,1.0,5,False
+يس,M8A,سعي,"strive, hasten, endeavour","سعى, سعي",يس (70) -> M2 ع; all of {ي س ع} rearranged,exact (all letters / equal value),3,Qur'anic lemma,3,0,1,,3.8993071957172094,1.0,1.0,0.054894510548945105,1.0,6,False
+المر,M1,رسو,be firmly fixed (mountains); anchor,"أرسى, راسي",Abjad(المر) = 271 = Abjad(أرسى),exact (all letters / equal value),3,Qur'anic lemma,3,0,1,,6.750102473015438,,1.0,0.4146585341465853,1.0,6,False
+المر,M8B,اوب,"return, turning back",ماب,"المر (271) -> M3 بزا; subset {ا ب م} of {ا ل م ر ب ز ا}, unused {ا ل ر ز}",subset (letters left unused),2,Qur'anic lemma,3,0,2,,11.700177619893427,,1.0,0.43745625437456254,1.0,6,False
+حم عسق,M1,قلب,heart; turn over,منقلبون,Abjad(حم عسق) = 278 = Abjad(منقلبون),exact (all letters / equal value),3,Qur'anic lemma,3,0,1,,0.5727423296540382,1.0,1.0,0.6153384661533846,1.0,6,False
+ن,M1,كلل,"all, every; burden",كل,Abjad(ن) = 50 = Abjad(كل),exact (all letters / equal value),3,Qur'anic lemma,3,0,1,,0.6931046006460957,1.0,1.0,0.6419358064193581,1.0,6,False
+ق,M1,صحب,companion,صحب,Abjad(ق) = 100 = Abjad(صحب),exact (all letters / equal value),3,Qur'anic root only,2,0,2,,4.272567132116005,1.0,1.0,0.7138286171382862,1.0,6,False
+حم,M1,حلي,"ornament, jewellery","حلى, حلي",Abjad(حم) = 48 = Abjad(حلي),exact (all letters / equal value),3,Qur'anic lemma,3,0,1,,2.1511935131195337,,1.0,0.9084091590840916,1.0,6,False
+الر,M1,نفق,spend; hypocrisy; tunnel,"أنفق, نافق, نفاق",Abjad(الر) = 231 = Abjad(أنفق),exact (all letters / equal value),3,Qur'anic lemma,3,0,1,,0.0945471138489619,1.0,1.0,0.9852014798520148,1.0,6,False
+حم عسق,M8B,عزم,"resolve, determination",عزم,"حم عسق (278) -> M3 بزح; subset {ز ع م} of {ح م ع س ق ب ز ح}, unused {ح ح س ق ب}",subset (letters left unused),2,Qur'anic lemma,3,0,1,,11.955996131528046,,1.0,0.8494150584941506,1.0,7,False
+كهيعص,M8B,قصو,"farthest, remote",قصي,"كهيعص (195) -> M2 قصه; subset {ص ق ي} of {ك ه ي ع ص ق ص ه}, unused {ك ه ه ع ص}",subset (letters left unused),2,Qur'anic lemma,3,0,1,,18.76331811263318,,0.9352928343529282,0.8707129287071292,1.0,7,False
+الم,M8A,محل,might in planning,"ماحل, محال",الم (71) -> M4 ح; all of {ا ل م ح} rearranged,exact (all letters / equal value),3,Qur'anic lemma,3,0,0,,0.0,1.0,1.0,1.0,1.0,7,False
+طه,M3,ادد,grievous/monstrous thing,إد,14 -> digits -> ا + د = اد,exact (all letters / equal value),3,Qur'anic lemma,3,0,0,,0.0,1.0,1.0,1.0,1.0,7,False
+طس,M3,وطا,tread,وط,69 -> digits -> و + ط = وط,exact (all letters / equal value),3,Qur'anic lemma,3,0,0,,0.0,1.0,1.0,1.0,1.0,7,False
+طس,M8A,وسط,middle,وسط,طس (69) -> M4 و; all of {ط س و} rearranged,exact (all letters / equal value),3,Qur'anic lemma,3,0,0,,0.0,1.0,1.0,1.0,1.0,7,False
+حم عسق,M6,زرع,,"زارع, زراع",278 = 1 + 7 + 70 + 200 -> {ا ز ع ر} (any order),exact (all letters / equal value),3,Qur'anic lemma,3,0,0,,0.0,1.0,1.0,1.0,1.0,7,False
+طسم,M7,طمس,"obliterate, efface",طمس,rearrange ط س م,exact (all letters / equal value),3,Qur'anic root only,2,0,0,,0.0,1.0,1.0,1.0,1.0,8,False
+طس,M8B,سوط,,سوط,"طس (69) -> M3 وط; subset {س ط و} of {ط س و ط}, unused {ط}",subset (letters left unused),2,Qur'anic lemma,3,0,0,,0.0,1.0,1.0,1.0,1.0,8,False

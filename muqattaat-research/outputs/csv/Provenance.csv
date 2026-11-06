@@ -1,0 +1,9 @@
+key,file,url,sha256,bytes,licence
+qac,qac/quranic-corpus-morphology-0.4.txt,https://raw.githubusercontent.com/cltk/arabic_morphology_quranic-corpus/master/quranic-corpus-morphology-0.4.txt,a1d12923815341face765083805d2148ed2d9f5cc3f7d6665219d887675d8c46,6309503,GPL (QAC) / CC BY-ND 3.0 (Tanzil text); verbatim copy
+qac_crosscheck,qac_crosscheck/quran-morphology.txt,https://raw.githubusercontent.com/mustafa0x/quran-morphology/master/quran-morphology.txt,742bfac59941b2cb09736d5b7aae694af50792261fb8450cbf6afafcc340645f,6322866,derivative of QAC (GPL)
+meta_qcom,meta_qcom/chapters_en.json,https://raw.githubusercontent.com/quran/quran.com-frontend-next/production/data/chapters/en.json,a85fdfbda9e005e134dfcf1b642c197ca65ebbdf4d0da74f59e59497ff5c3716,19525,quran.com (MIT repo)
+meta_fawaz,meta_fawaz/info.json,https://raw.githubusercontent.com/fawazahmed0/quran-api/1/info.json,99c654caeea7c63bf9634703167ea0f806d90c55f98d23e2e82d3e3d1b74075c,2322156,Unlicense
+font_amiri,fonts/Amiri-Regular.ttf,https://raw.githubusercontent.com/google/fonts/main/ofl/amiri/Amiri-Regular.ttf,ab391c4147d054c48976e98322ad0eefe1427aa0e0502a12a4c75d80a70cfcd7,431116,SIL OFL
+font_amiri_bold,fonts/Amiri-Bold.ttf,https://raw.githubusercontent.com/google/fonts/main/ofl/amiri/Amiri-Bold.ttf,cfccb794268e7d573d857e6d6a67f89cf8a053e8ffd85dfa0c8ec1bb36fc4827,413480,SIL OFL
+arramooz,pip arramooz-pysqlite,https://github.com/linuxscout/arramooz,,,GPL
+corpus.quran.com / Birzeit / MASAQ / tanzil.net,NOT DOWNLOADED,DNS blocked in the build environment,,,see report: secondary sources not used

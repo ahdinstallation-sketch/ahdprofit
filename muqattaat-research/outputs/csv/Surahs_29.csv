@@ -1,0 +1,30 @@
+surah,name,name_ar,opening,abjad,verses,place,revelation_order,root_tokens
+2,Al-Baqarah,البقرة,الم,71,286,madinah,87,3884
+3,Ali 'Imran,ال عمرن,الم,71,200,madinah,89,2274
+7,Al-A'raf,الاعراف,المص,161,206,makkah,39,2144
+10,Yunus,يونس,الر,231,109,makkah,51,1129
+11,Hud,هود,الر,231,123,makkah,52,1162
+12,Yusuf,يوسف,الر,231,111,makkah,53,1126
+13,Ar-Ra'd,الرعد,المر,271,43,madinah,96,563
+14,Ibrahim,ابراهيم,الر,231,52,makkah,72,556
+15,Al-Hijr,الحجر,الر,231,99,makkah,54,410
+19,Maryam,مريم,كهيعص,195,98,makkah,44,657
+20,Taha,طه,طه,14,135,makkah,45,836
+26,Ash-Shu'ara,الشعراء,طسم,109,227,makkah,47,821
+27,An-Naml,النمل,طس,69,93,makkah,48,737
+28,Al-Qasas,القصص,طسم,109,88,makkah,49,882
+29,Al-'Ankabut,العنكبوت,الم,71,69,makkah,85,627
+30,Ar-Rum,الروم,الم,71,60,makkah,84,528
+31,Luqman,لقمان,الم,71,34,makkah,57,352
+32,As-Sajdah,السجدة,الم,71,30,makkah,75,237
+36,Ya-Sin,يس,يس,70,83,makkah,41,438
+38,Sad,ص,ص,90,88,makkah,38,468
+40,Ghafir,المؤمن,حم,48,85,makkah,60,788
+41,Fussilat,فصلت,حم,48,54,makkah,61,497
+42,Ash-Shuraa,الشوري,حم عسق,278,53,makkah,62,517
+43,Az-Zukhruf,الزخرف,حم,48,89,makkah,63,512
+44,Ad-Dukhan,الدخان,حم,48,59,makkah,64,222
+45,Al-Jathiyah,الجاثية,حم,48,37,makkah,65,320
+46,Al-Ahqaf,الاحقاف,حم,48,35,makkah,66,405
+50,Qaf,ق,ق,100,45,makkah,34,245
+68,Al-Qalam,القلم,ن,50,52,makkah,2,191

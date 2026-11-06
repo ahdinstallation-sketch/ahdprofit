@@ -1,0 +1,22 @@
+sheet,contents
+Provenance,"Data sources, URLs, sha256, licences"
+Openings,14 openings: Abjad verification and numeric reconstructions
+Surahs_29,The 29 surahs with metadata
+Discoveries,"User discoveries A–E with rate ratios, exact CIs, NB-GLM, permutation p"
+A_equal_value_14,"All Qur'anic lemmas/roots with Abjad 14, ranked by enrichment in Ta-Ha"
+E_equal_value_90,All roots with Abjad 90 in Sad
+C_per_surah,علم / عمل per ALM surah
+F_structure,Discovery F structure of 26/27/28
+F_triples,Middle-surah distinctiveness for all adjacent triples
+F_distinctive_roots,Roots distinguishing 27 from 26+28
+Candidates_all,Every candidate produced by every method (incl. Arramooz)
+Validation,Phase 5 validation of each unique candidate
+Cross_reference,"Phase 6: candidate roots x 5 baselines + NB GLM + permutation, BH"
+Null_summary,Phase 7 primary + secondary null tests
+Per_opening_method,Each opening x method vs random sequences
+Legitimacy,How often random sequences produce valid roots
+Nested_CV,Held-out method selection (200 splits)
+M9_relations,Numeric relations between openings
+M9_vs_null,Those relations vs random openings
+M9_adjacent,Adjacent-surah differences
+Rankings,"Ranked findings on six separate dimensions (Pareto fronts, no weights)"
